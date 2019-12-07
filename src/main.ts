@@ -8,34 +8,43 @@ type Reducer = <T>(accum: T, cur: any, index: number) => T
 const to = (s: any) => typeof s
 const isNull = (s: any) => s===null
 const isUndef = (s: any) => s===void(0)
-// unsafe wd be faster.
-const _equals = (a: any, b: any) => {
-  if(to(a)==='object' && to(b)==='object') {
-    if(isNull(a) || isNull(b)) {
-      return a===b
-    }
-    for(let v of [a, b]) {
-      for(let k in v) {
-        if(!_equals(a[k], b[k])) {
-          return false
-        }
-      }
-    }
-  }
-  return true
-}
+
 const _curry = (fn: Function, _args: any[], args: any[]) =>
   _args.length+args.length<fn.length
     ? (...args: any[]) => _curry(fn, [..._args, ...args], args)
     : fn(..._args, ...args)
 export const curry = (fn: Function) =>
   (...args: any[]) => _curry(fn, args, [])
+// unsafe wd be faster.
+export const equals = curry((a: any, b: any) => {
+  if(to(a)=='object' && to(b)=='object') {
+    if(isNull(a) || isNull(b)) {
+      return a===b
+    }
+    for(let v of [a, b]) {
+      for(let k in v) {
+        if(!equals(a[k], b[k])) {
+          return false
+        }
+      }
+    }
+  }
+  return a===b
+})
+export const ifElse = curry(
+  (
+    cond: (s: any) => boolean,
+    pipeYes: (s: any) => any,
+    pipeNo: (s: any) => any,
+    s: any
+  ) => cond(s) ? pipeYes(s) : pipeNo(s)
+)
 export const when = curry(
   (
     cond: (s: any) => boolean,
     pipe: (s: any) => any,
     s: any
-  ) => cond(s) ? pipe(s) : s
+  ) => ifElse(cond, pipe, identity, s)
 )
 export const compose = (...fns: Function[]) =>
   (s: any) => {
@@ -45,7 +54,6 @@ export const compose = (...fns: Function[]) =>
     return s
   }
 
-export const equals = curry(_equals)
 export const isArray = (s: any) => Array.isArray(s)
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
@@ -93,9 +101,9 @@ export const join = curry(
 export const map = curry(
   (pipe: (s: any) => any, arr: any[]) => arr.map(pipe)
 )
-export const filter = curry(
-  (cond: Cond, arr: any[]) => arr.filter(cond)
-)
+// export const filter = curry(
+//   (cond: Cond, arr: any[]) => arr.filter(cond)
+// )
 export const forEach = curry(
   (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)
 )
@@ -124,13 +132,17 @@ export const replace = curry(
     where: string
   ) => where.replace(a, b)
 )
-export const filterObj = curry(
+export const filter = curry(
   (
-    cond: (v: any, k: string) => boolean,
-    obj: AnyObject
-  ) => compose(
-    fromPairs,
-    filter(([k, v]) => cond(v, k)),
-    toPairs
-  )(obj)
+    cond: (v: any, k: string | number) => boolean,
+    data: any[] | AnyObject
+  ) => ifElse(
+    compose(equals('Array'), type),
+    (arr: any[]) => arr.filter(cond),
+    compose(
+      fromPairs,
+      filter(([k, v]) => cond(v, k)),
+      toPairs
+    )
+  )(data)
 )
