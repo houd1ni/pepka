@@ -27,17 +27,12 @@ const _curry = (fn: Function, _args: any[], args: any[]) => {
 }
 export const curry = (fn: Function) =>
   (...args: any[]) => _curry(fn, [], args)
-export const type = (s: any) => {
-  const t = typeof s
-  return t=='object'
-    ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
-    : t[0].toUpperCase() + t.slice(1)
-}
 export const when = curry(
   (
     cond: (s: any) => boolean,
-    pipe: (s: any) => any
-  ) => (s: any) => cond(s) ? pipe(s) : s
+    pipe: (s: any) => any,
+    s: any
+  ) => cond(s) ? pipe(s) : s
 )
 export const compose = (...fns: Function[]) =>
   (s: any) => {
@@ -70,6 +65,12 @@ export const forEach = curry(
 export const both = curry(
   (cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s)
 )
+export const type = (s: any) => {
+  const t = to(s)
+  return t=='object'
+    ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
+    : t[0].toUpperCase() + t.slice(1)
+}
 export const isEmpty = (s: any) => {
   switch(type(s)) {
     case 'String': return s==''

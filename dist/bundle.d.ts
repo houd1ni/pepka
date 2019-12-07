@@ -1,6 +1,5 @@
 export declare type Cond = (s: any) => boolean;
 export declare const curry: (fn: Function) => (...args: any[]) => any;
-export declare const type: (s: any) => string;
 export declare const when: (...args: any[]) => any;
 export declare const compose: (...fns: Function[]) => (s: any) => any;
 export declare const equals: (...args: any[]) => any;
@@ -16,6 +15,7 @@ export declare const map: (...args: any[]) => any;
 export declare const filter: (...args: any[]) => any;
 export declare const forEach: (...args: any[]) => any;
 export declare const both: (...args: any[]) => any;
+export declare const type: (s: any) => string;
 export declare const isEmpty: (s: any) => boolean;
 export declare const replace: (...args: any[]) => any;
 

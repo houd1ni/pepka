@@ -1,6 +1,3 @@
-import { css } from '../src/css-lit'
-import { Renderer } from '../src/main'
+import * as pepka from '../src/main'
 
-
-;(window as any).css = css
-;(window as any).renderer = new Renderer()
+;(window as any).pepka = pepka
