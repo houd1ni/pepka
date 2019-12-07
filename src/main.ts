@@ -1,105 +1,90 @@
-import { createRenderer, combineRules, IRenderer } from 'fela'
-import { render, rehydrate, renderToMarkup } from 'fela-dom'
-import embedded from 'fela-plugin-embedded'
-import prefixer from 'fela-plugin-prefixer'
-import fallback from 'fela-plugin-fallback-value'
-import unit from 'fela-plugin-unit'
-import { clearEmpty } from 'lafetch'
-import { AnyObject, Options } from './types'
-import getRules from './fns/getRules'
-import { memoize, types, isBrowser, emptyObject } from './utils'
 
-const defaultOpts = {
-  method: 'f',
-  defStyles: undefined,
-  plugins: [],
-  enhancers: [],
-  preset: { unit: [] },
-  ssr: false
-}
+type Cond = (s: any) => boolean
 
-class Renderer {
-  private renderer: IRenderer
-  private _mixin: AnyObject
-  public get mixin(): AnyObject {
-    return Object.freeze(this._mixin)
-  }
-  public get style(): string {
-    return renderToMarkup(this.renderer)
-  }
-  constructor(opts: Partial<Options> = {}) {
-    const {
-      method,
-      ssr,
-      preset,
-      plugins,
-      enhancers,
-      ...miscRenderOpts
-    } = { ...defaultOpts, ...opts }
-    const presetConfig = { ...defaultOpts.preset, ...(preset || {}) }
-
-    if((opts as any).fdef) {
-      throw new Error('fela-vue: Change deprecated `fdef` to `defStyles`!')
+const to = (s: any) => typeof s
+const isNull = (s: any) => s===null
+const isUndef = (s: any) => s===void(0)
+// unsafe wd be faster.
+const _equals = (a: any, b: any) => {
+  if(to(a)==='object' && to(b)==='object') {
+    if(isNull(a) || isNull(b)) {
+      return a===b
     }
-
-    // Fela renderer creation. 
-    this.renderer = createRenderer({      
-      ...miscRenderOpts,
-      enhancers,
-      plugins: [
-        embedded(),
-        prefixer(),
-        fallback(),
-        unit(...presetConfig.unit),
-        ...plugins
-      ]
-    })
-    const { renderer } = this
-
-    // Default styles.
-    const fdef = opts.defStyles as any
-    let fdefKey: string, fdefValue: (vm?: AnyObject) => AnyObject 
-
-    switch(typeof fdef) {
-      case types.o: [fdefKey, fdefValue] = [fdef.key, fdef.value]; break
-      case types.f: [fdefKey, fdefValue] = ['fdef', fdef]; break
-      default: break
-    }
-
-    // Fela mounting.
-    if(isBrowser) {
-      if(ssr) {
-        rehydrate(renderer)
-      } else {
-        render(renderer)
+    for(let v of [a, b]) {
+      for(let k in v) {
+        if(!_equals(a[k], b[k])) {
+          return false
+        }
       }
     }
-
-    // Mixin creation.
-    this._mixin = clearEmpty({
-      methods: {
-        [method](propsOrRule: any, props: AnyObject = {}): string {
-          return renderer.renderRule(
-            combineRules(...getRules(
-              memoize(() => fdefValue ? fdefValue(this): emptyObject),
-              this.style,
-              propsOrRule,
-              this
-            )),
-            props
-          ) || undefined
-        }
-      },
-      computed: fdef ? {
-        [fdefKey]() {
-          return fdefValue(this)
-        }
-      } : ''
-    })
   }
 }
-
-export * from './css-lit'
-export {
-  Renderer
+const _curry = (fn: Function, _args: any[], args: any[]) => {
+  _args.push(...args)
+  if(args.length+_args.length<=fn.length) {
+    return (...args: any[]) => _curry(fn, _args, args)
+  } else {
+    return fn(..._args, ...args)
+  }
 }
+export const curry = (fn: Function) =>
+  (...args: any[]) => _curry(fn, [], args)
+export const type = (s: any) => {
+  const t = typeof s
+  return t=='object'
+    ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
+    : t[0].toUpperCase() + t.slice(1)
+}
+export const when = curry(
+  (
+    cond: (s: any) => boolean,
+    pipe: (s: any) => any
+  ) => (s: any) => cond(s) ? pipe(s) : s
+)
+export const compose = (...fns: Function[]) =>
+  (s: any) => {
+    for(let i = length(fns)-1; i>-1; i--) {
+      s = fns[i](s)
+    }
+    return s
+  }
+
+export const equals = curry(_equals)
+export const isArray = (s: any) => Array.isArray(s)
+export const isNil = (s: any) => isNull(s) || isUndef(s)
+export const length = (s: any[] | string) => s.length
+export const always = (s: any) => () => s
+export const identity = () => (s: any) => s
+export const trim = (s: string) => s.trim()
+export const join = curry(
+  (delimeter: string, arr: string[]) => arr.join(delimeter)
+)
+export const complement = (fn: Cond) => (s: any) => !fn(s)
+export const map = curry(
+  (pipe: (s: any) => any, arr: any[]) => arr.map(pipe)
+)
+export const filter = curry(
+  (cond: Cond, arr: any[]) => arr.filter(cond)
+)
+export const forEach = curry(
+  (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)
+)
+export const both = curry(
+  (cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s)
+)
+export const isEmpty = (s: any) => {
+  switch(type(s)) {
+    case 'String': return s==''
+    case 'Array': return length(s)==0
+    case 'Null': return false
+    case 'Object': return length(Object.keys(s)) == 0
+    default: return false
+  }
+}
+export const replace = curry(
+  (
+    a: RegExp | string,
+    b: string,
+    where: string
+  ) => where.replace(a, b)
+)

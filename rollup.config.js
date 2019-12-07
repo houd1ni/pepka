@@ -9,17 +9,8 @@ export default {
   output: {
     file: process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.esm.js',
     format: process.env.BUILD == 'cjs' ? 'cjs' : 'es',
-    name: 'fela-vue'
+    name: 'pepka'
   },
-  external: process.env.NODE_ENV=='development' ? [] : [
-    'fela',
-    'fela-dom',
-    'fela-plugin-embedded',
-    'fela-plugin-prefixer',
-    'fela-plugin-fallback-value',
-    'fela-plugin-unit',
-    'ramda'
-  ],
   plugins: [
     resolve(),
     commonjs(),

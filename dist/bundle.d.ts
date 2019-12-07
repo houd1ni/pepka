@@ -1,28 +1,22 @@
-import { TEnhancer, TPlugin } from 'fela';
-
-export interface AnyObject {
-	[key: string]: any;
-}
-export interface Options {
-	method: string;
-	defStyles?: ((vm: AnyObject) => AnyObject) | {
-		key: string;
-		value: ((vm?: AnyObject) => AnyObject);
-	};
-	preset: {
-		unit: [string, AnyObject] | [];
-	};
-	plugins: TPlugin[];
-	enhancers: TEnhancer[];
-	ssr: boolean;
-}
-export declare const css: (strings: string[] | TemplateStringsArray, ...values: any[]) => any;
-export declare class Renderer {
-	private renderer;
-	private _mixin;
-	get mixin(): AnyObject;
-	get style(): string;
-	constructor(opts?: Partial<Options>);
-}
+export declare type Cond = (s: any) => boolean;
+export declare const curry: (fn: Function) => (...args: any[]) => any;
+export declare const type: (s: any) => string;
+export declare const when: (...args: any[]) => any;
+export declare const compose: (...fns: Function[]) => (s: any) => any;
+export declare const equals: (...args: any[]) => any;
+export declare const isArray: (s: any) => boolean;
+export declare const isNil: (s: any) => boolean;
+export declare const length: (s: string | any[]) => number;
+export declare const always: (s: any) => () => any;
+export declare const identity: () => (s: any) => any;
+export declare const trim: (s: string) => string;
+export declare const join: (...args: any[]) => any;
+export declare const complement: (fn: Cond) => (s: any) => boolean;
+export declare const map: (...args: any[]) => any;
+export declare const filter: (...args: any[]) => any;
+export declare const forEach: (...args: any[]) => any;
+export declare const both: (...args: any[]) => any;
+export declare const isEmpty: (s: any) => boolean;
+export declare const replace: (...args: any[]) => any;
 
 export {};
