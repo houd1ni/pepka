@@ -1,5 +1,9 @@
 
 type Cond = (s: any) => boolean
+interface AnyObject {
+  [k: string]: any
+}
+type Reducer = <T>(accum: T, cur: any, index: number) => T
 
 const to = (s: any) => typeof s
 const isNull = (s: any) => s===null
@@ -18,15 +22,14 @@ const _equals = (a: any, b: any) => {
       }
     }
   }
+  return true
 }
-const _curry = (fn: Function, _args: any[], args: any[]) => {
-  _args.push(...args)
-  return _args.length<fn.length
-    ? (...args: any[]) => _curry(fn, _args, args)
+const _curry = (fn: Function, _args: any[], args: any[]) =>
+  _args.length+args.length<fn.length
+    ? (...args: any[]) => _curry(fn, [..._args, ...args], args)
     : fn(..._args, ...args)
-}
 export const curry = (fn: Function) =>
-  (...args: any[]) => _curry(fn, [], args)
+  (...args: any[]) => _curry(fn, args, [])
 export const when = curry(
   (
     cond: (s: any) => boolean,
@@ -47,12 +50,46 @@ export const isArray = (s: any) => Array.isArray(s)
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
 export const always = (s: any) => () => s
-export const identity = () => (s: any) => s
+export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
+export const last = (s: any[] | string) => s[s.length-1]
+export const complement = (fn: Cond) => (s: any) => !fn(s)
+export const keys = (o: AnyObject) => Object.keys(o)
+export const values = (o: AnyObject) => Object.values(o)
+export const toPairs = (o: AnyObject) => Object.entries(o)
+export const assoc = curry(
+  (prop: string, v: any, obj: AnyObject) => ({
+    ...obj,
+    [prop]: v
+  })
+)
+export const clone = (s: any) => {
+  switch(to(s)) {
+    case 'object':
+      switch(type(s)) {
+        case 'Null': return s
+        case 'Array': return s.map(clone)
+        case 'Object':
+          const out = {}
+          for(let k in s) {
+            out[k] = clone(s[k])
+          }
+          return out
+      }
+    default: return s
+  }
+}
+export const reduce = curry(
+  (fn: Reducer, accum: any, arr: any[]) =>
+    arr.reduce(fn, clone(accum))
+)
+export const fromPairs = (pairs: [string, any][]) => reduce(
+  (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
+  {}, pairs
+)
 export const join = curry(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
 )
-export const complement = (fn: Cond) => (s: any) => !fn(s)
 export const map = curry(
   (pipe: (s: any) => any, arr: any[]) => arr.map(pipe)
 )
@@ -86,4 +123,14 @@ export const replace = curry(
     b: string,
     where: string
   ) => where.replace(a, b)
+)
+export const filterObj = curry(
+  (
+    cond: (v: any, k: string) => boolean,
+    obj: AnyObject
+  ) => compose(
+    fromPairs,
+    filter(([k, v]) => cond(v, k)),
+    toPairs
+  )(obj)
 )
