@@ -21,11 +21,9 @@ const _equals = (a: any, b: any) => {
 }
 const _curry = (fn: Function, _args: any[], args: any[]) => {
   _args.push(...args)
-  if(args.length+_args.length<=fn.length) {
-    return (...args: any[]) => _curry(fn, _args, args)
-  } else {
-    return fn(..._args, ...args)
-  }
+  return _args.length<fn.length
+    ? (...args: any[]) => _curry(fn, _args, args)
+    : fn(..._args, ...args)
 }
 export const curry = (fn: Function) =>
   (...args: any[]) => _curry(fn, [], args)
@@ -83,7 +81,7 @@ export const isEmpty = (s: any) => {
 }
 export const replace = curry(
   (
-    a: RegExp | string,
+    a: string | RegExp,
     b: string,
     where: string
   ) => where.replace(a, b)
