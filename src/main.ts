@@ -76,7 +76,7 @@ export const clone = (s: any) => {
     case 'object':
       switch(type(s)) {
         case 'Null': return s
-        case 'Array': return s.map(clone)
+        case 'Array': return map(clone, s)
         case 'Object':
           const out = {}
           for(let k in s) {
@@ -101,9 +101,6 @@ export const join = curry(
 export const map = curry(
   (pipe: (s: any) => any, arr: any[]) => arr.map(pipe)
 )
-// export const filter = curry(
-//   (cond: Cond, arr: any[]) => arr.filter(cond)
-// )
 export const forEach = curry(
   (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)
 )
