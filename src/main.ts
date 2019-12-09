@@ -5,9 +5,13 @@ interface AnyObject {
 }
 type Reducer = <T>(accum: T, cur: any, index: number) => T
 
+const undef = undefined
+const nul = null
 const to = (s: any) => typeof s
-const isNull = (s: any) => s===null
-const isUndef = (s: any) => s===void(0)
+const isNull = (s: any) => s===nul
+const isUndef = (s: any) => s===undef
+const isNum = (s: any) => to(s)=='number'
+const isArray = (s: any) => Array.isArray(s)
 
 const _curry = (fn: Function, _args: any[], args: any[]) =>
   _args.length+args.length<fn.length
@@ -54,23 +58,49 @@ export const compose = (...fns: Function[]) =>
     return s
   }
 
-export const isArray = (s: any) => Array.isArray(s)
+export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
 export const always = (s: any) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
+export const head = (s: any[] | string) => s[0]
 export const last = (s: any[] | string) => s[s.length-1]
 export const complement = (fn: Cond) => (s: any) => !fn(s)
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
+export const tap = (fn: Function) => (s: any) => { fn(s); return s }
+export const explore = (caption: string, level = 'log') => tap(
+  (v: any) => console[level](caption, v)
+)
+export const slice = curry(
+  (from: number, to: number, o: any[]) => o.slice(from, isNum(to)?to:Infinity)
+)
 export const assoc = curry(
   (prop: string, v: any, obj: AnyObject) => ({
     ...obj,
     [prop]: v
   })
 )
+export const prop = curry(
+  (key: string, o: AnyObject) => o[key]
+)
+export const pathOr = curry(
+  (_default: any, path: string[], o: any) =>
+    ifElse(length,
+      compose(
+        ifElse(isNil,
+          always(_default),
+          (o: any) => pathOr(_default, slice(1, nul, path), o)
+        ),
+        flip(prop)(o),
+        head
+      ),
+      always(o)
+    )(path)
+)
+export const path = pathOr(undef)
 export const clone = (s: any) => {
   switch(to(s)) {
     case 'object':
