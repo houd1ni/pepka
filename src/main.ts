@@ -4,6 +4,7 @@ interface AnyObject {
   [k: string]: any
 }
 type Reducer = <T>(accum: T, cur: any, index: number) => T
+type AnyFunc = (...args: any[]) => any
 
 const undef = undefined
 const nul = null
@@ -143,6 +144,7 @@ export const type = (s: any) => {
     ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
     : t[0].toUpperCase() + t.slice(1)
 }
+const isObject = compose(equals('Object'), type)
 export const isEmpty = (s: any) => {
   switch(type(s)) {
     case 'String': return s==''
@@ -173,3 +175,58 @@ export const filter = curry(
     )
   )(data)
 )
+export const memoize = (fn: Function) => {
+  let cache: any
+  let cached = false
+  return () => cached ? cache : (cached = true, cache = fn())
+}
+export const deepMerge = (o1: AnyObject, o2: AnyObject): AnyObject => {
+  for(let k in o2) {
+    if(isObject(o1[k]) && isObject(o2[k])) {
+      deepMerge(o1[k], o2[k])
+    } else {
+      o1[k] = o2[k]
+    }
+  }
+  return o1
+}
+/** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+export const mapKeys = curry(
+  (
+    keyMap: {[oldKey: string]: string},
+    o: AnyObject
+  ) => compose(
+    fromPairs,
+    filter(complement(isNil)),
+    map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])),
+    toPairs
+  )(o)
+)
+
+// ASYNCS
+
+/** One promise waits for another. */
+export const forEachSerial = (() => {
+  const pipe = async (fn: AnyFunc, items: any[], i: number) => {
+    if(i<items.length) {
+      await fn(items[i])
+      await pipe(fn, items, ++i)
+    }
+  }
+  return curry(
+    (fn: AnyFunc, items: any[]) => pipe(fn, items, 0)
+  )
+})()
+/** Promise.all wrapper for functional pipelining. */
+export const waitAll = (promises: Promise<any>[]) => Promise.all(promises)
+/** Waits for all promises mapped by the fn. */
+export const forEachAsync = curry(
+  (fn: (item: any) => Promise<any>, items: any[]) =>
+    Promise.all(items.map(fn))
+)
+/** The same as compose, but waits for promises in chains and returns a Promise.  */
+export const composeAsync = (() => {
+  const pipe = async (fns: AnyFunc[], data: any, i: number): Promise<any> =>
+    ~i ? await pipe(fns, await fns[i](data), --i) : data
+  return (...fns: AnyFunc[]) => (data?: any) => pipe(fns, data, fns.length-1)
+})()
