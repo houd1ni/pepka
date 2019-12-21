@@ -1,3 +1,5 @@
+import { __, curry } from './curry'
+export * from './curry'
 
 type Cond = (s: any) => boolean
 interface AnyObject {
@@ -13,13 +15,12 @@ const isNull = (s: any) => s===nul
 const isUndef = (s: any) => s===undef
 const isNum = (s: any) => to(s)=='number'
 const isArray = (s: any) => Array.isArray(s)
+const isObjArr = (s: any) => to(s)=='object' && !isNull(s)
 
 const _curry = (fn: Function, _args: any[], args: any[]) =>
   _args.length+args.length<fn.length
     ? (...args: any[]) => _curry(fn, [..._args, ...args], args)
     : fn(..._args, ...args)
-export const curry = (fn: Function) =>
-  (...args: any[]) => _curry(fn, args, [])
 // unsafe wd be faster.
 export const equals = curry((a: any, b: any) => {
   if(to(a)=='object' && to(b)=='object') {
@@ -66,6 +67,7 @@ export const always = (s: any) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const head = (s: any[] | string) => s[0]
+export const tail = (s: any[] | string) => s.slice(1)
 export const last = (s: any[] | string) => s[s.length-1]
 export const complement = (fn: Cond) => (s: any) => !fn(s)
 export const keys = (o: AnyObject) => Object.keys(o)
@@ -144,7 +146,6 @@ export const type = (s: any) => {
     ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
     : t[0].toUpperCase() + t.slice(1)
 }
-const isObject = compose(equals('Object'), type)
 export const isEmpty = (s: any) => {
   switch(type(s)) {
     case 'String': return s==''
@@ -180,16 +181,28 @@ export const memoize = (fn: Function) => {
   let cached = false
   return () => cached ? cache : (cached = true, cache = fn())
 }
-export const deepMerge = (o1: AnyObject, o2: AnyObject): AnyObject => {
-  for(let k in o2) {
-    if(isObject(o1[k]) && isObject(o2[k])) {
-      deepMerge(o1[k], o2[k])
-    } else {
-      o1[k] = o2[k]
+export const mergeShallow = curry(
+  (o1: AnyObject, o2: AnyObject): AnyObject =>
+    Object.assign({}, o1, o2)
+)
+export const mergeDeep = curry(
+  (o1: AnyObject, o2: AnyObject): AnyObject => {
+    for(let k in o2) {
+      switch(type(o2[k])) {
+        case 'Array':
+        case 'Object':
+          if(isObjArr(o2[k])) {
+            mergeDeep(o1[k], o2[k])
+            break
+          }
+        default:
+          o1[k] = o2[k]
+          break
+      }
     }
+    return o1
   }
-  return o1
-}
+)
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry(
   (

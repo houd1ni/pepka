@@ -1,9 +1,10 @@
+export declare const __: () => void;
+export declare const curry: (fn: Function) => (...args: any[]) => any;
 export declare type Cond = (s: any) => boolean;
 export interface AnyObject {
 	[k: string]: any;
 }
 export declare type AnyFunc = (...args: any[]) => any;
-export declare const curry: (fn: Function) => (...args: any[]) => any;
 export declare const equals: (...args: any[]) => any;
 export declare const ifElse: (...args: any[]) => any;
 export declare const when: (...args: any[]) => any;
@@ -15,6 +16,7 @@ export declare const always: (s: any) => () => any;
 export declare const identity: (s: any) => any;
 export declare const trim: (s: string) => string;
 export declare const head: (s: string | any[]) => any;
+export declare const tail: (s: string | any[]) => string | any[];
 export declare const last: (s: string | any[]) => any;
 export declare const complement: (fn: Cond) => (s: any) => boolean;
 export declare const keys: (o: AnyObject) => string[];
@@ -39,7 +41,8 @@ export declare const isEmpty: (s: any) => boolean;
 export declare const replace: (...args: any[]) => any;
 export declare const filter: (...args: any[]) => any;
 export declare const memoize: (fn: Function) => () => any;
-export declare const deepMerge: (o1: AnyObject, o2: AnyObject) => AnyObject;
+export declare const mergeShallow: (...args: any[]) => any;
+export declare const mergeDeep: (...args: any[]) => any;
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const mapKeys: (...args: any[]) => any;
 /** One promise waits for another. */

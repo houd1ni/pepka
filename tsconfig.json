@@ -5,7 +5,7 @@
       "esnext"
     ],
     "target": "esnext",
-    "module": "commonjs",
+    "module": "esnext",
     "allowJs": false,
     "sourceMap": true,
     "emitDecoratorMetadata": true,
