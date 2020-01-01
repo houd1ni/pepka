@@ -35,7 +35,7 @@ const addArgs = (args: Args, _args: any[]) => {
   return new_args
 }
 
-const _curry = (fn: Function, args: Args, _args: any[]) => {
+const _curry = (fn: Function, args: Args, new_args: any[]) => {
   // console.log({
   //   _a: _args.length,
   //   count: countArgs(args),
@@ -44,21 +44,23 @@ const _curry = (fn: Function, args: Args, _args: any[]) => {
   //   new_args: _args,
   //   new_args2: addArgs(args, _args)
   // })
-  const saved_len = countArgs(args)
-  const args2add = fn.length - saved_len - _args.length
+  const args2add = fn.length - countArgs(args) - new_args.length
+
   if(args2add < 1) {
     return fn(
-      ...extractArgs(addArgs(args, _args)),
-      ..._args.slice(-args2add)
+      ...extractArgs(addArgs(args, new_args)),
+      ...new_args.slice(-args2add)
     )
   } else {
     return (...__args: any[]) => _curry(
       fn,
-      addArgs(args, _args),
+      addArgs(args, new_args),
       __args
     )
   }
 }
 
 export const curry = (fn: Function) =>
-  (...args: any[]) => _curry(fn, {}, args)
+  (...args: any[]) => fn.length>args.length
+    ? _curry(fn, {}, args)
+    : fn(...args)

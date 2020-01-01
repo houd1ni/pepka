@@ -60,15 +60,26 @@ export const compose = (...fns: Function[]) =>
     return s
   }
 
+export const nth = curry(
+  (i: number, data: any[]) => data[i]
+)
+export const includes = curry(
+  (element: any, data: any[]) => data.includes(element)
+)
+export const slice = curry(
+  (from: number, to: number, o: any[]) => o.slice(from, isNum(to)?to:Infinity)
+)
+export const head = nth(0)
+export const tail = slice(1, nul)
+export const add = curry((n: number, m: number) => n+m)
+export const subtract = curry((n: number, m: number) => m-n)
 export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
 export const always = (s: any) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
-export const head = (s: any[] | string) => s[0]
-export const tail = (s: any[] | string) => s.slice(1)
-export const last = (s: any[] | string) => s[s.length-1]
+export const last = (s: any[] | string) => s[length(s)-1]
 export const complement = (fn: Cond) => (s: any) => !fn(s)
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
@@ -76,9 +87,6 @@ export const toPairs = (o: AnyObject) => Object.entries(o)
 export const tap = (fn: Function) => (s: any) => { fn(s); return s }
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
-)
-export const slice = curry(
-  (from: number, to: number, o: any[]) => o.slice(from, isNum(to)?to:Infinity)
 )
 export const assoc = curry(
   (prop: string, v: any, obj: AnyObject) => ({
@@ -120,15 +128,21 @@ export const clone = (s: any) => {
     default: return s
   }
 }
+export const reduce = curry(
+  (fn: Reducer, accum: any, arr: any[]) =>
+    arr.reduce(fn, clone(accum))
+)
 export const pick = curry(
   (props: string[], o: AnyObject) => reduce(
     (accum: AnyObject, key: string) => accum[key] = o[key],
     {}, props
   )
 )
-export const reduce = curry(
-  (fn: Reducer, accum: any, arr: any[]) =>
-    arr.reduce(fn, clone(accum))
+export const omit = curry(
+  (props: string[], o: AnyObject) => filter(
+    (_: any, k: string) => !includes(k, props),
+    o
+  )
 )
 export const fromPairs = (pairs: [string, any][]) => reduce(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
