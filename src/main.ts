@@ -120,6 +120,12 @@ export const clone = (s: any) => {
     default: return s
   }
 }
+export const pick = curry(
+  (props: string[], o: AnyObject) => reduce(
+    (accum: AnyObject, key: string) => accum[key] = o[key],
+    {}, props
+  )
+)
 export const reduce = curry(
   (fn: Reducer, accum: any, arr: any[]) =>
     arr.reduce(fn, clone(accum))
@@ -241,5 +247,6 @@ export const forEachAsync = curry(
 export const composeAsync = (() => {
   const pipe = async (fns: AnyFunc[], data: any, i: number): Promise<any> =>
     ~i ? await pipe(fns, await fns[i](data), --i) : data
-  return (...fns: AnyFunc[]) => (data?: any) => pipe(fns, data, fns.length-1)
+  return <T = any>(...fns: AnyFunc[]) =>
+    (data?: any) => pipe(fns, data, fns.length-1) as Promise<T>
 })()
