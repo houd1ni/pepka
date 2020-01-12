@@ -5,5 +5,6 @@ Yes, I know, it's not a superfresh idea,
 It should be smallest possible ramda alternative.
 Maybe even not drop-in replacement.
 
+Later on:
 To load unsafe use smth like `import { reduce } from 'pepka/unsafe'`.
 It's faster, but mutates data.
