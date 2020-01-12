@@ -34,6 +34,8 @@ export declare const prop: (...args: any[]) => any;
 export declare const pathOr: (...args: any[]) => any;
 export declare const path: any;
 export declare const clone: (s: any) => any;
+export declare const toLower: (s: string) => string;
+export declare const toUpper: (s: string) => string;
 export declare const reduce: (...args: any[]) => any;
 export declare const pick: (...args: any[]) => any;
 export declare const omit: (...args: any[]) => any;
@@ -59,5 +61,7 @@ export declare const waitAll: (promises: Promise<any>[]) => Promise<any[]>;
 export declare const forEachAsync: (...args: any[]) => any;
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
 export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (data?: any) => Promise<T>;
+export declare const mirror: (s: any) => any;
+export declare const echo: (s: any) => any;
 
 export {};
