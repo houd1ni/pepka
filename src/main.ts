@@ -67,8 +67,10 @@ export const includes = curry(
   (element: any, data: any[]) => data.includes(element)
 )
 export const slice = curry(
-  (from: number, to: number, o: any[]) => o.slice(from, isNum(to)?to:Infinity)
+  (from: number, to: number, o: any[] | string) => o.slice(from, isNum(to)?to:Infinity)
 )
+export const toLower = (s: string) => s.toLowerCase()
+export const toUpper = (s: string) => s.toUpperCase()
 export const head = nth(0)
 export const tail = slice(1, nul)
 export const add = curry((n: number, m: number) => n+m)
@@ -80,13 +82,38 @@ export const always = (s: any) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
-export const complement = (fn: Cond) => (s: any) => !fn(s)
+export const not = (o: boolean) => !o
+export const complement = (fn: Cond) => (s: any) => not(fn(s))
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
 export const tap = (fn: Function) => (s: any) => { fn(s); return s }
+export const gt = curry(
+  (a: number, b: number) => b>a
+)
+export const lt = curry(
+  (a: number, b: number) => b<a
+)
+export const gte = curry(
+  (a: number, b: number) => b>=a
+)
+export const lte = curry(
+  (a: number, b: number) => b<=a
+)
+export const findIndex = curry(
+  (fn: Cond, s: any[]) => s.findIndex(fn)
+)
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
+)
+export const cond = curry(
+  (pairs: [Cond, Function][], s: any) => {
+    for(const [cond, fn] of pairs) {
+      if(cond(s)) {
+        return fn(s)
+      }
+    }
+  }
 )
 export const assoc = curry(
   (prop: string, v: any, obj: AnyObject) => ({
@@ -128,8 +155,6 @@ export const clone = (s: any) => {
     default: return s
   }
 }
-export const toLower = (s: string) => s.toLowerCase()
-export const toUpper = (s: string) => s.toUpperCase()
 export const reduce = curry(
   (fn: Reducer, accum: any, arr: any[]) =>
     arr.reduce(fn, clone(accum))
@@ -166,7 +191,7 @@ export const type = (s: any) => {
   const t = to(s)
   return t=='object'
     ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
-    : t[0].toUpperCase() + t.slice(1)
+    : toUpper(t[0]) + t.slice(1)
 }
 export const isEmpty = (s: any) => {
   switch(type(s)) {
@@ -213,7 +238,7 @@ export const mergeDeep = curry(
       switch(type(o2[k])) {
         case 'Array':
         case 'Object':
-          if(isObjArr(o2[k])) {
+          if(isObjArr(o1[k])) {
             mergeDeep(o1[k], o2[k])
             break
           }
@@ -270,4 +295,5 @@ export const composeAsync = (() => {
 // ALIASES
 
 export const mirror = identity
+export const reflect = identity
 export const echo = identity
