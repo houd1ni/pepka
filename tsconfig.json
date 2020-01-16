@@ -4,6 +4,7 @@
       "dom",
       "esnext"
     ],
+    "strictNullChecks": true,
     "target": "esnext",
     "module": "esnext",
     "allowJs": false,
@@ -17,6 +18,7 @@
     "baseUrl": "."
   },
   "include": [
-    "./src/main.ts"
+    "./src/**/*",
+    "./node_modules/ts-toolbelt/out/index.d.ts"
   ]
 }

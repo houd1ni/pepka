@@ -1,8 +1,18 @@
+// import { F, A } from "ts-toolbelt"
+
+// type Currier = <F extends (...args: any) => any>(f: F) => F.Curry<F>
+
+// import { Currier } from './types'
+// import * as _ from 'ts-toolbelt'
+// const x: F
+
 interface Args {
   [i: number]: any
 }
 
-export const __ = function Placeholder() {}
+export const __ = (
+  function Placeholder() {}
+)// as unknown as A.x & {'@@functional/placeholder': true}
 
 const isPl = (s: any) => s === __
 const countArgs = (s: Args) => {
@@ -36,16 +46,7 @@ const addArgs = (args: Args, _args: any[]) => {
 }
 
 const _curry = (fn: Function, args: Args, new_args: any[]) => {
-  // console.log({
-  //   _a: _args.length,
-  //   count: countArgs(args),
-  //   fn: fn.length,
-  //   old_args: args,
-  //   new_args: _args,
-  //   new_args2: addArgs(args, _args)
-  // })
-  const args2add = fn.length - countArgs(args) - new_args.length
-
+  const args2add = fn.length - countArgs(args) - countArgs(new_args)
   if(args2add < 1) {
     return fn(
       ...extractArgs(addArgs(args, new_args)),
@@ -60,7 +61,9 @@ const _curry = (fn: Function, args: Args, new_args: any[]) => {
   }
 }
 
-export const curry = (fn: Function) =>
-  (...args: any[]) => fn.length>args.length
-    ? _curry(fn, {}, args)
-    : fn(...args)
+export const curry = (
+  (fn: Function) =>
+    (...args: any[]) => fn.length>countArgs(args)
+      ? _curry(fn, {}, args)
+      : fn(...args)
+)// as Currier

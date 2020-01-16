@@ -1,4 +1,5 @@
 import { __, curry } from './curry'
+// import { F } from 'ts-toolbelt'
 export * from './curry'
 
 type Cond = (s: any) => boolean
@@ -52,13 +53,15 @@ export const when = curry(
     s: any
   ) => ifElse(cond, pipe, identity, s)
 )
-export const compose = (...fns: Function[]) =>
-  (s: any) => {
-    for(let i = length(fns)-1; i>-1; i--) {
-      s = fns[i](s)
+export const compose = (
+  (...fns: Function[]) =>
+    (s: any) => {
+      for(let i = length(fns)-1; i>-1; i--) {
+        s = fns[i](s)
+      }
+      return s
     }
-    return s
-  }
+)// as F.Compose
 
 export const nth = curry(
   (i: number, data: any[]) => data[i]
@@ -67,7 +70,8 @@ export const includes = curry(
   (element: any, data: any[]) => data.includes(element)
 )
 export const slice = curry(
-  (from: number, to: number, o: any[] | string) => o.slice(from, isNum(to)?to:Infinity)
+  (from: number, to: number|null, o: any[] | string) =>
+    o.slice(from, (isNum(to)?to:Infinity) as number)
 )
 export const toLower = (s: string) => s.toLowerCase()
 export const toUpper = (s: string) => s.toUpperCase()
@@ -89,10 +93,10 @@ export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
 export const tap = (fn: Function) => (s: any) => { fn(s); return s }
 export const gt = curry(
-  (a: number, b: number) => b>a
+  (a: number, b: number) => a>b
 )
 export const lt = curry(
-  (a: number, b: number) => b<a
+  (a: number, b: number) => a<b
 )
 export const gte = curry(
   (a: number, b: number) => b>=a
