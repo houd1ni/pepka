@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "esnext"
-    ],
+    "lib": [ "esnext" ],
     "strictNullChecks": true,
     "target": "esnext",
     "module": "esnext",
@@ -18,7 +15,7 @@
     "baseUrl": "."
   },
   "include": [
-    "./src/**/*",
-    "./node_modules/ts-toolbelt/out/index.d.ts"
+    "src/**/*",
+    "node_modules/ts-toolbelt/out/index.d.ts"
   ]
 }

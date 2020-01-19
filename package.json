@@ -31,13 +31,13 @@
     "test": "npm run gentypes && npm run prod:cjs && ava",
     "test:report": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:lazy": "ava",
-    "gentypes": "dts-bundle-generator -o dist/bundle.d.ts src/main.ts",
+    "gentypes": "dts-bundle-generator -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs"
   },
-  "version": "0.5.4",
+  "version": "0.5.5",
   "ava": {
     "files": [
       "./test/specs/*.ts"

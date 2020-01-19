@@ -1,28 +1,8 @@
 import { __, curry } from './curry'
-// import { F } from 'ts-toolbelt'
-export * from './curry'
+import { to, isNum, nul, isUndef, undef, isNull, isArray } from './utils'
+import { qmergeDeep, qreduce } from './quick'
+import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 
-type Cond = (s: any) => boolean
-interface AnyObject {
-  [k: string]: any
-}
-type Reducer = <T>(accum: T, cur: any, index: number) => T
-type AnyFunc = (...args: any[]) => any
-
-const undef = undefined
-const nul = null
-const to = (s: any) => typeof s
-const isNull = (s: any) => s===nul
-const isUndef = (s: any) => s===undef
-const isNum = (s: any) => to(s)=='number'
-const isArray = (s: any) => Array.isArray(s)
-const isObjArr = (s: any) => to(s)=='object' && !isNull(s)
-
-const _curry = (fn: Function, _args: any[], args: any[]) =>
-  _args.length+args.length<fn.length
-    ? (...args: any[]) => _curry(fn, [..._args, ...args], args)
-    : fn(..._args, ...args)
-// unsafe wd be faster.
 export const equals = curry((a: any, b: any) => {
   if(to(a)=='object' && to(b)=='object') {
     if(isNull(a) || isNull(b)) {
@@ -63,11 +43,14 @@ export const compose = (
     }
 )// as F.Compose
 
+export const bind = curry(
+  (fn: AnyFunc, context: any) => fn.bind(context)
+)
 export const nth = curry(
   (i: number, data: any[]) => data[i]
 )
 export const includes = curry(
-  (element: any, data: any[]) => data.includes(element)
+  (s: any, ss: any[]) => ss.includes(s)
 )
 export const slice = curry(
   (from: number, to: number|null, o: any[] | string) =>
@@ -91,7 +74,11 @@ export const complement = (fn: Cond) => (s: any) => not(fn(s))
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
-export const tap = (fn: Function) => (s: any) => { fn(s); return s }
+export const tap = curry((fn: Function, s: any) => { fn(s); return s })
+export const append = (s: any, xs: any[]) => [...xs, s]
+export const split = (s: string, xs: string) => xs.split(s)
+export const T = always(true)
+export const F = always(false)
 export const gt = curry(
   (a: number, b: number) => a>b
 )
@@ -161,12 +148,15 @@ export const clone = (s: any) => {
 }
 export const reduce = curry(
   (fn: Reducer, accum: any, arr: any[]) =>
-    arr.reduce(fn, clone(accum))
+    qreduce(fn, clone(accum), arr)
+)
+export const pickBy = curry(
+  (cond: Cond, o: AnyObject) => filter(cond, o)
 )
 export const pick = curry(
-  (props: string[], o: AnyObject) => reduce(
-    (accum: AnyObject, key: string) => accum[key] = o[key],
-    {}, props
+  (props: string[], o: AnyObject) => filter(
+    (_: any, k: string) => includes(k, props),
+    o
   )
 )
 export const omit = curry(
@@ -237,22 +227,7 @@ export const mergeShallow = curry(
     Object.assign({}, o1, o2)
 )
 export const mergeDeep = curry(
-  (o1: AnyObject, o2: AnyObject): AnyObject => {
-    for(let k in o2) {
-      switch(type(o2[k])) {
-        case 'Array':
-        case 'Object':
-          if(isObjArr(o1[k])) {
-            mergeDeep(o1[k], o2[k])
-            break
-          }
-        default:
-          o1[k] = o2[k]
-          break
-      }
-    }
-    return o1
-  }
+  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), b)
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry(

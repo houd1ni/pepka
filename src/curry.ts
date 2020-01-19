@@ -15,9 +15,9 @@ export const __ = (
 )// as unknown as A.x & {'@@functional/placeholder': true}
 
 const isPl = (s: any) => s === __
-const countArgs = (s: Args) => {
+const countArgs = (s: Args, all=false) => {
   let i = 0
-  for (let k in s) !isPl(s[k]) && i++
+  for (let k in s) (all || !isPl(s[k])) && i++
   return i
 }
 const extractArgs = (args: Args) => {
@@ -32,7 +32,7 @@ const extractArgs = (args: Args) => {
 // TODO: try to make it mutable.
 // { 0: __, 1: 10 }, [ 11 ]
 const addArgs = (args: Args, _args: any[]) => {
-  const len = countArgs(args)
+  const len = countArgs(args, true)
   const new_len = _args.length
   const new_args = {}
   let i = 0, j = 0
@@ -49,8 +49,8 @@ const _curry = (fn: Function, args: Args, new_args: any[]) => {
   const args2add = fn.length - countArgs(args) - countArgs(new_args)
   if(args2add < 1) {
     return fn(
-      ...extractArgs(addArgs(args, new_args)),
-      ...new_args.slice(-args2add)
+      ...extractArgs(addArgs(args, new_args))//,
+      // ...new_args.slice(-args2add)
     )
   } else {
     return (...__args: any[]) => _curry(

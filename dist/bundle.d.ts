@@ -1,6 +1,6 @@
 export declare const __: () => void;
 export declare const curry: (fn: Function) => (...args: any[]) => any;
-export declare type Cond = (s: any) => boolean;
+export declare type Cond = (...ss: any[]) => boolean;
 export interface AnyObject {
 	[k: string]: any;
 }
@@ -9,6 +9,7 @@ export declare const equals: (...args: any[]) => any;
 export declare const ifElse: (...args: any[]) => any;
 export declare const when: (...args: any[]) => any;
 export declare const compose: (...fns: Function[]) => (s: any) => any;
+export declare const bind: (...args: any[]) => any;
 export declare const nth: (...args: any[]) => any;
 export declare const includes: (...args: any[]) => any;
 export declare const slice: (...args: any[]) => any;
@@ -30,13 +31,17 @@ export declare const complement: (fn: Cond) => (s: any) => boolean;
 export declare const keys: (o: AnyObject) => string[];
 export declare const values: (o: AnyObject) => any[];
 export declare const toPairs: (o: AnyObject) => [string, any][];
-export declare const tap: (fn: Function) => (s: any) => any;
+export declare const tap: (...args: any[]) => any;
+export declare const append: (s: any, xs: any[]) => any[];
+export declare const split: (s: string, xs: string) => string[];
+export declare const T: () => any;
+export declare const F: () => any;
 export declare const gt: (...args: any[]) => any;
 export declare const lt: (...args: any[]) => any;
 export declare const gte: (...args: any[]) => any;
 export declare const lte: (...args: any[]) => any;
 export declare const findIndex: (...args: any[]) => any;
-export declare const explore: (caption: string, level?: string) => (s: any) => any;
+export declare const explore: (caption: string, level?: string) => any;
 export declare const cond: (...args: any[]) => any;
 export declare const assoc: (...args: any[]) => any;
 export declare const prop: (...args: any[]) => any;
@@ -44,6 +49,7 @@ export declare const pathOr: (...args: any[]) => any;
 export declare const path: any;
 export declare const clone: (s: any) => any;
 export declare const reduce: (...args: any[]) => any;
+export declare const pickBy: (...args: any[]) => any;
 export declare const pick: (...args: any[]) => any;
 export declare const omit: (...args: any[]) => any;
 export declare const fromPairs: (pairs: [string, any][]) => any;
@@ -71,5 +77,9 @@ export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (data?: any) 
 export declare const mirror: (s: any) => any;
 export declare const reflect: (s: any) => any;
 export declare const echo: (s: any) => any;
+export declare const qappend: (s: any, xs: any[]) => any[];
+export declare const qassoc: (...args: any[]) => any;
+export declare const qreduce: (...args: any[]) => any;
+export declare const qmergeDeep: (...args: any[]) => any;
 
 export {};

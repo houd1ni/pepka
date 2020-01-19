@@ -1,4 +1,4 @@
-import * as pepka from '../src/main'
+import * as pepka from '../src/index'
 
 ;(window as any).pepka = pepka
 ;Object.assign((window as any), pepka)
