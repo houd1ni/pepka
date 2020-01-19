@@ -65,7 +65,7 @@ export const subtract = curry((n: number, m: number) => m-n)
 export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
-export const always = (s: any) => () => s
+export const always = <T=any>(s: T) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
@@ -76,9 +76,9 @@ export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = (s: any, xs: any[]) => [...xs, s]
-export const split = (s: string, xs: string) => xs.split(s)
-export const T = always(true)
-export const F = always(false)
+export const split = curry((s: string, xs: string) => xs.split(s))
+export const T = always<true>(true)
+export const F = always<false>(false)
 export const gt = curry(
   (a: number, b: number) => a>b
 )
