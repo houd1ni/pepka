@@ -7,7 +7,7 @@ export const type = (s: any) => {
   switch(true) {
     case t!=='object': return toUpper(t[0]) + t.slice(1)
     case isArray(s): return 'Array'
-    case isNull(s): return 'Array'
+    case isNull(s): return 'Null'
     case isRegExp(s): return 'RegExp'
     default: return 'Object'
   }

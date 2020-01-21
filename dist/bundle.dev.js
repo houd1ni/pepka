@@ -53,7 +53,6 @@ const isUndef = (s) => s === undef;
 const isNum = (s) => to(s) == 'number';
 const isArray = (s) => Array.isArray(s);
 const isRegExp = (s) => s instanceof RegExp;
-const isObjArr = (s) => to(s) == 'object' && !isNull(s);
 
 const toLower = (s) => s.toLowerCase();
 const toUpper = (s) => s.toUpperCase();
@@ -79,7 +78,7 @@ const qmergeDeep = curry((o1, o2) => {
         switch (type(o2[k])) {
             case 'Array':
             case 'Object':
-                if (isObjArr(o1[k])) {
+                if (type(o1[k]) === 'Object') {
                     qmergeDeep(o1[k], o2[k]);
                     break;
                 }
