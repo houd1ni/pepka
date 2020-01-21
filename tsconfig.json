@@ -1,21 +1,21 @@
 {
   "compilerOptions": {
-    "lib": [ "esnext" ],
+    "lib": [ "esnext", "DOM" ],
     "strictNullChecks": true,
     "target": "esnext",
     "module": "esnext",
     "allowJs": false,
-    "sourceMap": true,
+    "sourceMap": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noUnusedParameters": true,
     "noUnusedLocals": false,
-    "outDir": "./dist/",
-    "rootDir": ".",
+    "outDir": "dist/es",
+    "rootDir": "src",
     "baseUrl": "."
   },
   "include": [
     "src/**/*",
-    "node_modules/ts-toolbelt/out/index.d.ts"
+    "src/node_modules/ts-toolbelt/out/index.d.ts"
   ]
 }

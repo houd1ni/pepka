@@ -7,8 +7,9 @@ import replace from 'rollup-plugin-replace'
 export default {
   input: process.env.NODE_ENV=='development' ? 'test/in-browser.ts' : 'src/index.ts',
   output: {
-    file: process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.esm.js',
+    file: process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.dev.js',
     format: process.env.BUILD == 'cjs' ? 'cjs' : 'es',
+    exports: 'named',
     name: 'pepka'
   },
   plugins: [

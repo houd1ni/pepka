@@ -2,6 +2,7 @@ import { __, curry } from './curry'
 import { to, isNum, nul, isUndef, undef, isNull, isArray } from './utils'
 import { qmergeDeep, qreduce } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
+import { type } from './common'
 
 export const equals = curry((a: any, b: any) => {
   if(to(a)=='object' && to(b)=='object') {
@@ -56,8 +57,6 @@ export const slice = curry(
   (from: number, to: number|null, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:Infinity) as number)
 )
-export const toLower = (s: string) => s.toLowerCase()
-export const toUpper = (s: string) => s.toUpperCase()
 export const head = nth(0)
 export const tail = slice(1, nul)
 export const add = curry((n: number, m: number) => n+m)
@@ -75,7 +74,7 @@ export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
 export const toPairs = (o: AnyObject) => Object.entries(o)
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
-export const append = (s: any, xs: any[]) => [...xs, s]
+export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
 export const T = always<true>(true)
 export const F = always<false>(false)
@@ -181,12 +180,6 @@ export const forEach = curry(
 export const both = curry(
   (cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s)
 )
-export const type = (s: any) => {
-  const t = to(s)
-  return t=='object'
-    ? isArray(s) ? 'Array' : (isNull(s) ? 'Null' : 'Object')
-    : toUpper(t[0]) + t.slice(1)
-}
 export const isEmpty = (s: any) => {
   switch(type(s)) {
     case 'String': return s==''

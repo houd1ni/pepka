@@ -20,7 +20,7 @@
   ],
   "license": "MIT",
   "main": "dist/bundle.js",
-  "module": "dist/bundle.esm.js",
+  "module": "dist/es/index.js",
   "name": "pepka",
   "repository": {
     "type": "git",
@@ -34,10 +34,10 @@
     "gentypes": "dts-bundle-generator -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
-    "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
+    "prod:es": "cross-env NODE_ENV=production tsc",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs"
   },
-  "version": "0.6.1",
+  "version": "0.6.3",
   "ava": {
     "files": [
       "./test/specs/*.ts"
