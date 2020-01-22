@@ -1,5 +1,5 @@
 import { curry } from './curry';
-import { to, isNum, nul, isUndef, undef, isNull } from './utils';
+import { to, isNum, nul, isUndef, undef, isNull, isFunc } from './utils';
 import { qmergeDeep, qreduce, qappend } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
@@ -50,7 +50,7 @@ export const last = (s) => s[length(s) - 1];
 export const not = (o) => !o;
 export const complement = (fn) => (...args) => {
     const out = fn(...args);
-    return out.$args_left ? complement(out) : not(out);
+    return (isFunc(out) && out.$args_left) ? complement(out) : not(out);
 };
 export const keys = (o) => Object.keys(o);
 export const values = (o) => Object.values(o);

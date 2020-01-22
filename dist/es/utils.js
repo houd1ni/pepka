@@ -6,3 +6,4 @@ export const isUndef = (s) => s === undef;
 export const isNum = (s) => to(s) == 'number';
 export const isArray = (s) => Array.isArray(s);
 export const isRegExp = (s) => s instanceof RegExp;
+export const isFunc = (s) => to(s) === 'function';

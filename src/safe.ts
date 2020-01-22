@@ -1,5 +1,5 @@
 import { __, curry } from './curry'
-import { to, isNum, nul, isUndef, undef, isNull, isArray } from './utils'
+import { to, isNum, nul, isUndef, undef, isNull, isArray, isFunc } from './utils'
 import { qmergeDeep, qreduce, qappend } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
@@ -78,7 +78,7 @@ export const last = (s: any[] | string) => s[length(s)-1]
 export const not = (o: boolean) => !o
 export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
-  return (out as any).$args_left ? complement(out) : not(out)
+  return (isFunc(out) && (out as any).$args_left) ? complement(out) : not(out)
 }
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)
