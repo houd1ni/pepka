@@ -33,12 +33,12 @@ const addArgs = (args, _args) => {
 const _curry = (fn, args, new_args) => {
     const args2add = fn.length - countArgs(args) - countArgs(new_args);
     if (args2add < 1) {
-        return fn(...extractArgs(addArgs(args, new_args)) //,
-        // ...new_args.slice(-args2add)
-        );
+        return fn(...extractArgs(addArgs(args, new_args)));
     }
     else {
-        return (...__args) => _curry(fn, addArgs(args, new_args), __args);
+        const curried = (...__args) => _curry(fn, addArgs(args, new_args), __args);
+        curried.$args_left = args2add;
+        return curried;
     }
 };
 const curry = ((fn) => (...args) => fn.length > countArgs(args)
@@ -136,7 +136,10 @@ const identity = (s) => s;
 const trim = (s) => s.trim();
 const last = (s) => s[length(s) - 1];
 const not = (o) => !o;
-const complement = (fn) => (s) => not(fn(s));
+const complement = (fn) => (...args) => {
+    const out = fn(...args);
+    return out.$args_left ? out : not(out);
+};
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);

@@ -28,7 +28,7 @@ export declare const identity: (s: any) => any;
 export declare const trim: (s: string) => string;
 export declare const last: (s: string | any[]) => any;
 export declare const not: (o: boolean) => boolean;
-export declare const complement: (fn: Cond) => (s: any) => boolean;
+export declare const complement: (fn: Cond) => (...args: any) => boolean;
 export declare const keys: (o: AnyObject) => string[];
 export declare const values: (o: AnyObject) => any[];
 export declare const toPairs: (o: AnyObject) => [string, any][];

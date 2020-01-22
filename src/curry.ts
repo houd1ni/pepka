@@ -48,16 +48,15 @@ const addArgs = (args: Args, _args: any[]) => {
 const _curry = (fn: Function, args: Args, new_args: any[]) => {
   const args2add = fn.length - countArgs(args) - countArgs(new_args)
   if(args2add < 1) {
-    return fn(
-      ...extractArgs(addArgs(args, new_args))//,
-      // ...new_args.slice(-args2add)
-    )
+    return fn(...extractArgs(addArgs(args, new_args)))
   } else {
-    return (...__args: any[]) => _curry(
+    const curried = (...__args: any[]) => _curry(
       fn,
       addArgs(args, new_args),
       __args
     )
+    ;(curried as any).$args_left = args2add
+    return curried
   }
 }
 

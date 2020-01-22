@@ -33,12 +33,12 @@ const addArgs = (args, _args) => {
 const _curry = (fn, args, new_args) => {
     const args2add = fn.length - countArgs(args) - countArgs(new_args);
     if (args2add < 1) {
-        return fn(...extractArgs(addArgs(args, new_args)) //,
-        // ...new_args.slice(-args2add)
-        );
+        return fn(...extractArgs(addArgs(args, new_args)));
     }
     else {
-        return (...__args) => _curry(fn, addArgs(args, new_args), __args);
+        const curried = (...__args) => _curry(fn, addArgs(args, new_args), __args);
+        curried.$args_left = args2add;
+        return curried;
     }
 };
 export const curry = ((fn) => (...args) => fn.length > countArgs(args)
