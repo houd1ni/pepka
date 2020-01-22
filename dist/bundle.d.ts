@@ -37,6 +37,7 @@ export declare const append: (...args: any[]) => any;
 export declare const split: (...args: any[]) => any;
 export declare const T: () => true;
 export declare const F: () => false;
+export declare const uniq: (xs: any[]) => any;
 export declare const gt: (...args: any[]) => any;
 export declare const lt: (...args: any[]) => any;
 export declare const gte: (...args: any[]) => any;

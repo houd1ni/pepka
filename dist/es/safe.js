@@ -1,6 +1,6 @@
 import { curry } from './curry';
 import { to, isNum, nul, isUndef, undef, isNull } from './utils';
-import { qmergeDeep, qreduce } from './quick';
+import { qmergeDeep, qreduce, qappend } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
     if (to(a) == 'object' && to(b) == 'object') {
@@ -27,7 +27,14 @@ export const compose = ((...fns) => (s) => {
 }); // as F.Compose
 export const bind = curry((fn, context) => fn.bind(context));
 export const nth = curry((i, data) => data[i]);
-export const includes = curry((s, ss) => ss.includes(s));
+export const includes = curry((s, ss) => {
+    for (const a of ss) {
+        if (equals(a, s)) {
+            return true;
+        }
+    }
+    return false;
+});
 export const slice = curry((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
 export const head = nth(0);
 export const tail = slice(1, nul);
@@ -50,6 +57,7 @@ export const append = curry((s, xs) => [...xs, s]);
 export const split = curry((s, xs) => xs.split(s));
 export const T = always(true);
 export const F = always(false);
+export const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 export const gt = curry((a, b) => a > b);
 export const lt = curry((a, b) => a < b);
 export const gte = curry((a, b) => b >= a);
@@ -112,7 +120,7 @@ export const memoize = (fn) => {
     return () => cached ? cache : (cached = true, cache = fn());
 };
 export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
-export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), b));
+export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry((keyMap, o) => compose(fromPairs, filter(complement(isNil)), map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])), toPairs)(o));
 // ASYNCS

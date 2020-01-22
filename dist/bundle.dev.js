@@ -60,8 +60,8 @@ const type = (s) => {
     const t = to(s);
     switch (true) {
         case t !== 'object': return toUpper(t[0]) + t.slice(1);
+        case isNull(s): return 'Null';
         case isArray(s): return 'Array';
-        case isNull(s): return 'Array';
         case isRegExp(s): return 'RegExp';
         default: return 'Object';
     }
@@ -115,7 +115,14 @@ const compose = ((...fns) => (s) => {
 }); // as F.Compose
 const bind = curry((fn, context) => fn.bind(context));
 const nth = curry((i, data) => data[i]);
-const includes = curry((s, ss) => ss.includes(s));
+const includes = curry((s, ss) => {
+    for (const a of ss) {
+        if (equals(a, s)) {
+            return true;
+        }
+    }
+    return false;
+});
 const slice = curry((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
 const head = nth(0);
 const tail = slice(1, nul);
@@ -138,6 +145,7 @@ const append = curry((s, xs) => [...xs, s]);
 const split = curry((s, xs) => xs.split(s));
 const T = always(true);
 const F = always(false);
+const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
@@ -200,7 +208,7 @@ const memoize = (fn) => {
     return () => cached ? cache : (cached = true, cache = fn());
 };
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
-const mergeDeep = curry((a, b) => qmergeDeep(clone(a), b));
+const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const mapKeys = curry((keyMap, o) => compose(fromPairs, filter(complement(isNil)), map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])), toPairs)(o));
 // ASYNCS
@@ -266,6 +274,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   split: split,
   T: T,
   F: F,
+  uniq: uniq,
   gt: gt,
   lt: lt,
   gte: gte,

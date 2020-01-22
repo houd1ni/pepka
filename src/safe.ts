@@ -1,6 +1,6 @@
 import { __, curry } from './curry'
 import { to, isNum, nul, isUndef, undef, isNull, isArray } from './utils'
-import { qmergeDeep, qreduce } from './quick'
+import { qmergeDeep, qreduce, qappend } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
@@ -51,7 +51,14 @@ export const nth = curry(
   (i: number, data: any[]) => data[i]
 )
 export const includes = curry(
-  (s: any, ss: any[]) => ss.includes(s)
+  (s: any, ss: any[]) => {
+    for(const a of ss) {
+      if(equals(a, s)) {
+        return true
+      }
+    }
+    return false
+  }
 )
 export const slice = curry(
   (from: number, to: number|null, o: any[] | string) =>
@@ -78,6 +85,10 @@ export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
 export const T = always<true>(true)
 export const F = always<false>(false)
+export const uniq = (xs: any[]) => qreduce(
+  (accum: any[], x: any) =>
+    includes(x, accum) ? accum : qappend(x, accum),
+[], xs)
 export const gt = curry(
   (a: number, b: number) => a>b
 )
@@ -220,7 +231,7 @@ export const mergeShallow = curry(
     Object.assign({}, o1, o2)
 )
 export const mergeDeep = curry(
-  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), b)
+  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), clone(b))
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry(
