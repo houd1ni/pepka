@@ -3,7 +3,6 @@ export declare const curry: (fn: Function) => (...args: any[]) => any;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
 export declare const type: (s: any) => string;
-export declare type Cond = (...ss: any[]) => boolean;
 export interface AnyObject {
 	[k: string]: any;
 }
@@ -28,7 +27,7 @@ export declare const identity: (s: any) => any;
 export declare const trim: (s: string) => string;
 export declare const last: (s: string | any[]) => any;
 export declare const not: (o: boolean) => boolean;
-export declare const complement: (fn: Cond) => (...args: any) => boolean;
+export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | any;
 export declare const keys: (o: AnyObject) => string[];
 export declare const values: (o: AnyObject) => any[];
 export declare const toPairs: (o: AnyObject) => [string, any][];

@@ -76,9 +76,9 @@ export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
 export const not = (o: boolean) => !o
-export const complement = (fn: Cond) => (...args: any) => {
+export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
-  return (out as any).$args_left ? out : not(out)
+  return (out as any).$args_left ? complement(out) : not(out)
 }
 export const keys = (o: AnyObject) => Object.keys(o)
 export const values = (o: AnyObject) => Object.values(o)

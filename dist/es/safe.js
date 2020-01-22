@@ -50,7 +50,7 @@ export const last = (s) => s[length(s) - 1];
 export const not = (o) => !o;
 export const complement = (fn) => (...args) => {
     const out = fn(...args);
-    return out.$args_left ? out : not(out);
+    return out.$args_left ? complement(out) : not(out);
 };
 export const keys = (o) => Object.keys(o);
 export const values = (o) => Object.values(o);
