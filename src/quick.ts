@@ -31,3 +31,18 @@ export const qmergeDeep = curry(
     return o1
   }
 )
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+export const qmapKeys = curry(
+  (
+    keyMap: {[oldKey: string]: string},
+    o: AnyObject
+  ) => {
+    for(let k in keyMap) {
+      if(k !== keyMap[k]) {
+        o[keyMap[k]] = o[k]
+        delete o[k]
+      }
+    }
+    return o
+  }
+)

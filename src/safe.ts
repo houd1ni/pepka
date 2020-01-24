@@ -1,6 +1,6 @@
 import { __, curry } from './curry'
 import { to, isNum, nul, isUndef, undef, isNull, isArray, isFunc } from './utils'
-import { qmergeDeep, qreduce, qappend } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
@@ -104,6 +104,9 @@ export const gte = curry(
 export const lte = curry(
   (a: number, b: number) => b<=a
 )
+export const find = curry(
+  (fn: Cond, s: any[]) => s.find(fn)
+)
 export const findIndex = curry(
   (fn: Cond, s: any[]) => s.findIndex(fn)
 )
@@ -182,6 +185,11 @@ export const fromPairs = (pairs: [string, any][]) => reduce(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
   {}, pairs
 )
+type Concat = ((a: string, b: string) => string)
+            | ((a: any[], b: any[]) => any[])
+export const concat = curry(
+  ((a, b) => a.concat(b)) as Concat
+)
 export const join = curry(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
 )
@@ -241,12 +249,7 @@ export const mapKeys = curry(
   (
     keyMap: {[oldKey: string]: string},
     o: AnyObject
-  ) => compose(
-    fromPairs,
-    filter(complement(isNil)),
-    map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])),
-    toPairs
-  )(o)
+  ) => qmapKeys(keyMap, clone(o))
 )
 
 // ASYNCS

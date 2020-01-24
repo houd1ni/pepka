@@ -1,6 +1,6 @@
 import { curry } from './curry';
 import { to, isNum, nul, isUndef, undef, isNull, isFunc } from './utils';
-import { qmergeDeep, qreduce, qappend } from './quick';
+import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
     if (to(a) == 'object' && to(b) == 'object') {
@@ -65,6 +65,7 @@ export const gt = curry((a, b) => a > b);
 export const lt = curry((a, b) => a < b);
 export const gte = curry((a, b) => b >= a);
 export const lte = curry((a, b) => b <= a);
+export const find = curry((fn, s) => s.find(fn));
 export const findIndex = curry((fn, s) => s.findIndex(fn));
 export const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 export const cond = curry((pairs, s) => {
@@ -102,6 +103,7 @@ export const pickBy = curry((cond, o) => filter(cond, o));
 export const pick = curry((props, o) => filter((_, k) => includes(k, props), o));
 export const omit = curry((props, o) => filter((_, k) => !includes(k, props), o));
 export const fromPairs = (pairs) => reduce((o, pair) => assoc(...pair, o), {}, pairs);
+export const concat = curry(((a, b) => a.concat(b)));
 export const join = curry((delimeter, arr) => arr.join(delimeter));
 export const map = curry((pipe, arr) => arr.map(pipe));
 export const forEach = curry((pipe, arr) => arr.forEach(pipe));
@@ -125,7 +127,7 @@ export const memoize = (fn) => {
 export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-export const mapKeys = curry((keyMap, o) => compose(fromPairs, filter(complement(isNil)), map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])), toPairs)(o));
+export const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, clone(o)));
 // ASYNCS
 /** One promise waits for another. */
 export const forEachSerial = (() => {

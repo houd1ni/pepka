@@ -41,6 +41,7 @@ export declare const gt: (...args: any[]) => any;
 export declare const lt: (...args: any[]) => any;
 export declare const gte: (...args: any[]) => any;
 export declare const lte: (...args: any[]) => any;
+export declare const find: (...args: any[]) => any;
 export declare const findIndex: (...args: any[]) => any;
 export declare const explore: (caption: string, level?: string) => any;
 export declare const cond: (...args: any[]) => any;
@@ -54,6 +55,7 @@ export declare const pickBy: (...args: any[]) => any;
 export declare const pick: (...args: any[]) => any;
 export declare const omit: (...args: any[]) => any;
 export declare const fromPairs: (pairs: [string, any][]) => any;
+export declare const concat: (...args: any[]) => any;
 export declare const join: (...args: any[]) => any;
 export declare const map: (...args: any[]) => any;
 export declare const forEach: (...args: any[]) => any;
@@ -81,5 +83,7 @@ export declare const qappend: (...args: any[]) => any;
 export declare const qassoc: (...args: any[]) => any;
 export declare const qreduce: (...args: any[]) => any;
 export declare const qmergeDeep: (...args: any[]) => any;
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+export declare const qmapKeys: (...args: any[]) => any;
 
 export {};

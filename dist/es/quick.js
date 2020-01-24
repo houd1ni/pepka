@@ -22,3 +22,13 @@ export const qmergeDeep = curry((o1, o2) => {
     }
     return o1;
 });
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+export const qmapKeys = curry((keyMap, o) => {
+    for (let k in keyMap) {
+        if (k !== keyMap[k]) {
+            o[keyMap[k]] = o[k];
+            delete o[k];
+        }
+    }
+    return o;
+});
