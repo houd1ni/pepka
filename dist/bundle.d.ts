@@ -2,7 +2,7 @@ export declare const __: () => void;
 export declare const curry: (fn: Function) => (...args: any[]) => any;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
-export declare const type: (s: any) => string;
+export declare const type: (s: any) => any;
 export interface AnyObject {
 	[k: string]: any;
 }
