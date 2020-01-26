@@ -1,11 +1,12 @@
 import { __, curry } from './curry'
-import { to, isNum, nul, isUndef, undef, isNull, isArray, isFunc } from './utils'
+import { to, isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
 export const equals = curry((a: any, b: any) => {
-  if(to(a)=='object' && to(b)=='object') {
+  const typea = type(a)
+  if(typea===type(b) && (typea==='Object' || typea=='Array')) {
     if(isNull(a) || isNull(b)) {
       return a===b
     }
@@ -52,12 +53,16 @@ export const nth = curry(
 )
 export const includes = curry(
   (s: any, ss: any[]) => {
-    for(const a of ss) {
-      if(equals(a, s)) {
-        return true
+    if(isStr(ss)) {
+      return ss.includes(s)
+    } else {
+      for(const a of ss) {
+        if(equals(a, s)) {
+          return true
+        }
       }
+      return false
     }
-    return false
   }
 )
 export const slice = curry(

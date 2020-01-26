@@ -1,9 +1,10 @@
 import { curry } from './curry';
-import { to, isNum, nul, isUndef, undef, isNull, isFunc } from './utils';
+import { to, isNum, nul, isUndef, undef, isNull, isFunc, isStr } from './utils';
 import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
-    if (to(a) == 'object' && to(b) == 'object') {
+    const typea = type(a);
+    if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
         if (isNull(a) || isNull(b)) {
             return a === b;
         }
@@ -28,12 +29,17 @@ export const compose = ((...fns) => (s) => {
 export const bind = curry((fn, context) => fn.bind(context));
 export const nth = curry((i, data) => data[i]);
 export const includes = curry((s, ss) => {
-    for (const a of ss) {
-        if (equals(a, s)) {
-            return true;
-        }
+    if (isStr(ss)) {
+        return ss.includes(s);
     }
-    return false;
+    else {
+        for (const a of ss) {
+            if (equals(a, s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 });
 export const slice = curry((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
 export const head = nth(0);
