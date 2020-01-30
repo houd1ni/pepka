@@ -1,5 +1,6 @@
 import { curry } from "./curry";
 import { type } from "./common";
+import { isFunc } from "./utils";
 export const qappend = curry((s, xs) => { xs.push(s); return xs; });
 export const qassoc = curry((prop, v, obj) => {
     obj[prop] = v;
@@ -24,9 +25,14 @@ export const qmergeDeep = curry((o1, o2) => {
 });
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const qmapKeys = curry((keyMap, o) => {
-    for (let k in keyMap) {
-        if (k !== keyMap[k]) {
-            o[keyMap[k]] = o[k];
+    let k, mapped, newKey, newValue;
+    for (k in keyMap) {
+        mapped = keyMap[k];
+        [newKey, newValue] = isFunc(mapped)
+            ? mapped(o)
+            : [mapped, o[k]];
+        if (k !== newKey) {
+            o[newKey] = newValue;
             delete o[k];
         }
     }

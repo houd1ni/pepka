@@ -51,8 +51,8 @@ const to = (s) => typeof s;
 const isNull = (s) => s === nul;
 const isUndef = (s) => s === undef;
 const isNum = (s) => to(s) == 'number';
-const isArray = (s) => Array.isArray(s);
-const isRegExp = (s) => s instanceof RegExp;
+const isFunc = (s) => to(s) === 'function';
+const isStr = (s) => to(s) === 'string';
 
 const toLower = (s) => s.toLowerCase();
 const toUpper = (s) => s.toUpperCase();
@@ -61,9 +61,7 @@ const type = (s) => {
     switch (true) {
         case t !== 'object': return toUpper(t[0]) + t.slice(1);
         case isNull(s): return 'Null';
-        case isArray(s): return 'Array';
-        case isRegExp(s): return 'RegExp';
-        default: return 'Object';
+        default: return s.constructor.name;
     }
 };
 
@@ -89,9 +87,25 @@ const qmergeDeep = curry((o1, o2) => {
     }
     return o1;
 });
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+const qmapKeys = curry((keyMap, o) => {
+    let k, mapped, newKey, newValue;
+    for (k in keyMap) {
+        mapped = keyMap[k];
+        [newKey, newValue] = isFunc(mapped)
+            ? mapped(o)
+            : [mapped, o[k]];
+        if (k !== newKey) {
+            o[newKey] = newValue;
+            delete o[k];
+        }
+    }
+    return o;
+});
 
 const equals = curry((a, b) => {
-    if (to(a) == 'object' && to(b) == 'object') {
+    const typea = type(a);
+    if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
         if (isNull(a) || isNull(b)) {
             return a === b;
         }
@@ -116,12 +130,17 @@ const compose = ((...fns) => (s) => {
 const bind = curry((fn, context) => fn.bind(context));
 const nth = curry((i, data) => data[i]);
 const includes = curry((s, ss) => {
-    for (const a of ss) {
-        if (equals(a, s)) {
-            return true;
-        }
+    if (isStr(ss)) {
+        return ss.includes(s);
     }
-    return false;
+    else {
+        for (const a of ss) {
+            if (equals(a, s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 });
 const slice = curry((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
 const head = nth(0);
@@ -138,7 +157,7 @@ const last = (s) => s[length(s) - 1];
 const not = (o) => !o;
 const complement = (fn) => (...args) => {
     const out = fn(...args);
-    return out.$args_left ? out : not(out);
+    return (isFunc(out) && out.$args_left) ? complement(out) : not(out);
 };
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
@@ -153,6 +172,7 @@ const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
 const lte = curry((a, b) => b <= a);
+const find = curry((fn, s) => s.find(fn));
 const findIndex = curry((fn, s) => s.findIndex(fn));
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 const cond = curry((pairs, s) => {
@@ -190,6 +210,7 @@ const pickBy = curry((cond, o) => filter(cond, o));
 const pick = curry((props, o) => filter((_, k) => includes(k, props), o));
 const omit = curry((props, o) => filter((_, k) => !includes(k, props), o));
 const fromPairs = (pairs) => reduce((o, pair) => assoc(...pair, o), {}, pairs);
+const concat = curry(((a, b) => a.concat(b)));
 const join = curry((delimeter, arr) => arr.join(delimeter));
 const map = curry((pipe, arr) => arr.map(pipe));
 const forEach = curry((pipe, arr) => arr.forEach(pipe));
@@ -213,7 +234,7 @@ const memoize = (fn) => {
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const mapKeys = curry((keyMap, o) => compose(fromPairs, filter(complement(isNil)), map((([k, v]) => isNull(keyMap[k]) ? nul : [keyMap[k] || k, v])), toPairs)(o));
+const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, clone(o)));
 // ASYNCS
 /** One promise waits for another. */
 const forEachSerial = (() => {
@@ -282,6 +303,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   lt: lt,
   gte: gte,
   lte: lte,
+  find: find,
   findIndex: findIndex,
   explore: explore,
   cond: cond,
@@ -295,6 +317,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   pick: pick,
   omit: omit,
   fromPairs: fromPairs,
+  concat: concat,
   join: join,
   map: map,
   forEach: forEach,
@@ -316,7 +339,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   qappend: qappend,
   qassoc: qassoc,
   qreduce: qreduce,
-  qmergeDeep: qmergeDeep
+  qmergeDeep: qmergeDeep,
+  qmapKeys: qmapKeys
 });
 
 window.pepka = pepka;

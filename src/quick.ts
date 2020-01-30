@@ -1,6 +1,7 @@
 import { curry } from "./curry"
 import { type } from "./common"
-import { AnyObject, Reducer } from "./types"
+import { AnyObject, Reducer, AnyFunc } from "./types"
+import { isFunc } from "./utils"
 
 export const qappend = curry((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry(
@@ -37,9 +38,14 @@ export const qmapKeys = curry(
     keyMap: {[oldKey: string]: string},
     o: AnyObject
   ) => {
-    for(let k in keyMap) {
-      if(k !== keyMap[k]) {
-        o[keyMap[k]] = o[k]
+    let k: string, mapped: string | AnyFunc, newKey: string, newValue: any
+    for(k in keyMap) {
+      mapped = keyMap[k]
+      ;[newKey, newValue] = isFunc(mapped)
+        ? (mapped as unknown as AnyFunc)(o)
+        : [mapped, o[k]]
+      if(k !== newKey) {
+        o[newKey] = newValue
         delete o[k]
       }
     }

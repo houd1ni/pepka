@@ -1,5 +1,5 @@
 import { curry } from './curry';
-import { to, isNum, nul, isUndef, undef, isNull, isFunc, isStr } from './utils';
+import { isNum, nul, isUndef, undef, isNull, isFunc, isStr } from './utils';
 import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
@@ -86,21 +86,22 @@ export const assoc = curry((prop, v, obj) => ({
     [prop]: v
 }));
 export const prop = curry((key, o) => o[key]);
-export const pathOr = curry((_default, path, o) => ifElse(length, compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head), always(o))(path));
+export const propEq = curry((key, value, o) => o[key] === value);
+export const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
+export const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
+    ? _default
+    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 export const path = pathOr(undef);
 export const clone = (s) => {
-    switch (to(s)) {
-        case 'object':
-            switch (type(s)) {
-                case 'Null': return s;
-                case 'Array': return map(clone, s);
-                case 'Object':
-                    const out = {};
-                    for (let k in s) {
-                        out[k] = clone(s[k]);
-                    }
-                    return out;
+    switch (type(s)) {
+        case 'Null': return s;
+        case 'Array': return map(clone, s);
+        case 'Object':
+            const out = {};
+            for (let k in s) {
+                out[k] = clone(s[k]);
             }
+            return out;
         default: return s;
     }
 };

@@ -47,6 +47,8 @@ export declare const explore: (caption: string, level?: string) => any;
 export declare const cond: (...args: any[]) => any;
 export declare const assoc: (...args: any[]) => any;
 export declare const prop: (...args: any[]) => any;
+export declare const propEq: (...args: any[]) => any;
+export declare const propsEq: (...args: any[]) => any;
 export declare const pathOr: (...args: any[]) => any;
 export declare const path: any;
 export declare const clone: (s: any) => any;

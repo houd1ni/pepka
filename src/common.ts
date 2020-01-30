@@ -1,4 +1,4 @@
-import { isArray, to, isNull, isRegExp } from "./utils"
+import { to, isNull } from "./utils"
 
 export const toLower = (s: string) => s.toLowerCase()
 export const toUpper = (s: string) => s.toUpperCase()
