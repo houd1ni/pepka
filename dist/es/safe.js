@@ -1,6 +1,6 @@
 import { curry } from './curry';
-import { isNum, nul, isUndef, undef, isNull, isFunc, isStr } from './utils';
-import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
+import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils';
+import { qmergeDeep, qreduce, qappend } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
     const typea = type(a);
@@ -8,9 +8,13 @@ export const equals = curry((a, b) => {
         if (isNull(a) || isNull(b)) {
             return a === b;
         }
-        for (let v of [a, b]) {
-            for (let k in v) {
-                if (!equals(a[k], b[k])) {
+        if (a === b) {
+            return true;
+        }
+        for (const v of [a, b]) {
+            for (const k in v) {
+                if (!((v === b) && (k in a)) &&
+                    !((v === a) && (k in b) && equals(a[k], b[k]))) {
                     return false;
                 }
             }
@@ -124,8 +128,18 @@ export const isEmpty = (s) => {
         default: return false;
     }
 };
+export const empty = (s) => {
+    switch (type(s)) {
+        case 'String': return '';
+        case 'Object': return {};
+        case 'Array': return [];
+        default: return undef;
+    }
+};
 export const replace = curry((a, b, where) => where.replace(a, b));
-export const filter = curry((cond, data) => ifElse(compose(equals('Array'), type), (arr) => arr.filter(cond), compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs))(data));
+export const filter = curry((cond, data) => isArray(data)
+    ? data.filter(cond)
+    : compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs)(data));
 export const memoize = (fn) => {
     let cache;
     let cached = false;
@@ -134,7 +148,13 @@ export const memoize = (fn) => {
 export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-export const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, clone(o)));
+export const mapKeys = curry((keyMap, o) => {
+    const out = {};
+    for (const k in o) {
+        out[keyMap[k] || k] = o[k];
+    }
+    return out;
+});
 // ASYNCS
 /** One promise waits for another. */
 export const forEachSerial = (() => {

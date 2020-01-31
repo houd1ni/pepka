@@ -28,9 +28,9 @@ export declare const trim: (s: string) => string;
 export declare const last: (s: string | any[]) => any;
 export declare const not: (o: boolean) => boolean;
 export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | any;
-export declare const keys: (o: AnyObject) => string[];
-export declare const values: (o: AnyObject) => any[];
-export declare const toPairs: (o: AnyObject) => [string, any][];
+export declare const keys: (o: any[] | AnyObject) => string[];
+export declare const values: (o: any[] | AnyObject) => any[];
+export declare const toPairs: (o: any[] | AnyObject) => [string, any][];
 export declare const tap: (...args: any[]) => any;
 export declare const append: (...args: any[]) => any;
 export declare const split: (...args: any[]) => any;
@@ -63,6 +63,7 @@ export declare const map: (...args: any[]) => any;
 export declare const forEach: (...args: any[]) => any;
 export declare const both: (...args: any[]) => any;
 export declare const isEmpty: (s: any) => boolean;
+export declare const empty: (s: any) => {} | undefined;
 export declare const replace: (...args: any[]) => any;
 export declare const filter: (...args: any[]) => any;
 export declare const memoize: (fn: Function) => () => any;
@@ -87,5 +88,6 @@ export declare const qreduce: (...args: any[]) => any;
 export declare const qmergeDeep: (...args: any[]) => any;
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const qmapKeys: (...args: any[]) => any;
+export declare const qfilter: (...args: any[]) => any;
 
 export {};

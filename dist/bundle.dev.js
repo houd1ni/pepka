@@ -1,39 +1,41 @@
-// import { F, A } from "ts-toolbelt"
-const __ = (function Placeholder() { }); // as unknown as A.x & {'@@functional/placeholder': true}
-const isPl = (s) => s === __;
+const toPairsNum = (xs) => {
+    const len = xs.length;
+    const out = new Array(len);
+    for (let i = 0; i < len; i++) {
+        out[i] = [i, xs[i]];
+    }
+    return out;
+};
+const __ = (function Placeholder() { });
 const countArgs = (s, all = false) => {
     let i = 0;
-    for (let k in s)
-        (all || !isPl(s[k])) && i++;
+    for (const k in s)
+        (all || s[k] !== __) && i++;
     return i;
-};
-const extractArgs = (args) => {
-    const len = countArgs(args);
-    const arr = Array(len);
-    for (let i = 0; i < len; i++) {
-        arr[i] = args[i];
-    }
-    return arr;
 };
 // TODO: try to make it mutable.
 // { 0: __, 1: 10 }, [ 11 ]
 const addArgs = (args, _args) => {
-    const len = countArgs(args, true);
-    const new_len = _args.length;
-    const new_args = {};
-    let i = 0, j = 0;
-    for (; i < len; i++) {
-        new_args[i] = isPl(args[i]) && (j < new_len) ? _args[j++] : args[i];
+    const len = args.size;
+    const new_args = new Map(args);
+    const _args_len = _args.length;
+    let _args_left = _args_len;
+    let i = 0;
+    for (; _args_left && i < len; i++) {
+        if (new_args.get(i) === __) {
+            new_args.set(i, _args[_args_len - _args_left]);
+            _args_left--;
+        }
     }
-    for (; j < new_len; j++) {
-        new_args[len + j] = _args[j];
+    for (i = len + 1; _args_left; i++, _args_left--) {
+        new_args.set(i, _args[_args_len - _args_left]);
     }
     return new_args;
 };
 const _curry = (fn, args, new_args) => {
-    const args2add = fn.length - countArgs(args) - countArgs(new_args);
+    const args2add = fn.length - args.size - new_args.length;
     if (args2add < 1) {
-        return fn(...extractArgs(addArgs(args, new_args)));
+        return fn(...addArgs(args, new_args).values());
     }
     else {
         const curried = (...__args) => _curry(fn, addArgs(args, new_args), __args);
@@ -42,8 +44,8 @@ const _curry = (fn, args, new_args) => {
     }
 };
 const curry = ((fn) => (...args) => fn.length > countArgs(args)
-    ? _curry(fn, {}, args)
-    : fn(...args)); // as Currier
+    ? _curry(fn, new Map(toPairsNum(args)), [])
+    : fn(...args));
 
 const undef = undefined;
 const nul = null;
@@ -51,6 +53,7 @@ const to = (s) => typeof s;
 const isNull = (s) => s === nul;
 const isUndef = (s) => s === undef;
 const isNum = (s) => to(s) == 'number';
+const isArray = (s) => Array.isArray(s);
 const isFunc = (s) => to(s) === 'function';
 const isStr = (s) => to(s) === 'string';
 
@@ -101,6 +104,20 @@ const qmapKeys = curry((keyMap, o) => {
         }
     }
     return o;
+});
+const qfilter = curry((cond, data) => {
+    const isArr = isArray(data);
+    for (let k in data) {
+        if (!cond(data[k], k)) {
+            if (isArr) {
+                data.splice(k, 1);
+            }
+            else {
+                delete data[k];
+            }
+        }
+    }
+    return data;
 });
 
 const equals = curry((a, b) => {
@@ -187,21 +204,22 @@ const assoc = curry((prop, v, obj) => ({
     [prop]: v
 }));
 const prop = curry((key, o) => o[key]);
-const pathOr = curry((_default, path, o) => ifElse(length, compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head), always(o))(path));
+const propEq = curry((key, value, o) => o[key] === value);
+const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
+const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
+    ? _default
+    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 const path = pathOr(undef);
 const clone = (s) => {
-    switch (to(s)) {
-        case 'object':
-            switch (type(s)) {
-                case 'Null': return s;
-                case 'Array': return map(clone, s);
-                case 'Object':
-                    const out = {};
-                    for (let k in s) {
-                        out[k] = clone(s[k]);
-                    }
-                    return out;
+    switch (type(s)) {
+        case 'Null': return s;
+        case 'Array': return map(clone, s);
+        case 'Object':
+            const out = {};
+            for (let k in s) {
+                out[k] = clone(s[k]);
             }
+            return out;
         default: return s;
     }
 };
@@ -225,7 +243,9 @@ const isEmpty = (s) => {
     }
 };
 const replace = curry((a, b, where) => where.replace(a, b));
-const filter = curry((cond, data) => ifElse(compose(equals('Array'), type), (arr) => arr.filter(cond), compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs))(data));
+const filter = curry((cond, data) => isArray(data)
+    ? data.filter(cond)
+    : compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs)(data));
 const memoize = (fn) => {
     let cache;
     let cached = false;
@@ -309,6 +329,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   cond: cond,
   assoc: assoc,
   prop: prop,
+  propEq: propEq,
+  propsEq: propsEq,
   pathOr: pathOr,
   path: path,
   clone: clone,
@@ -340,7 +362,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   qassoc: qassoc,
   qreduce: qreduce,
   qmergeDeep: qmergeDeep,
-  qmapKeys: qmapKeys
+  qmapKeys: qmapKeys,
+  qfilter: qfilter
 });
 
 window.pepka = pepka;

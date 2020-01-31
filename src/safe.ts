@@ -10,9 +10,15 @@ export const equals = curry((a: any, b: any) => {
     if(isNull(a) || isNull(b)) {
       return a===b
     }
-    for(let v of [a, b]) {
-      for(let k in v) {
-        if(!equals(a[k], b[k])) {
+    if(a===b) {
+      return true
+    }
+    for(const v of [a, b]) {
+      for(const k in v) {
+        if(
+          !((v===b) && (k in a)) &&
+          !((v===a) && (k in b) && equals(a[k], b[k]))
+        ) {
           return false
         }
       }
@@ -85,9 +91,9 @@ export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
   return (isFunc(out) && (out as any).$args_left) ? complement(out) : not(out)
 }
-export const keys = (o: AnyObject) => Object.keys(o)
-export const values = (o: AnyObject) => Object.values(o)
-export const toPairs = (o: AnyObject) => Object.entries(o)
+export const keys = (o: AnyObject | any[]) => Object.keys(o)
+export const values = (o: AnyObject | any[]) => Object.values(o)
+export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
@@ -221,6 +227,14 @@ export const isEmpty = (s: any) => {
     default: return false
   }
 }
+export const empty = (s: any) => {
+  switch(type(s)) {
+    case 'String': return ''
+    case 'Object': return {}
+    case 'Array': return []
+    default: return undef
+  }
+}
 export const replace = curry(
   (
     a: string | RegExp,
@@ -232,15 +246,13 @@ export const filter = curry(
   (
     cond: (v: any, k: string | number) => boolean,
     data: any[] | AnyObject
-  ) => ifElse(
-    compose(equals('Array'), type),
-    (arr: any[]) => arr.filter(cond),
-    compose(
+  ) => isArray(data)
+    ? data.filter(cond)
+    : compose(
       fromPairs,
       filter(([k, v]) => cond(v, k)),
       toPairs
-    )
-  )(data)
+    )(data)
 )
 export const memoize = (fn: Function) => {
   let cache: any
@@ -259,7 +271,13 @@ export const mapKeys = curry(
   (
     keyMap: {[oldKey: string]: string},
     o: AnyObject
-  ) => qmapKeys(keyMap, clone(o))
+  ) => {
+    const out = {}
+    for(const k in o) {
+      out[keyMap[k] || k] = o[k]
+    }
+    return out
+  }
 )
 
 // ASYNCS

@@ -1,7 +1,7 @@
 import { curry } from "./curry"
 import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
-import { isFunc } from "./utils"
+import { isFunc, isArray } from "./utils"
 
 export const qappend = curry((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry(
@@ -50,5 +50,25 @@ export const qmapKeys = curry(
       }
     }
     return o
+  }
+)
+
+export const qfilter = curry(
+  (
+    cond: (v: any, k: string | number) => boolean,
+    data: any[] | AnyObject
+  ) => {
+    const isArr = isArray(data)
+    for(let k in data) {
+      if(!cond(data[k], k)) {
+        if(isArr) {
+          data.splice(k, 1)
+        } else {
+          // TODO: handle Maps and Sets ?
+          delete data[k]
+        }
+      }
+    }
+    return data
   }
 )
