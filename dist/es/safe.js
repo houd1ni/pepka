@@ -19,6 +19,7 @@ export const equals = curry((a, b) => {
                 }
             }
         }
+        return true;
     }
     return a === b;
 });

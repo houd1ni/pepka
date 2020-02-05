@@ -1,14 +1,3 @@
-
-const toPairsNum = (xs: any[]) => {
-  const len = xs.length
-  const out: [number, any][] = new Array(len)
-  for(let i=0; i<len; i++) {
-    out[i] = [i, xs[i]]
-  }
-  return out
-}
-
-
 // TODO: make curry2, curry3 and curry4 for faster stuff.
 // Probably make build a class to hold placeholder positions etc.
 
@@ -45,7 +34,7 @@ const addArgs = (args: Args, _args: any[]) => {
 }
 
 const _curry = (fn: Function, args: Args, new_args: any[]) => {
-  const args2add = fn.length - args.size - new_args.length
+  const args2add = fn.length - args.size - countArgs(new_args)
   if(args2add < 1) {
     return fn(...addArgs(args, new_args).values())
   } else {
@@ -62,6 +51,6 @@ const _curry = (fn: Function, args: Args, new_args: any[]) => {
 export const curry = (
   (fn: Function) =>
     (...args: any[]) => fn.length>countArgs(args)
-      ? _curry(fn, new Map<number, any>(toPairsNum(args)), [])
+      ? _curry(fn, new Map(), args)
       : fn(...args)
 )

@@ -1,6 +1,6 @@
 import { __, curry } from './curry'
-import { to, isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick'
+import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
+import { qmergeDeep, qreduce, qappend } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
@@ -23,6 +23,7 @@ export const equals = curry((a: any, b: any) => {
         }
       }
     }
+    return true
   }
   return a===b
 })
@@ -94,6 +95,7 @@ export const complement = (fn: AnyFunc) => (...args: any) => {
 export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
+export const test = (re: RegExp, s: string) => re.test(s)
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))

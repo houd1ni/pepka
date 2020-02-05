@@ -1,16 +1,8 @@
-const toPairsNum = (xs) => {
-    const len = xs.length;
-    const out = new Array(len);
-    for (let i = 0; i < len; i++) {
-        out[i] = [i, xs[i]];
-    }
-    return out;
-};
 const __ = (function Placeholder() { });
-const countArgs = (s, all = false) => {
+const countArgs = (s) => {
     let i = 0;
-    for (const k in s)
-        (all || s[k] !== __) && i++;
+    for (const v of s)
+        v !== __ && i++;
     return i;
 };
 // TODO: try to make it mutable.
@@ -33,7 +25,7 @@ const addArgs = (args, _args) => {
     return new_args;
 };
 const _curry = (fn, args, new_args) => {
-    const args2add = fn.length - args.size - new_args.length;
+    const args2add = fn.length - args.size - countArgs(new_args);
     if (args2add < 1) {
         return fn(...addArgs(args, new_args).values());
     }
@@ -44,7 +36,7 @@ const _curry = (fn, args, new_args) => {
     }
 };
 const curry = ((fn) => (...args) => fn.length > countArgs(args)
-    ? _curry(fn, new Map(toPairsNum(args)), [])
+    ? _curry(fn, new Map(), args)
     : fn(...args));
 
 const undef = undefined;
@@ -57,15 +49,17 @@ const isArray = (s) => Array.isArray(s);
 const isFunc = (s) => to(s) === 'function';
 const isStr = (s) => to(s) === 'string';
 
+// It's faster that toUpperCase() !
+const caseMap = {
+    u: 'U', b: 'B', n: 'N', s: 'S', f: 'F'
+};
 const toLower = (s) => s.toLowerCase();
 const toUpper = (s) => s.toUpperCase();
 const type = (s) => {
     const t = to(s);
-    switch (true) {
-        case t !== 'object': return toUpper(t[0]) + t.slice(1);
-        case isNull(s): return 'Null';
-        default: return s.constructor.name;
-    }
+    return t === 'object'
+        ? isNull(s) ? 'Null' : s.constructor.name
+        : caseMap[t[0]] + t.slice(1);
 };
 
 const qappend = curry((s, xs) => { xs.push(s); return xs; });
@@ -113,6 +107,7 @@ const qfilter = curry((cond, data) => {
                 data.splice(k, 1);
             }
             else {
+                // TODO: handle Maps and Sets ?
                 delete data[k];
             }
         }
@@ -126,13 +121,18 @@ const equals = curry((a, b) => {
         if (isNull(a) || isNull(b)) {
             return a === b;
         }
-        for (let v of [a, b]) {
-            for (let k in v) {
-                if (!equals(a[k], b[k])) {
+        if (a === b) {
+            return true;
+        }
+        for (const v of [a, b]) {
+            for (const k in v) {
+                if (!((v === b) && (k in a)) &&
+                    !((v === a) && (k in b) && equals(a[k], b[k]))) {
                     return false;
                 }
             }
         }
+        return true;
     }
     return a === b;
 });
@@ -242,6 +242,14 @@ const isEmpty = (s) => {
         default: return false;
     }
 };
+const empty = (s) => {
+    switch (type(s)) {
+        case 'String': return '';
+        case 'Object': return {};
+        case 'Array': return [];
+        default: return undef;
+    }
+};
 const replace = curry((a, b, where) => where.replace(a, b));
 const filter = curry((cond, data) => isArray(data)
     ? data.filter(cond)
@@ -254,7 +262,13 @@ const memoize = (fn) => {
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, clone(o)));
+const mapKeys = curry((keyMap, o) => {
+    const out = {};
+    for (const k in o) {
+        out[keyMap[k] || k] = o[k];
+    }
+    return out;
+});
 // ASYNCS
 /** One promise waits for another. */
 const forEachSerial = (() => {
@@ -345,6 +359,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   forEach: forEach,
   both: both,
   isEmpty: isEmpty,
+  empty: empty,
   replace: replace,
   filter: filter,
   memoize: memoize,

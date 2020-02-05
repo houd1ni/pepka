@@ -1,11 +1,5 @@
-const toPairsNum = (xs) => {
-    const len = xs.length;
-    const out = new Array(len);
-    for (let i = 0; i < len; i++) {
-        out[i] = [i, xs[i]];
-    }
-    return out;
-};
+// TODO: make curry2, curry3 and curry4 for faster stuff.
+// Probably make build a class to hold placeholder positions etc.
 export const __ = (function Placeholder() { });
 const countArgs = (s) => {
     let i = 0;
@@ -33,7 +27,7 @@ const addArgs = (args, _args) => {
     return new_args;
 };
 const _curry = (fn, args, new_args) => {
-    const args2add = fn.length - args.size - new_args.length;
+    const args2add = fn.length - args.size - countArgs(new_args);
     if (args2add < 1) {
         return fn(...addArgs(args, new_args).values());
     }
@@ -44,5 +38,5 @@ const _curry = (fn, args, new_args) => {
     }
 };
 export const curry = ((fn) => (...args) => fn.length > countArgs(args)
-    ? _curry(fn, new Map(toPairsNum(args)), [])
+    ? _curry(fn, new Map(), args)
     : fn(...args));
