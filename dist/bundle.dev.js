@@ -1,3 +1,5 @@
+// TODO: make curry2, curry3 and curry4 for faster stuff.
+// Probably make build a class to hold placeholder positions etc.
 const __ = (function Placeholder() { });
 const countArgs = (s) => {
     let i = 0;
@@ -179,16 +181,20 @@ const complement = (fn) => (...args) => {
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);
+const test = (re, s) => re.test(s);
 const tap = curry((fn, s) => { fn(s); return s; });
 const append = curry((s, xs) => [...xs, s]);
 const split = curry((s, xs) => xs.split(s));
 const T = always(true);
 const F = always(false);
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
+const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
+const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
 const lte = curry((a, b) => b <= a);
+const indexOf = curry((element, s) => s.indexOf(element));
 const find = curry((fn, s) => s.find(fn));
 const findIndex = curry((fn, s) => s.findIndex(fn));
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
@@ -327,16 +333,20 @@ var pepka = /*#__PURE__*/Object.freeze({
   keys: keys,
   values: values,
   toPairs: toPairs,
+  test: test,
   tap: tap,
   append: append,
   split: split,
   T: T,
   F: F,
   uniq: uniq,
+  intersection: intersection,
+  genBy: genBy,
   gt: gt,
   lt: lt,
   gte: gte,
   lte: lte,
+  indexOf: indexOf,
   find: find,
   findIndex: findIndex,
   explore: explore,

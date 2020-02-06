@@ -4,6 +4,7 @@ import { qmergeDeep, qreduce, qappend } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
+
 export const equals = curry((a: any, b: any) => {
   const typea = type(a)
   if(typea===type(b) && (typea==='Object' || typea=='Array')) {
@@ -105,6 +106,18 @@ export const uniq = (xs: any[]) => qreduce(
   (accum: any[], x: any) =>
     includes(x, accum) ? accum : qappend(x, accum),
 [], xs)
+export const intersection = curry(
+  (
+    arr1: any[],
+    arr2: any[]
+  ) => arr1.filter((a) => arr2.includes(a))
+)
+export const genBy = curry(
+  (
+    generator: (i: number) => any,
+    length: number
+  ) => [...Array(length)].map((_, i) => generator(i))
+)
 export const gt = curry(
   (a: number, b: number) => a>b
 )
@@ -116,6 +129,9 @@ export const gte = curry(
 )
 export const lte = curry(
   (a: number, b: number) => b<=a
+)
+export const indexOf = curry(
+  (element: any, s: any[]) => s.indexOf(element)
 )
 export const find = curry(
   (fn: Cond, s: any[]) => s.find(fn)
