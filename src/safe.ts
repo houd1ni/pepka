@@ -118,6 +118,17 @@ export const genBy = curry(
     length: number
   ) => [...Array(length)].map((_, i) => generator(i))
 )
+export const once = <Func extends AnyFunc>(fn: Func) => {
+  let done = false, cache: any
+  return (...args: Parameters<Func>) => {
+    if(done) {
+      return cache
+    } else {
+      done = true
+      return cache = fn(...args)
+    }
+  }
+}
 export const gt = curry(
   (a: number, b: number) => a>b
 )

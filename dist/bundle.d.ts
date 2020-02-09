@@ -40,6 +40,7 @@ export declare const F: () => false;
 export declare const uniq: (xs: any[]) => any;
 export declare const intersection: (...args: any[]) => any;
 export declare const genBy: (...args: any[]) => any;
+export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => any;
 export declare const gt: (...args: any[]) => any;
 export declare const lt: (...args: any[]) => any;
 export declare const gte: (...args: any[]) => any;

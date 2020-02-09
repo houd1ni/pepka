@@ -75,6 +75,18 @@ export const F = always(false);
 export const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 export const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
 export const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
+export const once = (fn) => {
+    let done = false, cache;
+    return (...args) => {
+        if (done) {
+            return cache;
+        }
+        else {
+            done = true;
+            return cache = fn(...args);
+        }
+    };
+};
 export const gt = curry((a, b) => a > b);
 export const lt = curry((a, b) => a < b);
 export const gte = curry((a, b) => b >= a);
