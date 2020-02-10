@@ -1,6 +1,6 @@
 import { curry } from './curry';
 import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils';
-import { qmergeDeep, qreduce, qappend } from './quick';
+import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
 import { type } from './common';
 export const equals = curry((a, b) => {
     const typea = type(a);
@@ -165,13 +165,7 @@ export const memoize = (fn) => {
 export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-export const mapKeys = curry((keyMap, o) => {
-    const out = {};
-    for (const k in o) {
-        out[keyMap[k] || k] = o[k];
-    }
-    return out;
-});
+export const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
 /** One promise waits for another. */
 export const forEachSerial = (() => {

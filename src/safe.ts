@@ -1,6 +1,6 @@
 import { __, curry } from './curry'
 import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
-import { qmergeDeep, qreduce, qappend } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 
@@ -300,13 +300,7 @@ export const mapKeys = curry(
   (
     keyMap: {[oldKey: string]: string},
     o: AnyObject
-  ) => {
-    const out = {}
-    for(const k in o) {
-      out[keyMap[k] || k] = o[k]
-    }
-    return out
-  }
+  ) => qmapKeys(keyMap, Object.assign({}, o))
 )
 
 // ASYNCS

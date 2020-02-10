@@ -190,6 +190,18 @@ const F = always(false);
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
 const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
+const once = (fn) => {
+    let done = false, cache;
+    return (...args) => {
+        if (done) {
+            return cache;
+        }
+        else {
+            done = true;
+            return cache = fn(...args);
+        }
+    };
+};
 const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
@@ -268,13 +280,7 @@ const memoize = (fn) => {
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const mapKeys = curry((keyMap, o) => {
-    const out = {};
-    for (const k in o) {
-        out[keyMap[k] || k] = o[k];
-    }
-    return out;
-});
+const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
 /** One promise waits for another. */
 const forEachSerial = (() => {
@@ -342,6 +348,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   uniq: uniq,
   intersection: intersection,
   genBy: genBy,
+  once: once,
   gt: gt,
   lt: lt,
   gte: gte,

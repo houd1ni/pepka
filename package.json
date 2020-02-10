@@ -35,9 +35,10 @@
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production tsc",
-    "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs"
+    "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
+    "all": "npm run dev && npm run prod"
   },
-  "version": "0.8.1",
+  "version": "0.8.2",
   "ava": {
     "files": [
       "./test/specs/*.ts"
