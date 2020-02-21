@@ -1,13 +1,9 @@
-// TODO: make curry2, curry3 and curry4 for faster stuff.
-// Probably make build a class to hold placeholder positions etc.
 
-type Args = Map<number, any>
+type Args = any[]
 
-export const __ = (
-  function Placeholder() {}
-)
+export const __ = (function Placeholder() {})
 
-const countArgs = (s: any[]) => {
+const countArgs = (s: Args) => {
   let i = 0
   for (const v of s) v!==__ && i++
   return i
@@ -15,30 +11,30 @@ const countArgs = (s: any[]) => {
 
 // TODO: try to make it mutable.
 // { 0: __, 1: 10 }, [ 11 ]
-const addArgs = (args: Args, _args: any[]) => {
-  const len = args.size
-  const new_args = new Map(args)
+const addArgs = (args: Args, _args: Args) => {
+  const len = args.length
+  const new_args = args.slice()
   const _args_len = _args.length
   let _args_left = _args_len
   let i=0
   for (; _args_left && i<len; i++) {
-    if(new_args.get(i) === __) {
-      new_args.set(i, _args[_args_len-_args_left])
+    if(new_args[i] === __) {
+      new_args[i] = _args[_args_len-_args_left]
       _args_left--
     }
   }
-  for(i=len+1; _args_left; i++, _args_left--) {
-    new_args.set(i, _args[_args_len-_args_left])
+  for(i=len; _args_left; i++, _args_left--) {
+    new_args[i] = _args[_args_len-_args_left]
   }
   return new_args
 }
 
-const _curry = (fn: Function, args: Args, new_args: any[]) => {
-  const args2add = fn.length - args.size - countArgs(new_args)
+const _curry = (fn: Function, args: Args, new_args: Args) => {
+  const args2add = fn.length - args.length - countArgs(new_args)
   if(args2add < 1) {
-    return fn(...addArgs(args, new_args).values())
+    return fn(...addArgs(args, new_args))
   } else {
-    const curried = (...__args: any[]) => _curry(
+    const curried = (...__args: Args) => _curry(
       fn,
       addArgs(args, new_args),
       __args
@@ -50,7 +46,7 @@ const _curry = (fn: Function, args: Args, new_args: any[]) => {
 
 export const curry = (
   (fn: Function) =>
-    (...args: any[]) => fn.length>countArgs(args)
-      ? _curry(fn, new Map(), args)
+    (...args: Args) => fn.length>countArgs(args)
+      ? _curry(fn, [], args)
       : fn(...args)
 )

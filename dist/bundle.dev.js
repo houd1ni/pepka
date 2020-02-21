@@ -1,5 +1,3 @@
-// TODO: make curry2, curry3 and curry4 for faster stuff.
-// Probably make build a class to hold placeholder positions etc.
 const __ = (function Placeholder() { });
 const countArgs = (s) => {
     let i = 0;
@@ -10,26 +8,26 @@ const countArgs = (s) => {
 // TODO: try to make it mutable.
 // { 0: __, 1: 10 }, [ 11 ]
 const addArgs = (args, _args) => {
-    const len = args.size;
-    const new_args = new Map(args);
+    const len = args.length;
+    const new_args = args.slice();
     const _args_len = _args.length;
     let _args_left = _args_len;
     let i = 0;
     for (; _args_left && i < len; i++) {
-        if (new_args.get(i) === __) {
-            new_args.set(i, _args[_args_len - _args_left]);
+        if (new_args[i] === __) {
+            new_args[i] = _args[_args_len - _args_left];
             _args_left--;
         }
     }
-    for (i = len + 1; _args_left; i++, _args_left--) {
-        new_args.set(i, _args[_args_len - _args_left]);
+    for (i = len; _args_left; i++, _args_left--) {
+        new_args[i] = _args[_args_len - _args_left];
     }
     return new_args;
 };
 const _curry = (fn, args, new_args) => {
-    const args2add = fn.length - args.size - countArgs(new_args);
+    const args2add = fn.length - args.length - countArgs(new_args);
     if (args2add < 1) {
-        return fn(...addArgs(args, new_args).values());
+        return fn(...addArgs(args, new_args));
     }
     else {
         const curried = (...__args) => _curry(fn, addArgs(args, new_args), __args);
@@ -38,7 +36,7 @@ const _curry = (fn, args, new_args) => {
     }
 };
 const curry = ((fn) => (...args) => fn.length > countArgs(args)
-    ? _curry(fn, new Map(), args)
+    ? _curry(fn, [], args)
     : fn(...args));
 
 const undef = undefined;
@@ -70,13 +68,34 @@ const qassoc = curry((prop, v, obj) => {
     return obj;
 });
 const qreduce = curry((fn, accum, arr) => arr.reduce(fn, accum));
-const qmergeDeep = curry((o1, o2) => {
+// strategy is for arrays: 1->clean, 2->merge, 3->push.
+const mergeDeep = (strategy, o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
+                if (type(o1[k]) === 'Array') {
+                    switch (strategy) {
+                        case 2:
+                            const o1k = o1[k], o2k = o2[k];
+                            for (const i in o2k) {
+                                if (o1k[i]) {
+                                    mergeDeep(strategy, o1k[i], o2k[i]);
+                                }
+                                else {
+                                    o1k[i] = o2k[i];
+                                }
+                            }
+                            break;
+                        case 3: o1[k].push(...o2[k]);
+                    }
+                }
+                else {
+                    o1[k] = o2[k];
+                }
+                break;
             case 'Object':
                 if (type(o1[k]) === 'Object') {
-                    qmergeDeep(o1[k], o2[k]);
+                    mergeDeep(strategy, o1[k], o2[k]);
                     break;
                 }
             default:
@@ -85,7 +104,10 @@ const qmergeDeep = curry((o1, o2) => {
         }
     }
     return o1;
-});
+};
+const qmergeDeep = curry(mergeDeep)(1);
+const qmergeDeepX = curry(mergeDeep)(2);
+const qmergeDeepAdd = curry(mergeDeep)(3);
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const qmapKeys = curry((keyMap, o) => {
     let k, mapped, newKey, newValue;
@@ -94,8 +116,8 @@ const qmapKeys = curry((keyMap, o) => {
         [newKey, newValue] = isFunc(mapped)
             ? mapped(o)
             : [mapped, o[k]];
+        o[newKey] = newValue;
         if (k !== newKey) {
-            o[newKey] = newValue;
             delete o[k];
         }
     }
@@ -116,7 +138,17 @@ const qfilter = curry((cond, data) => {
     }
     return data;
 });
+const qpick = curry((props, o) => {
+    const out = {};
+    for (const p of props) {
+        if (p in o) {
+            out[p] = o[p];
+        }
+    }
+    return out;
+});
 
+// over, lensProp
 const equals = curry((a, b) => {
     const typea = type(a);
     if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
@@ -181,6 +213,7 @@ const complement = (fn) => (...args) => {
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);
+const reverse = (xs) => xs.reverse();
 const test = (re, s) => re.test(s);
 const tap = curry((fn, s) => { fn(s); return s; });
 const append = curry((s, xs) => [...xs, s]);
@@ -221,6 +254,10 @@ const assoc = curry((prop, v, obj) => ({
     ...obj,
     [prop]: v
 }));
+const all = curry((pred, xs) => xs.every(pred));
+const any = curry((pred, xs) => xs.some(pred));
+const allPass = curry((preds, x) => preds.every((pred) => pred(x)));
+const anyPass = curry((preds, x) => preds.some((pred) => pred(x)));
 const prop = curry((key, o) => o[key]);
 const propEq = curry((key, value, o) => o[key] === value);
 const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
@@ -253,11 +290,13 @@ const forEach = curry((pipe, arr) => arr.forEach(pipe));
 const both = curry((cond1, cond2, s) => cond2(s) && cond1(s));
 const isEmpty = (s) => {
     switch (type(s)) {
-        case 'String': return s == '';
+        case 'String':
         case 'Array': return length(s) == 0;
-        case 'Null': return false;
-        case 'Object': return length(Object.keys(s)) == 0;
-        default: return false;
+        case 'Object':
+            for (const _k in s)
+                return false;
+            return true;
+        default: return null;
     }
 };
 const empty = (s) => {
@@ -278,7 +317,9 @@ const memoize = (fn) => {
     return () => cached ? cache : (cached = true, cache = fn());
 };
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
-const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
+const mergeDeep$1 = curry((a, b) => qmergeDeep(clone(a), clone(b)));
+const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
+const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
@@ -339,6 +380,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   keys: keys,
   values: values,
   toPairs: toPairs,
+  reverse: reverse,
   test: test,
   tap: tap,
   append: append,
@@ -359,6 +401,10 @@ var pepka = /*#__PURE__*/Object.freeze({
   explore: explore,
   cond: cond,
   assoc: assoc,
+  all: all,
+  any: any,
+  allPass: allPass,
+  anyPass: anyPass,
   prop: prop,
   propEq: propEq,
   propsEq: propsEq,
@@ -381,7 +427,9 @@ var pepka = /*#__PURE__*/Object.freeze({
   filter: filter,
   memoize: memoize,
   mergeShallow: mergeShallow,
-  mergeDeep: mergeDeep,
+  mergeDeep: mergeDeep$1,
+  mergeDeepX: mergeDeepX,
+  mergeDeepAdd: mergeDeepAdd,
   mapKeys: mapKeys,
   forEachSerial: forEachSerial,
   waitAll: waitAll,
@@ -394,8 +442,11 @@ var pepka = /*#__PURE__*/Object.freeze({
   qassoc: qassoc,
   qreduce: qreduce,
   qmergeDeep: qmergeDeep,
+  qmergeDeepX: qmergeDeepX,
+  qmergeDeepAdd: qmergeDeepAdd,
   qmapKeys: qmapKeys,
-  qfilter: qfilter
+  qfilter: qfilter,
+  qpick: qpick
 });
 
 window.pepka = pepka;

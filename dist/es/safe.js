@@ -1,7 +1,8 @@
 import { curry } from './curry';
 import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils';
-import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick';
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick';
 import { type } from './common';
+// over, lensProp
 export const equals = curry((a, b) => {
     const typea = type(a);
     if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
@@ -66,6 +67,7 @@ export const complement = (fn) => (...args) => {
 export const keys = (o) => Object.keys(o);
 export const values = (o) => Object.values(o);
 export const toPairs = (o) => Object.entries(o);
+export const reverse = (xs) => xs.reverse();
 export const test = (re, s) => re.test(s);
 export const tap = curry((fn, s) => { fn(s); return s; });
 export const append = curry((s, xs) => [...xs, s]);
@@ -106,6 +108,10 @@ export const assoc = curry((prop, v, obj) => ({
     ...obj,
     [prop]: v
 }));
+export const all = curry((pred, xs) => xs.every(pred));
+export const any = curry((pred, xs) => xs.some(pred));
+export const allPass = curry((preds, x) => preds.every((pred) => pred(x)));
+export const anyPass = curry((preds, x) => preds.some((pred) => pred(x)));
 export const prop = curry((key, o) => o[key]);
 export const propEq = curry((key, value, o) => o[key] === value);
 export const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
@@ -138,11 +144,13 @@ export const forEach = curry((pipe, arr) => arr.forEach(pipe));
 export const both = curry((cond1, cond2, s) => cond2(s) && cond1(s));
 export const isEmpty = (s) => {
     switch (type(s)) {
-        case 'String': return s == '';
+        case 'String':
         case 'Array': return length(s) == 0;
-        case 'Null': return false;
-        case 'Object': return length(Object.keys(s)) == 0;
-        default: return false;
+        case 'Object':
+            for (const _k in s)
+                return false;
+            return true;
+        default: return null;
     }
 };
 export const empty = (s) => {
@@ -164,6 +172,8 @@ export const memoize = (fn) => {
 };
 export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
+export const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
+export const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS

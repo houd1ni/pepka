@@ -1,9 +1,9 @@
 import { __, curry } from './curry'
 import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-
+// over, lensProp
 
 export const equals = curry((a: any, b: any) => {
   const typea = type(a)
@@ -96,12 +96,13 @@ export const complement = (fn: AnyFunc) => (...args: any) => {
 export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
+export const reverse = (xs: any[]) => xs.reverse()
 export const test = (re: RegExp, s: string) => re.test(s)
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
-export const T = always<true>(true)
-export const F = always<false>(false)
+export const T = always<true>(true) as (...args: any[]) => true
+export const F = always<false>(false) as (...args: any[]) => false
 export const uniq = (xs: any[]) => qreduce(
   (accum: any[], x: any) =>
     includes(x, accum) ? accum : qappend(x, accum),
@@ -167,6 +168,14 @@ export const assoc = curry(
     ...obj,
     [prop]: v
   })
+)
+export const all = curry((pred: Cond, xs: any[]) => xs.every(pred))
+export const any = curry((pred: Cond, xs: any[]) => xs.some(pred))
+export const allPass = curry(
+  (preds: Cond[], x: any) => preds.every((pred) => pred(x))
+)
+export const anyPass = curry(
+  (preds: Cond[], x: any) => preds.some((pred) => pred(x))
 )
 export const prop = curry(
   (key: string, o: AnyObject) => o[key]
@@ -249,11 +258,11 @@ export const both = curry(
 )
 export const isEmpty = (s: any) => {
   switch(type(s)) {
-    case 'String': return s==''
-    case 'Array': return length(s)==0
-    case 'Null': return false
-    case 'Object': return length(Object.keys(s)) == 0
-    default: return false
+    case 'String': case 'Array': return length(s)==0
+    case 'Object':
+      for(const _k in s) return false
+      return true
+    default: return null
   }
 }
 export const empty = (s: any) => {
@@ -294,6 +303,12 @@ export const mergeShallow = curry(
 )
 export const mergeDeep = curry(
   (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), clone(b))
+)
+export const mergeDeepX = curry(
+  (a: AnyObject, b: AnyObject) => qmergeDeepX(clone(a), clone(b))
+)
+export const mergeDeepAdd = curry(
+  (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), clone(b))
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry(

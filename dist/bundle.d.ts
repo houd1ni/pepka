@@ -1,5 +1,6 @@
+export declare type Args = any[];
 export declare const __: () => void;
-export declare const curry: (fn: Function) => (...args: any[]) => any;
+export declare const curry: (fn: Function) => (...args: Args) => any;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
 export declare const type: (s: any) => any;
@@ -31,12 +32,13 @@ export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | an
 export declare const keys: (o: any[] | AnyObject) => string[];
 export declare const values: (o: any[] | AnyObject) => any[];
 export declare const toPairs: (o: any[] | AnyObject) => [string, any][];
+export declare const reverse: (xs: any[]) => any[];
 export declare const test: (re: RegExp, s: string) => boolean;
 export declare const tap: (...args: any[]) => any;
 export declare const append: (...args: any[]) => any;
 export declare const split: (...args: any[]) => any;
-export declare const T: () => true;
-export declare const F: () => false;
+export declare const T: (...args: any[]) => true;
+export declare const F: (...args: any[]) => false;
 export declare const uniq: (xs: any[]) => any;
 export declare const intersection: (...args: any[]) => any;
 export declare const genBy: (...args: any[]) => any;
@@ -51,6 +53,10 @@ export declare const findIndex: (...args: any[]) => any;
 export declare const explore: (caption: string, level?: string) => any;
 export declare const cond: (...args: any[]) => any;
 export declare const assoc: (...args: any[]) => any;
+export declare const all: (...args: any[]) => any;
+export declare const any: (...args: any[]) => any;
+export declare const allPass: (...args: any[]) => any;
+export declare const anyPass: (...args: any[]) => any;
 export declare const prop: (...args: any[]) => any;
 export declare const propEq: (...args: any[]) => any;
 export declare const propsEq: (...args: any[]) => any;
@@ -67,13 +73,15 @@ export declare const join: (...args: any[]) => any;
 export declare const map: (...args: any[]) => any;
 export declare const forEach: (...args: any[]) => any;
 export declare const both: (...args: any[]) => any;
-export declare const isEmpty: (s: any) => boolean;
+export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
 export declare const replace: (...args: any[]) => any;
 export declare const filter: (...args: any[]) => any;
 export declare const memoize: (fn: Function) => () => any;
 export declare const mergeShallow: (...args: any[]) => any;
 export declare const mergeDeep: (...args: any[]) => any;
+export declare const mergeDeepX: (...args: any[]) => any;
+export declare const mergeDeepAdd: (...args: any[]) => any;
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const mapKeys: (...args: any[]) => any;
 /** One promise waits for another. */
@@ -90,9 +98,12 @@ export declare const echo: (s: any) => any;
 export declare const qappend: (...args: any[]) => any;
 export declare const qassoc: (...args: any[]) => any;
 export declare const qreduce: (...args: any[]) => any;
-export declare const qmergeDeep: (...args: any[]) => any;
+export declare const qmergeDeep: any;
+export declare const qmergeDeepX: any;
+export declare const qmergeDeepAdd: any;
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const qmapKeys: (...args: any[]) => any;
 export declare const qfilter: (...args: any[]) => any;
+export declare const qpick: (...args: any[]) => any;
 
 export {};
