@@ -76,7 +76,7 @@ export const T = always(true);
 export const F = always(false);
 export const range = curry((from, to) => genBy(add(from), to - from));
 export const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
-export const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
+export const intersection = curry((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
 export const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 export const once = (fn) => {
     let done = false, cache;

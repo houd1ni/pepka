@@ -214,7 +214,7 @@ const T = always(true);
 const F = always(false);
 const range = curry((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
-const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
+const intersection = curry((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
 const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;

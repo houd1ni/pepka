@@ -111,10 +111,7 @@ export const uniq = (xs: any[]) => qreduce(
     includes(x, accum) ? accum : qappend(x, accum),
 [], xs)
 export const intersection = curry(
-  (
-    arr1: any[],
-    arr2: any[]
-  ) => arr1.filter((a) => arr2.includes(a))
+  (xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2))
 )
 export const genBy = curry(
   (
