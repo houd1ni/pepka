@@ -142,6 +142,7 @@ export const gte = curry(
 export const lte = curry(
   (a: number, b: number) => b<=a
 )
+// TODO: this is a quick version, and make it really searching by value.
 export const indexOf = curry(
   (element: any, s: any[]) => s.indexOf(element)
 )
