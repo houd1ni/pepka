@@ -68,12 +68,13 @@ export const keys = (o) => Object.keys(o);
 export const values = (o) => Object.values(o);
 export const toPairs = (o) => Object.entries(o);
 export const reverse = (xs) => xs.reverse();
-export const test = (re, s) => re.test(s);
+export const test = curry((re, s) => re.test(s));
 export const tap = curry((fn, s) => { fn(s); return s; });
 export const append = curry((s, xs) => [...xs, s]);
 export const split = curry((s, xs) => xs.split(s));
 export const T = always(true);
 export const F = always(false);
+export const range = curry((from, to) => genBy(add(from), to - from));
 export const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 export const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
 export const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
@@ -93,9 +94,11 @@ export const gt = curry((a, b) => a > b);
 export const lt = curry((a, b) => a < b);
 export const gte = curry((a, b) => b >= a);
 export const lte = curry((a, b) => b <= a);
-export const indexOf = curry((element, s) => s.indexOf(element));
+// : <U=any>(sortFn: (v: U)=>-1|1, xs: U[]) => U[] 
+export const sort = curry((sortFn, xs) => xs.sort(sortFn));
 export const find = curry((fn, s) => s.find(fn));
 export const findIndex = curry((fn, s) => s.findIndex(fn));
+export const indexOf = curry((x, xs) => findIndex(equals(x), xs));
 export const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 export const cond = curry((pairs, s) => {
     for (const [cond, fn] of pairs) {
@@ -119,8 +122,10 @@ export const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
     : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 export const path = pathOr(undef);
+const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 export const clone = (s) => {
-    switch (type(s)) {
+    const t = type(s);
+    switch (t) {
         case 'Null': return s;
         case 'Array': return map(clone, s);
         case 'Object':
@@ -129,12 +134,26 @@ export const clone = (s) => {
                 out[k] = clone(s[k]);
             }
             return out;
-        default: return s;
+        case 'String':
+        case 'Number':
+        case 'Boolean':
+        case 'Symbol':
+            return s;
+        default:
+            return typed_arr_re.test(t) ? map(clone, s) : s;
     }
 };
 export const reduce = curry((fn, accum, arr) => qreduce(fn, clone(accum), arr));
 export const pickBy = curry((cond, o) => filter(cond, o));
-export const pick = curry((props, o) => filter((_, k) => includes(k, props), o));
+export const pick = curry((props, o) => {
+    const out = {};
+    for (const p of props) {
+        if (p in o) {
+            out[p] = o[p];
+        }
+    }
+    return out;
+});
 export const omit = curry((props, o) => filter((_, k) => !includes(k, props), o));
 export const fromPairs = (pairs) => reduce((o, pair) => assoc(...pair, o), {}, pairs);
 export const concat = curry(((a, b) => a.concat(b)));

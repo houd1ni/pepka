@@ -69,11 +69,11 @@ const qassoc = curry((prop, v, obj) => {
 });
 const qreduce = curry((fn, accum, arr) => arr.reduce(fn, accum));
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep = (strategy, o1, o2) => {
+const mergeDeep = curry((strategy, o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
-                if (type(o1[k]) === 'Array') {
+                if (strategy > 1 && type(o1[k]) === 'Array') {
                     switch (strategy) {
                         case 2:
                             const o1k = o1[k], o2k = o2[k];
@@ -104,10 +104,10 @@ const mergeDeep = (strategy, o1, o2) => {
         }
     }
     return o1;
-};
-const qmergeDeep = curry(mergeDeep)(1);
-const qmergeDeepX = curry(mergeDeep)(2);
-const qmergeDeepAdd = curry(mergeDeep)(3);
+});
+const qmergeDeep = mergeDeep(1);
+const qmergeDeepX = mergeDeep(2);
+const qmergeDeepAdd = mergeDeep(3);
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const qmapKeys = curry((keyMap, o) => {
     let k, mapped, newKey, newValue;
@@ -138,15 +138,7 @@ const qfilter = curry((cond, data) => {
     }
     return data;
 });
-const qpick = curry((props, o) => {
-    const out = {};
-    for (const p of props) {
-        if (p in o) {
-            out[p] = o[p];
-        }
-    }
-    return out;
-});
+const qindexOf = curry((x, xs) => xs.indexOf(x));
 
 // over, lensProp
 const equals = curry((a, b) => {
@@ -214,12 +206,13 @@ const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);
 const reverse = (xs) => xs.reverse();
-const test = (re, s) => re.test(s);
+const test = curry((re, s) => re.test(s));
 const tap = curry((fn, s) => { fn(s); return s; });
 const append = curry((s, xs) => [...xs, s]);
 const split = curry((s, xs) => xs.split(s));
 const T = always(true);
 const F = always(false);
+const range = curry((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry((arr1, arr2) => arr1.filter((a) => arr2.includes(a)));
 const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
@@ -239,9 +232,11 @@ const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
 const lte = curry((a, b) => b <= a);
-const indexOf = curry((element, s) => s.indexOf(element));
+// : <U=any>(sortFn: (v: U)=>-1|1, xs: U[]) => U[] 
+const sort = curry((sortFn, xs) => xs.sort(sortFn));
 const find = curry((fn, s) => s.find(fn));
 const findIndex = curry((fn, s) => s.findIndex(fn));
+const indexOf = curry((x, xs) => findIndex(equals(x), xs));
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 const cond = curry((pairs, s) => {
     for (const [cond, fn] of pairs) {
@@ -265,8 +260,10 @@ const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
     : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 const path = pathOr(undef);
+const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 const clone = (s) => {
-    switch (type(s)) {
+    const t = type(s);
+    switch (t) {
         case 'Null': return s;
         case 'Array': return map(clone, s);
         case 'Object':
@@ -275,12 +272,26 @@ const clone = (s) => {
                 out[k] = clone(s[k]);
             }
             return out;
-        default: return s;
+        case 'String':
+        case 'Number':
+        case 'Boolean':
+        case 'Symbol':
+            return s;
+        default:
+            return typed_arr_re.test(t) ? map(clone, s) : s;
     }
 };
 const reduce = curry((fn, accum, arr) => qreduce(fn, clone(accum), arr));
 const pickBy = curry((cond, o) => filter(cond, o));
-const pick = curry((props, o) => filter((_, k) => includes(k, props), o));
+const pick = curry((props, o) => {
+    const out = {};
+    for (const p of props) {
+        if (p in o) {
+            out[p] = o[p];
+        }
+    }
+    return out;
+});
 const omit = curry((props, o) => filter((_, k) => !includes(k, props), o));
 const fromPairs = (pairs) => reduce((o, pair) => assoc(...pair, o), {}, pairs);
 const concat = curry(((a, b) => a.concat(b)));
@@ -387,6 +398,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   split: split,
   T: T,
   F: F,
+  range: range,
   uniq: uniq,
   intersection: intersection,
   genBy: genBy,
@@ -395,9 +407,10 @@ var pepka = /*#__PURE__*/Object.freeze({
   lt: lt,
   gte: gte,
   lte: lte,
-  indexOf: indexOf,
+  sort: sort,
   find: find,
   findIndex: findIndex,
+  indexOf: indexOf,
   explore: explore,
   cond: cond,
   assoc: assoc,
@@ -446,7 +459,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   qmergeDeepAdd: qmergeDeepAdd,
   qmapKeys: qmapKeys,
   qfilter: qfilter,
-  qpick: qpick
+  qindexOf: qindexOf
 });
 
 window.pepka = pepka;

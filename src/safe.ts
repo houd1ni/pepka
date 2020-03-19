@@ -97,12 +97,15 @@ export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const reverse = (xs: any[]) => xs.reverse()
-export const test = (re: RegExp, s: string) => re.test(s)
+export const test = curry((re: RegExp, s: string) => re.test(s))
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
+export const range = curry((from: number, to: number) =>
+  genBy(add(from), to-from)
+)
 export const uniq = (xs: any[]) => qreduce(
   (accum: any[], x: any) =>
     includes(x, accum) ? accum : qappend(x, accum),
@@ -142,14 +145,16 @@ export const gte = curry(
 export const lte = curry(
   (a: number, b: number) => b<=a
 )
-export const indexOf = curry(
-  (element: any, s: any[]) => s.indexOf(element)
-)
+// : <U=any>(sortFn: (v: U)=>-1|1, xs: U[]) => U[] 
+export const sort = curry((sortFn: any, xs: any[]) => xs.sort(sortFn))
 export const find = curry(
   (fn: Cond, s: any[]) => s.find(fn)
 )
 export const findIndex = curry(
   (fn: Cond, s: any[]) => s.findIndex(fn)
+)
+export const indexOf = curry(
+  (x: any, xs: any[]) => findIndex(equals(x), xs)
 )
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
@@ -203,8 +208,10 @@ export const pathOr = curry(
     path)
 )
 export const path = pathOr(undef)
+const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/
 export const clone = (s: any) => {
-  switch(type(s)) {
+  const t = type(s)
+  switch(t) {
     case 'Null': return s
     case 'Array': return map(clone, s)
     case 'Object':
@@ -213,7 +220,11 @@ export const clone = (s: any) => {
         out[k] = clone(s[k])
       }
       return out
-    default: return s
+    case 'String': case 'Number':
+    case 'Boolean': case 'Symbol':
+      return s
+    default:
+      return typed_arr_re.test(t) ? map(clone, s) : s
   }
 }
 export const reduce = curry(
@@ -224,10 +235,15 @@ export const pickBy = curry(
   (cond: Cond, o: AnyObject) => filter(cond, o)
 )
 export const pick = curry(
-  (props: string[], o: AnyObject) => filter(
-    (_: any, k: string) => includes(k, props),
-    o
-  )
+  (props: string[], o: AnyObject) => {
+    const out = {}
+    for(const p of props) {
+      if(p in o) {
+        out[p] = o[p]
+      }
+    }
+    return out
+  }
 )
 export const omit = curry(
   (props: string[], o: AnyObject) => filter(
