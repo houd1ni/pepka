@@ -212,6 +212,16 @@ const append = curry((s, xs) => [...xs, s]);
 const split = curry((s, xs) => xs.split(s));
 const T = always(true);
 const F = always(false);
+const sizeof = (s) => {
+    if (type(s) === 'Object') {
+        let len = 0;
+        for (let _k in s)
+            len++;
+        return len;
+    }
+    else
+        return length(s);
+};
 const range = curry((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
@@ -331,6 +341,7 @@ const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 const mergeDeep$1 = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
 const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
+const overProp = curry((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
@@ -398,6 +409,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   split: split,
   T: T,
   F: F,
+  sizeof: sizeof,
   range: range,
   uniq: uniq,
   intersection: intersection,
@@ -443,6 +455,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   mergeDeep: mergeDeep$1,
   mergeDeepX: mergeDeepX,
   mergeDeepAdd: mergeDeepAdd,
+  overProp: overProp,
   mapKeys: mapKeys,
   forEachSerial: forEachSerial,
   waitAll: waitAll,

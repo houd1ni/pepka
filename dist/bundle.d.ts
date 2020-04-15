@@ -41,6 +41,7 @@ export declare const append: (...args: any[]) => any;
 export declare const split: (...args: any[]) => any;
 export declare const T: (...args: any[]) => true;
 export declare const F: (...args: any[]) => false;
+export declare const sizeof: (s: string | any[] | AnyObject) => number;
 export declare const range: (...args: any[]) => any;
 export declare const uniq: (xs: any[]) => any;
 export declare const intersection: (...args: any[]) => any;
@@ -86,6 +87,7 @@ export declare const mergeShallow: (...args: any[]) => any;
 export declare const mergeDeep: (...args: any[]) => any;
 export declare const mergeDeepX: (...args: any[]) => any;
 export declare const mergeDeepAdd: (...args: any[]) => any;
+export declare const overProp: (...args: any[]) => any;
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const mapKeys: (...args: any[]) => any;
 /** One promise waits for another. */

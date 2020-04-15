@@ -103,6 +103,13 @@ export const append = curry((s: any, xs: any[]) => [...xs, s])
 export const split = curry((s: string, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
+export const sizeof = (s: any[] | string | AnyObject) => {
+  if(type(s) === 'Object') {
+    let len = 0
+    for(let _k in s as AnyObject) len++
+    return len
+  } else return length(s as any[])
+}
 export const range = curry((from: number, to: number) =>
   genBy(add(from), to-from)
 )
@@ -322,6 +329,10 @@ export const mergeDeepX = curry(
 )
 export const mergeDeepAdd = curry(
   (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), clone(b))
+)
+export const overProp = curry(
+  (prop: string, pipe: AnyFunc, data: any) =>
+    assoc(prop, pipe(data[prop]), data)
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry(

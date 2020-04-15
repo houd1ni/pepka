@@ -74,6 +74,16 @@ export const append = curry((s, xs) => [...xs, s]);
 export const split = curry((s, xs) => xs.split(s));
 export const T = always(true);
 export const F = always(false);
+export const sizeof = (s) => {
+    if (type(s) === 'Object') {
+        let len = 0;
+        for (let _k in s)
+            len++;
+        return len;
+    }
+    else
+        return length(s);
+};
 export const range = curry((from, to) => genBy(add(from), to - from));
 export const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
 export const intersection = curry((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
@@ -193,6 +203,7 @@ export const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
 export const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 export const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
 export const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
+export const overProp = curry((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
