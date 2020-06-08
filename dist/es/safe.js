@@ -126,12 +126,14 @@ export const any = curry((pred, xs) => xs.some(pred));
 export const allPass = curry((preds, x) => preds.every((pred) => pred(x)));
 export const anyPass = curry((preds, x) => preds.some((pred) => pred(x)));
 export const prop = curry((key, o) => o[key]);
-export const propEq = curry((key, value, o) => o[key] === value);
-export const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
+export const propEq = curry((key, value, o) => equals(o[key], value));
+export const propsEq = curry((key, o1, o2) => equals(o1[key], o2[key]));
 export const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
     : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 export const path = pathOr(undef);
+export const pathEq = curry((_path, value, o) => equals(path(_path, o), value));
+export const pathsEq = curry((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 export const clone = (s) => {
     const t = type(s);

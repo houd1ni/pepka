@@ -67,6 +67,8 @@ export declare const propEq: (...args: any[]) => any;
 export declare const propsEq: (...args: any[]) => any;
 export declare const pathOr: (...args: any[]) => any;
 export declare const path: any;
+export declare const pathEq: (...args: any[]) => any;
+export declare const pathsEq: (...args: any[]) => any;
 export declare const clone: (s: any) => any;
 export declare const reduce: (...args: any[]) => any;
 export declare const pickBy: (...args: any[]) => any;

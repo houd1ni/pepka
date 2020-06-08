@@ -38,7 +38,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.9.5",
+  "version": "0.9.6",
   "ava": {
     "files": [
       "./test/specs/*.ts"

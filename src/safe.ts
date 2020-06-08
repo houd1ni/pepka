@@ -190,10 +190,10 @@ export const prop = curry(
   (key: string, o: AnyObject) => o[key]
 )
 export const propEq = curry(
-  (key: string, value: any, o: AnyObject) => o[key]===value
+  (key: string, value: any, o: AnyObject) => equals(o[key], value)
 )
 export const propsEq = curry(
-  (key: string, o1: any, o2: AnyObject) => o1[key]===o2[key]
+  (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 )
 export const pathOr = curry(
   (_default: any, path: string[], o: any) =>
@@ -212,6 +212,13 @@ export const pathOr = curry(
     path)
 )
 export const path = pathOr(undef)
+export const pathEq = curry(
+  (_path: string[], value: any, o: AnyObject) => equals(path(_path, o), value)
+)
+export const pathsEq = curry(
+  (_path: string[], o1: AnyObject, o2: AnyObject) =>
+    equals(path(_path, o1), path(_path, o2))
+)
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/
 export const clone = (s: any) => {
   const t = type(s)
