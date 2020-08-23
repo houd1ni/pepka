@@ -35,6 +35,6 @@ const _curry = (fn, args, new_args) => {
         return curried;
     }
 };
-export const curry = ((fn) => (...args) => fn.length > countArgs(args)
+export const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
-    : fn(...args));
+    : fn(...args)));

@@ -1,5 +1,5 @@
 import { __, curry } from './curry'
-import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils'
+import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
@@ -45,9 +45,9 @@ export const when = curry(
 )
 export const compose = (
   (...fns: Function[]) =>
-    (s: any) => {
+    (s: any = __) => {
       for(let i = length(fns)-1; i>-1; i--) {
-        s = fns[i](s)
+        s = s===__ ? fns[i]() : fns[i](s)
       }
       return s
     }
@@ -96,7 +96,6 @@ export const complement = (fn: AnyFunc) => (...args: any) => {
 export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
-export const reverse = (xs: any[]) => xs.reverse()
 export const test = curry((re: RegExp, s: string) => re.test(s))
 export const tap = curry((fn: Function, s: any) => { fn(s); return s })
 export const append = curry((s: any, xs: any[]) => [...xs, s])
@@ -137,6 +136,14 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
     }
   }
 }
+export const reverse = (xs: any[]) => compose(
+  (ln: number) => reduce(
+    (nxs: any[], _: any, i: number) => qappend(xs[ln-i], nxs),
+    [], xs
+  ),
+  add(-1),
+  length
+)(xs)
 export const gt = curry(
   (a: number, b: number) => a>b
 )
@@ -177,6 +184,18 @@ export const assoc = curry(
     ...obj,
     [prop]: v
   })
+)
+export const assocPath = curry(
+  (_path: string[], v: any, o: AnyObject) => compose(
+    (first: string) => assoc(
+      first,
+      length(_path)<2
+        ? v
+        : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}),
+      o
+    ),
+    head
+  )(_path)
 )
 export const all = curry((pred: Cond, xs: any[]) => xs.every(pred))
 export const any = curry((pred: Cond, xs: any[]) => xs.some(pred))

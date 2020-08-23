@@ -1,5 +1,5 @@
-import { curry } from './curry';
-import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr } from './utils';
+import { __, curry } from './curry';
+import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj } from './utils';
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick';
 import { type } from './common';
 // over, lensProp
@@ -26,9 +26,9 @@ export const equals = curry((a, b) => {
 });
 export const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 export const when = curry((cond, pipe, s) => ifElse(cond, pipe, identity, s));
-export const compose = ((...fns) => (s) => {
+export const compose = ((...fns) => (s = __) => {
     for (let i = length(fns) - 1; i > -1; i--) {
-        s = fns[i](s);
+        s = s === __ ? fns[i]() : fns[i](s);
     }
     return s;
 }); // as F.Compose
@@ -67,7 +67,6 @@ export const complement = (fn) => (...args) => {
 export const keys = (o) => Object.keys(o);
 export const values = (o) => Object.values(o);
 export const toPairs = (o) => Object.entries(o);
-export const reverse = (xs) => xs.reverse();
 export const test = curry((re, s) => re.test(s));
 export const tap = curry((fn, s) => { fn(s); return s; });
 export const append = curry((s, xs) => [...xs, s]);
@@ -100,6 +99,7 @@ export const once = (fn) => {
         }
     };
 };
+export const reverse = (xs) => compose((ln) => reduce((nxs, _, i) => qappend(xs[ln - i], nxs), [], xs), add(-1), length)(xs);
 export const gt = curry((a, b) => a > b);
 export const lt = curry((a, b) => a < b);
 export const gte = curry((a, b) => b >= a);
@@ -121,6 +121,9 @@ export const assoc = curry((prop, v, obj) => ({
     ...obj,
     [prop]: v
 }));
+export const assocPath = curry((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
+    ? v
+    : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
 export const all = curry((pred, xs) => xs.every(pred));
 export const any = curry((pred, xs) => xs.some(pred));
 export const allPass = curry((preds, x) => preds.every((pred) => pred(x)));

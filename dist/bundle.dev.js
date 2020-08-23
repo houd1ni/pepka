@@ -35,9 +35,9 @@ const _curry = (fn, args, new_args) => {
         return curried;
     }
 };
-const curry = ((fn) => (...args) => fn.length > countArgs(args)
+const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
-    : fn(...args));
+    : fn(...args)));
 
 const undef = undefined;
 const nul = null;
@@ -48,6 +48,7 @@ const isNum = (s) => to(s) == 'number';
 const isArray = (s) => Array.isArray(s);
 const isFunc = (s) => to(s) === 'function';
 const isStr = (s) => to(s) === 'string';
+const isObj = (s) => !isNull(s) && to(s) === 'object';
 
 // It's faster that toUpperCase() !
 const caseMap = {
@@ -164,9 +165,9 @@ const equals = curry((a, b) => {
 });
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 const when = curry((cond, pipe, s) => ifElse(cond, pipe, identity, s));
-const compose = ((...fns) => (s) => {
+const compose = ((...fns) => (s = __) => {
     for (let i = length(fns) - 1; i > -1; i--) {
-        s = fns[i](s);
+        s = s === __ ? fns[i]() : fns[i](s);
     }
     return s;
 }); // as F.Compose
@@ -205,7 +206,6 @@ const complement = (fn) => (...args) => {
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);
-const reverse = (xs) => xs.reverse();
 const test = curry((re, s) => re.test(s));
 const tap = curry((fn, s) => { fn(s); return s; });
 const append = curry((s, xs) => [...xs, s]);
@@ -238,6 +238,7 @@ const once = (fn) => {
         }
     };
 };
+const reverse = (xs) => compose((ln) => reduce((nxs, _, i) => qappend(xs[ln - i], nxs), [], xs), add(-1), length)(xs);
 const gt = curry((a, b) => a > b);
 const lt = curry((a, b) => a < b);
 const gte = curry((a, b) => b >= a);
@@ -259,17 +260,22 @@ const assoc = curry((prop, v, obj) => ({
     ...obj,
     [prop]: v
 }));
+const assocPath = curry((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
+    ? v
+    : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
 const all = curry((pred, xs) => xs.every(pred));
 const any = curry((pred, xs) => xs.some(pred));
 const allPass = curry((preds, x) => preds.every((pred) => pred(x)));
 const anyPass = curry((preds, x) => preds.some((pred) => pred(x)));
 const prop = curry((key, o) => o[key]);
-const propEq = curry((key, value, o) => o[key] === value);
-const propsEq = curry((key, o1, o2) => o1[key] === o2[key]);
+const propEq = curry((key, value, o) => equals(o[key], value));
+const propsEq = curry((key, o1, o2) => equals(o1[key], o2[key]));
 const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
     : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 const path = pathOr(undef);
+const pathEq = curry((_path, value, o) => equals(path(_path, o), value));
+const pathsEq = curry((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 const clone = (s) => {
     const t = type(s);
@@ -402,7 +408,6 @@ var pepka = /*#__PURE__*/Object.freeze({
   keys: keys,
   values: values,
   toPairs: toPairs,
-  reverse: reverse,
   test: test,
   tap: tap,
   append: append,
@@ -415,6 +420,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   intersection: intersection,
   genBy: genBy,
   once: once,
+  reverse: reverse,
   gt: gt,
   lt: lt,
   gte: gte,
@@ -426,6 +432,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   explore: explore,
   cond: cond,
   assoc: assoc,
+  assocPath: assocPath,
   all: all,
   any: any,
   allPass: allPass,
@@ -435,6 +442,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   propsEq: propsEq,
   pathOr: pathOr,
   path: path,
+  pathEq: pathEq,
+  pathsEq: pathsEq,
   clone: clone,
   reduce: reduce,
   pickBy: pickBy,

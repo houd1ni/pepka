@@ -9,3 +9,4 @@ export const isNum = (s: any) => to(s)=='number'
 export const isArray = (s: any) => Array.isArray(s)
 export const isFunc = (s: any) => to(s)==='function'
 export const isStr = (s: any) => to(s)==='string'
+export const isObj = (s: any) => !isNull(s) && to(s)==='object'

@@ -7,3 +7,4 @@ export const isNum = (s) => to(s) == 'number';
 export const isArray = (s) => Array.isArray(s);
 export const isFunc = (s) => to(s) === 'function';
 export const isStr = (s) => to(s) === 'string';
+export const isObj = (s) => !isNull(s) && to(s) === 'object';

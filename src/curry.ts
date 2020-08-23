@@ -45,8 +45,9 @@ const _curry = (fn: Function, args: Args, new_args: Args) => {
 }
 
 export const curry = (
-  (fn: Function) =>
+  (fn: Function) => (
     (...args: Args) => fn.length>countArgs(args)
       ? _curry(fn, [], args)
       : fn(...args)
+  )
 )
