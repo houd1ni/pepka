@@ -1,7 +1,7 @@
 import { path } from "./safe";
 export const getTmpl = (tmpl) => {
     const parts = [];
-    const keymap = {};
+    const keymap = [];
     const len = tmpl.length;
     let i = 0, s, ln, start = 0, open = false;
     for (i = 0; i < len; i++) {
@@ -14,7 +14,7 @@ export const getTmpl = (tmpl) => {
             case '}':
                 open = false;
                 parts.push('');
-                keymap[parts.length - 1] = tmpl.slice(start + 1, i);
+                keymap.push(tmpl.slice(start + 1, i));
                 break;
             default:
                 if (!open) {

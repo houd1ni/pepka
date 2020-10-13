@@ -6,7 +6,7 @@ import { path } from "./safe"
 type StrTmpl = ((data: AnyObject) => string)
 export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
-  const keymap: {[key: number]: string} = {}
+  const keymap: string[] = []
   const len = tmpl.length
   let i = 0, s: string, ln: number, start = 0, open = false
   for(i=0; i<len; i++) {
@@ -17,7 +17,7 @@ export const getTmpl = (tmpl: string): StrTmpl => {
         break
       case '}':
         open = false; parts.push('')
-        keymap[parts.length-1] = tmpl.slice(start+1, i)
+        keymap.push(tmpl.slice(start+1, i))
         break
       default:
         if(!open) {

@@ -114,5 +114,7 @@ export declare const qmergeDeepAdd: any;
 export declare const qmapKeys: (...args: any[]) => any;
 export declare const qfilter: (...args: any[]) => any;
 export declare const qindexOf: (...args: any[]) => any;
+export declare type StrTmpl = ((data: AnyObject) => string);
+export declare const getTmpl: (tmpl: string) => StrTmpl;
 
 export {};
