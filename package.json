@@ -38,7 +38,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.12.2",
+  "version": "0.12.3",
   "ava": {
     "files": [
       "./test/specs/*.ts"
@@ -54,25 +54,24 @@
       "ts-node/register"
     ]
   },
-  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^13.9.2",
-    "ava": "^2.4.0",
-    "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
-    "dts-bundle-generator": "^4.0.0",
-    "nyc": "^15.0.0",
-    "rollup": "^2.1.0",
+    "@types/node": "^15.12.4",
+    "ava": "^3.15.0",
+    "codecov": "^3.8.2",
+    "cross-env": "^7.0.3",
+    "dts-bundle-generator": "^5.9.0",
+    "nyc": "^15.1.0",
+    "rollup": "^2.52.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-resolve-aliases": "^0.3.0",
-    "rollup-plugin-terser": "^5.3.0",
-    "rollup-plugin-typescript2": "^0.26.0",
-    "ts-node": "^8.7.0",
-    "ts-toolbelt": "^6.3.6",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "ts-node": "^10.0.0",
+    "ts-toolbelt": "^9.6.0",
     "tslint": "^6.1.0",
-    "typescript": "^3.8.3"
+    "typescript": "^4.3.4"
   },
   "types": "./dist/bundle.d.ts",
   "sideEffects": false

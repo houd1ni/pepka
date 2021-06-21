@@ -78,4 +78,5 @@ export const qfilter = curry((cond, data) => {
     }
     return data;
 });
+/** @deprecated */
 export const qindexOf = curry((x, xs) => xs.indexOf(x));

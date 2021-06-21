@@ -70,7 +70,7 @@ const qassoc = curry((prop, v, obj) => {
 });
 const qreduce = curry((fn, accum, arr) => arr.reduce(fn, accum));
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep = curry((strategy, o1, o2) => {
+const mergeDeep$1 = curry((strategy, o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
@@ -80,7 +80,7 @@ const mergeDeep = curry((strategy, o1, o2) => {
                             const o1k = o1[k], o2k = o2[k];
                             for (const i in o2k) {
                                 if (o1k[i]) {
-                                    mergeDeep(strategy, o1k[i], o2k[i]);
+                                    mergeDeep$1(strategy, o1k[i], o2k[i]);
                                 }
                                 else {
                                     o1k[i] = o2k[i];
@@ -96,7 +96,7 @@ const mergeDeep = curry((strategy, o1, o2) => {
                 break;
             case 'Object':
                 if (type(o1[k]) === 'Object') {
-                    mergeDeep(strategy, o1[k], o2[k]);
+                    mergeDeep$1(strategy, o1[k], o2[k]);
                     break;
                 }
             default:
@@ -106,9 +106,9 @@ const mergeDeep = curry((strategy, o1, o2) => {
     }
     return o1;
 });
-const qmergeDeep = mergeDeep(1);
-const qmergeDeepX = mergeDeep(2);
-const qmergeDeepAdd = mergeDeep(3);
+const qmergeDeep = mergeDeep$1(1);
+const qmergeDeepX = mergeDeep$1(2);
+const qmergeDeepAdd = mergeDeep$1(3);
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const qmapKeys = curry((keyMap, o) => {
     let k, mapped, newKey, newValue;
@@ -139,6 +139,7 @@ const qfilter = curry((cond, data) => {
     }
     return data;
 });
+/** @deprecated */
 const qindexOf = curry((x, xs) => xs.indexOf(x));
 
 // over, lensProp
@@ -344,7 +345,7 @@ const memoize = (fn) => {
     return () => cached ? cache : (cached = true, cache = fn());
 };
 const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
-const mergeDeep$1 = curry((a, b) => qmergeDeep(clone(a), clone(b)));
+const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
 const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
 const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
 const overProp = curry((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
@@ -416,8 +417,6 @@ const getTmpl = (tmpl) => {
         return out.join('');
     };
 };
-
-
 
 var pepka = /*#__PURE__*/Object.freeze({
   __proto__: null,
@@ -503,7 +502,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   filter: filter,
   memoize: memoize,
   mergeShallow: mergeShallow,
-  mergeDeep: mergeDeep$1,
+  mergeDeep: mergeDeep,
   mergeDeepX: mergeDeepX,
   mergeDeepAdd: mergeDeepAdd,
   overProp: overProp,
