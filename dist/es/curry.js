@@ -38,9 +38,6 @@ const _curry = (fn, args, new_args) => {
 export const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
     : fn(...args)));
-// type EndlessPh<Func extends FT.Function, ArgT> =
-//   (a: ArgT) => ReturnType<Func>
-//   | ((a: A.x) => EndlessPh<Func, ArgT>)
 const endlessph = (fn) => {
     function _endlessph(a) {
         return a === __ ? fn : fn(a);

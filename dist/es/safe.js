@@ -1,5 +1,5 @@
 import { __, curry, curry2, curry3 } from './curry';
-import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj } from './utils';
+import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils';
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick';
 import { type } from './common';
 // over, lensProp
@@ -48,9 +48,9 @@ export const includes = curry2((s, ss) => {
         return false;
     }
 });
-export const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
+export const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
 export const head = nth(0);
-export const tail = slice(1, nul);
+export const tail = slice(1, inf); // typeshit.
 export const add = curry2((n, m) => n + m);
 export const subtract = curry2((n, m) => m - n);
 export const flip = (fn) => curry((b, a) => fn(a, b));
@@ -123,7 +123,7 @@ export const assoc = curry3((prop, v, obj) => ({
 }));
 export const assocPath = curry3((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
     ? v
-    : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
+    : assocPath(slice(1, inf, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
 export const all = curry2((pred, xs) => xs.every(pred));
 export const any = curry2((pred, xs) => xs.some(pred));
 export const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
@@ -133,7 +133,7 @@ export const propEq = curry3((key, value, o) => equals(o[key], value));
 export const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));
 export const pathOr = curry3((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
-    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
+    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, inf, path), o)), flip(prop)(o), head)(path), always(o), path));
 export const path = pathOr(undef);
 export const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
 export const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));

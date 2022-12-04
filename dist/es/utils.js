@@ -1,5 +1,6 @@
 export const undef = undefined;
 export const nul = null;
+export const inf = Infinity;
 export const to = (s) => typeof s;
 export const isNull = (s) => s === nul;
 export const isUndef = (s) => s === undef;

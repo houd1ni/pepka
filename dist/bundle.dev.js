@@ -38,9 +38,6 @@ const _curry = (fn, args, new_args) => {
 const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
     : fn(...args)));
-// type EndlessPh<Func extends FT.Function, ArgT> =
-//   (a: ArgT) => ReturnType<Func>
-//   | ((a: Placeholder) => EndlessPh<Func, ArgT>)
 const endlessph = (fn) => {
     function _endlessph(a) {
         return a === __ ? fn : fn(a);
@@ -72,6 +69,7 @@ function curry3(fn) {
 
 const undef = undefined;
 const nul = null;
+const inf = Infinity;
 const to = (s) => typeof s;
 const isNull = (s) => s === nul;
 const isUndef = (s) => s === undef;
@@ -222,9 +220,9 @@ const includes = curry2((s, ss) => {
         return false;
     }
 });
-const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
+const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
 const head = nth(0);
-const tail = slice(1, nul);
+const tail = slice(1, inf); // typeshit.
 const add = curry2((n, m) => n + m);
 const subtract = curry2((n, m) => m - n);
 const flip = (fn) => curry((b, a) => fn(a, b));
@@ -297,7 +295,7 @@ const assoc = curry3((prop, v, obj) => ({
 }));
 const assocPath = curry3((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
     ? v
-    : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
+    : assocPath(slice(1, inf, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
 const all = curry2((pred, xs) => xs.every(pred));
 const any = curry2((pred, xs) => xs.some(pred));
 const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
@@ -307,7 +305,7 @@ const propEq = curry3((key, value, o) => equals(o[key], value));
 const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));
 const pathOr = curry3((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
-    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
+    : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, inf, path), o)), flip(prop)(o), head)(path), always(o), path));
 const path = pathOr(undef);
 const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
 const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
