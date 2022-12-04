@@ -2,6 +2,7 @@
 
 export const undef = undefined
 export const nul = null
+export const inf = Infinity
 export const to = (s: any) => typeof s
 export const isNull = (s: any) => s===nul
 export const isUndef = (s: any) => s===undef

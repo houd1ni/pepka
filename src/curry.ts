@@ -1,7 +1,8 @@
-import { F as FT, A } from 'ts-toolbelt'
+import { F as FT } from 'ts-toolbelt'
 import { AnyFunc, AnyArgs } from "./types"
 
-export const __ = Symbol('Placeholder') as A.x
+export const __ = Symbol('Placeholder')
+type Placeholder = typeof __
 
 const countArgs = (s: AnyArgs) => {
   let i = 0
@@ -51,15 +52,12 @@ export const curry = (
       : fn(...args)
   ) as FT.Curry<Func>
 )
-// type EndlessPh<Func extends FT.Function, ArgT> =
-//   (a: ArgT) => ReturnType<Func>
-//   | ((a: A.x) => EndlessPh<Func, ArgT>)
 const endlessph = <Func extends FT.Function>(fn: Func) => {
   type ReturnT = ReturnType<Func>
   type p0 = Parameters<Func>[0]
   function _endlessph(a: p0): ReturnT
-  function _endlessph(a: A.x): Func
-  function _endlessph(a: p0 | A.x) {
+  function _endlessph(a: Placeholder): Func
+  function _endlessph(a: p0 | Placeholder) {
     return a===__ ? fn : fn(a)
   }
   return _endlessph
@@ -72,9 +70,9 @@ export function curry2<Func extends Func2>(fn: Func) {
   type ReturnT = ReturnType<Func>
   function curried2( a: p0 ): (b: p1) => ReturnT
   function curried2( a: p0, b: p1 ): ReturnT
-  function curried2( a: A.x, b: p1 ): (a: p0) => ReturnT
-  function curried2( a: p0, b: A.x ): (b: p1) => ReturnT
-  function curried2( a: p0 | A.x, b?: p1 ) {
+  function curried2( a: Placeholder, b: p1 ): (a: p0) => ReturnT
+  function curried2( a: p0, b: Placeholder ): (b: p1) => ReturnT
+  function curried2( a: p0 | Placeholder, b?: p1 ) {
     const withPlaceholder1 = a===__
     const aln = arguments.length
     if(aln === 1 && withPlaceholder1)
@@ -95,5 +93,5 @@ export function curry3<Func extends Func3>(fn: Func) {
   // type p2 = Parameters<Func>[2]
   // type ReturnT = ReturnType<Func>
   // TODO: optimize.
-  return curry(fn)
+  return curry(fn) as FT.Curry<Func>
 }

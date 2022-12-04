@@ -1,14 +1,14 @@
-import { curry } from "./curry";
+import { curry2, curry3 } from "./curry";
 import { type } from "./common";
 import { isFunc, isArray } from "./utils";
-export const qappend = curry((s, xs) => { xs.push(s); return xs; });
-export const qassoc = curry((prop, v, obj) => {
+export const qappend = curry2((s, xs) => { xs.push(s); return xs; });
+export const qassoc = curry3((prop, v, obj) => {
     obj[prop] = v;
     return obj;
 });
-export const qreduce = curry((fn, accum, arr) => arr.reduce(fn, accum));
+export const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep = curry((strategy, o1, o2) => {
+const mergeDeep = curry3((strategy, o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
@@ -49,7 +49,7 @@ export const qmergeDeep = mergeDeep(1);
 export const qmergeDeepX = mergeDeep(2);
 export const qmergeDeepAdd = mergeDeep(3);
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-export const qmapKeys = curry((keyMap, o) => {
+export const qmapKeys = curry2((keyMap, o) => {
     let k, mapped, newKey, newValue;
     for (k in keyMap) {
         mapped = keyMap[k];
@@ -63,7 +63,7 @@ export const qmapKeys = curry((keyMap, o) => {
     }
     return o;
 });
-export const qfilter = curry((cond, data) => {
+export const qfilter = curry2((cond, data) => {
     const isArr = isArray(data);
     for (let k in data) {
         if (!cond(data[k], k)) {
@@ -79,4 +79,4 @@ export const qfilter = curry((cond, data) => {
     return data;
 });
 /** @deprecated */
-export const qindexOf = curry((x, xs) => xs.indexOf(x));
+export const qindexOf = curry2((x, xs) => xs.indexOf(x));

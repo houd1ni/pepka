@@ -1,4 +1,4 @@
-import { curry, curry2, curry3 } from "./curry"
+import { curry2, curry3 } from "./curry"
 import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray } from "./utils"
@@ -11,7 +11,7 @@ export const qassoc = curry3(
   }
 )
 export const qreduce = curry3(
-  (fn: Reducer, accum: any, arr: any[]) =>
+  <T>(fn: Reducer, accum: any, arr: T[]) =>
     arr.reduce(fn, accum)
 )
 // strategy is for arrays: 1->clean, 2->merge, 3->push.

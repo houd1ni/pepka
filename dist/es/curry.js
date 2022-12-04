@@ -1,4 +1,4 @@
-export const __ = (function Placeholder() { });
+export const __ = Symbol('Placeholder');
 const countArgs = (s) => {
     let i = 0;
     for (const v of s)
@@ -38,3 +38,34 @@ const _curry = (fn, args, new_args) => {
 export const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
     : fn(...args)));
+// type EndlessPh<Func extends FT.Function, ArgT> =
+//   (a: ArgT) => ReturnType<Func>
+//   | ((a: A.x) => EndlessPh<Func, ArgT>)
+const endlessph = (fn) => {
+    function _endlessph(a) {
+        return a === __ ? fn : fn(a);
+    }
+    return _endlessph;
+};
+export function curry2(fn) {
+    function curried2(a, b) {
+        const withPlaceholder1 = a === __;
+        const aln = arguments.length;
+        if (aln === 1 && withPlaceholder1)
+            throw new Error('Senseless placeholder usage.');
+        return arguments.length > 1
+            ? withPlaceholder1
+                ? endlessph((a) => fn(a, b))
+                : fn(a, b)
+            : (b) => fn(a, b);
+    }
+    return curried2;
+}
+export function curry3(fn) {
+    // type p0 = Parameters<Func>[0]
+    // type p1 = Parameters<Func>[1]
+    // type p2 = Parameters<Func>[2]
+    // type ReturnT = ReturnType<Func>
+    // TODO: optimize.
+    return curry(fn);
+}

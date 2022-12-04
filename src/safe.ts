@@ -1,9 +1,9 @@
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj } from './utils'
+import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-import { F as FT } from 'ts-toolbelt'
+import { F as FT, U } from 'ts-toolbelt'
 // over, lensProp
 
 export const equals = curry2((a: any, b: any) => {
@@ -62,7 +62,7 @@ const _nth = <T=any>(i: number, data: T[]) => data[i]
 export const nth = curry2(_nth)
 
 export const includes = curry2(
-  (s: any, ss: any[]) => {
+  <T>(s: T, ss: T[]) => {
     if(isStr(ss)) {
       return ss.includes(s)
     } else {
@@ -76,11 +76,11 @@ export const includes = curry2(
   }
 )
 export const slice = curry3(
-  (from: number, to: number|null, o: any[] | string) =>
-    o.slice(from, (isNum(to)?to:Infinity) as number)
+  (from: number, to: number, o: any[] | string) =>
+    o.slice(from, (isNum(to)?to:inf) as number)
 )
 export const head = nth(0)
-export const tail = slice(1, nul)
+export const tail = slice(1, inf) // typeshit.
 export const add = curry2((n: number, m: number) => n+m)
 export const subtract = curry2((n: number, m: number) => m-n)
 export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
@@ -115,7 +115,7 @@ export const range = curry2((from: number, to: number) =>
   genBy(add(from), to-from)
 )
 export const uniq = (xs: any[]) => qreduce(
-  (accum: any[], x: any) =>
+  <T>(accum: any, x: T) =>
     includes(x, accum) ? accum : qappend(x, accum),
 [], xs)
 export const intersection = curry2(
@@ -139,8 +139,8 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
   }
 }
 export const reverse = (xs: any[]) => compose(
-  (ln: number) => reduce(
-    (nxs: any[], _: any, i: number) => qappend(xs[ln-i], nxs),
+  <T>(ln: number) => reduce<any>(
+    (nxs: T[], _: any, i: number) => qappend(xs[ln-i], nxs),
     [], xs
   ),
   add(-1),
@@ -178,7 +178,7 @@ export const assocPath = curry3(
       first,
       length(_path)<2
         ? v
-        : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}),
+        : assocPath(slice(1, inf, _path), v, isObj(o[first]) ? o[first] : {}),
       o
     ),
     head
@@ -207,7 +207,7 @@ export const pathOr = curry3(
         : compose(
             ifElse(isNil,
               always(_default),
-              (o: any) => pathOr(_default, slice(1, nul, path), o)
+              (o: any) => pathOr(_default, slice(1, inf, path), o)
             ),
             flip(prop)(o),
             head
@@ -269,7 +269,7 @@ export const omit = curry2(
     o
   )
 )
-export const fromPairs = (pairs: [string, any][]) => reduce(
+export const fromPairs = (pairs: [string, any][]) => reduce<any>(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
   {}, pairs
 )
