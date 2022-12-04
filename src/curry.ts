@@ -1,9 +1,9 @@
+import { F as FT, A } from 'ts-toolbelt'
+import { AnyFunc, AnyArgs } from "./types"
 
-type Args = any[]
+export const __ = Symbol('Placeholder') as A.x
 
-export const __ = (function Placeholder() {})
-
-const countArgs = (s: Args) => {
+const countArgs = (s: AnyArgs) => {
   let i = 0
   for (const v of s) v!==__ && i++
   return i
@@ -11,7 +11,7 @@ const countArgs = (s: Args) => {
 
 // TODO: try to make it mutable.
 // { 0: __, 1: 10 }, [ 11 ]
-const addArgs = (args: Args, _args: Args) => {
+const addArgs = (args: AnyArgs, _args: AnyArgs) => {
   const len = args.length
   const new_args = args.slice()
   const _args_len = _args.length
@@ -29,12 +29,12 @@ const addArgs = (args: Args, _args: Args) => {
   return new_args
 }
 
-const _curry = (fn: Function, args: Args, new_args: Args) => {
+const _curry = (fn: Function, args: AnyArgs, new_args: AnyArgs) => {
   const args2add = fn.length - args.length - countArgs(new_args)
   if(args2add < 1) {
     return fn(...addArgs(args, new_args))
   } else {
-    const curried = (...__args: Args) => _curry(
+    const curried = (...__args: AnyArgs) => _curry(
       fn,
       addArgs(args, new_args),
       __args
@@ -45,9 +45,55 @@ const _curry = (fn: Function, args: Args, new_args: Args) => {
 }
 
 export const curry = (
-  (fn: Function) => (
-    (...args: Args) => fn.length>countArgs(args)
+  <Func extends AnyFunc>(fn: AnyFunc) => (
+    (...args: AnyArgs) => fn.length>countArgs(args)
       ? _curry(fn, [], args)
       : fn(...args)
-  )
+  ) as FT.Curry<Func>
 )
+// type EndlessPh<Func extends FT.Function, ArgT> =
+//   (a: ArgT) => ReturnType<Func>
+//   | ((a: A.x) => EndlessPh<Func, ArgT>)
+const endlessph = <Func extends FT.Function>(fn: Func) => {
+  type ReturnT = ReturnType<Func>
+  type p0 = Parameters<Func>[0]
+  function _endlessph(a: p0): ReturnT
+  function _endlessph(a: A.x): Func
+  function _endlessph(a: p0 | A.x) {
+    return a===__ ? fn : fn(a)
+  }
+  return _endlessph
+}
+
+type Func2 = (a: any, b: any) => any
+export function curry2<Func extends Func2>(fn: Func) {
+  type p0 = Parameters<Func>[0]
+  type p1 = Parameters<Func>[1]
+  type ReturnT = ReturnType<Func>
+  function curried2( a: p0 ): (b: p1) => ReturnT
+  function curried2( a: p0, b: p1 ): ReturnT
+  function curried2( a: A.x, b: p1 ): (a: p0) => ReturnT
+  function curried2( a: p0, b: A.x ): (b: p1) => ReturnT
+  function curried2( a: p0 | A.x, b?: p1 ) {
+    const withPlaceholder1 = a===__
+    const aln = arguments.length
+    if(aln === 1 && withPlaceholder1)
+      throw new Error('Senseless placeholder usage.')
+    return arguments.length>1
+    ? withPlaceholder1
+      ? endlessph((a: p0) => fn(a, b))
+      : fn(a, b) as ReturnType<Func>
+    : (b: p1) => fn(a, b)
+  }
+  return curried2
+}
+
+type Func3 = (a: any, b: any, c: any) => any
+export function curry3<Func extends Func3>(fn: Func) {
+  // type p0 = Parameters<Func>[0]
+  // type p1 = Parameters<Func>[1]
+  // type p2 = Parameters<Func>[2]
+  // type ReturnT = ReturnType<Func>
+  // TODO: optimize.
+  return curry(fn)
+}

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "moduleResolution": "Node",
     "lib": [ "esnext", "DOM" ],
     "strictNullChecks": true,
     "target": "esnext",
@@ -14,8 +15,5 @@
     "rootDir": "src",
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*",
-    "src/node_modules/ts-toolbelt/out/index.d.ts"
-  ]
+  "include": [ "src/**/*" ]
 }

@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import { terser } from 'rollup-plugin-terser'
 import replace from 'rollup-plugin-replace'
+import tsc from 'typescript'
 
 export default {
   input: process.env.NODE_ENV=='development' ? 'test/in-browser.ts' : 'src/index.ts',
@@ -16,7 +17,7 @@ export default {
     resolve(),
     commonjs(),
     typescript({
-      typescript: require("typescript"),
+      typescript: tsc,
       tsconfig: "./tsconfig.json",
       tsconfigOverride: {
         compilerOptions: {

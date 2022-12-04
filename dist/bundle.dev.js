@@ -1,4 +1,4 @@
-const __ = (function Placeholder() { });
+const __ = Symbol('Placeholder');
 const countArgs = (s) => {
     let i = 0;
     for (const v of s)
@@ -38,6 +38,37 @@ const _curry = (fn, args, new_args) => {
 const curry = ((fn) => ((...args) => fn.length > countArgs(args)
     ? _curry(fn, [], args)
     : fn(...args)));
+// type EndlessPh<Func extends FT.Function, ArgT> =
+//   (a: ArgT) => ReturnType<Func>
+//   | ((a: A.x) => EndlessPh<Func, ArgT>)
+const endlessph = (fn) => {
+    function _endlessph(a) {
+        return a === __ ? fn : fn(a);
+    }
+    return _endlessph;
+};
+function curry2(fn) {
+    function curried2(a, b) {
+        const withPlaceholder1 = a === __;
+        const aln = arguments.length;
+        if (aln === 1 && withPlaceholder1)
+            throw new Error('Senseless placeholder usage.');
+        return arguments.length > 1
+            ? withPlaceholder1
+                ? endlessph((a) => fn(a, b))
+                : fn(a, b)
+            : (b) => fn(a, b);
+    }
+    return curried2;
+}
+function curry3(fn) {
+    // type p0 = Parameters<Func>[0]
+    // type p1 = Parameters<Func>[1]
+    // type p2 = Parameters<Func>[2]
+    // type ReturnT = ReturnType<Func>
+    // TODO: optimize.
+    return curry(fn);
+}
 
 const undef = undefined;
 const nul = null;
@@ -63,14 +94,14 @@ const type = (s) => {
         : caseMap[t[0]] + t.slice(1);
 };
 
-const qappend = curry((s, xs) => { xs.push(s); return xs; });
-const qassoc = curry((prop, v, obj) => {
+const qappend = curry2((s, xs) => { xs.push(s); return xs; });
+const qassoc = curry3((prop, v, obj) => {
     obj[prop] = v;
     return obj;
 });
-const qreduce = curry((fn, accum, arr) => arr.reduce(fn, accum));
+const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep$1 = curry((strategy, o1, o2) => {
+const mergeDeep$1 = curry3((strategy, o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
@@ -110,7 +141,7 @@ const qmergeDeep = mergeDeep$1(1);
 const qmergeDeepX = mergeDeep$1(2);
 const qmergeDeepAdd = mergeDeep$1(3);
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const qmapKeys = curry((keyMap, o) => {
+const qmapKeys = curry2((keyMap, o) => {
     let k, mapped, newKey, newValue;
     for (k in keyMap) {
         mapped = keyMap[k];
@@ -124,7 +155,7 @@ const qmapKeys = curry((keyMap, o) => {
     }
     return o;
 });
-const qfilter = curry((cond, data) => {
+const qfilter = curry2((cond, data) => {
     const isArr = isArray(data);
     for (let k in data) {
         if (!cond(data[k], k)) {
@@ -140,10 +171,13 @@ const qfilter = curry((cond, data) => {
     return data;
 });
 /** @deprecated */
-const qindexOf = curry((x, xs) => xs.indexOf(x));
+const qindexOf = curry2((x, xs) => xs.indexOf(x));
+
+// TODO: possibly introduce a second argument limiting unfolding.
+const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
 // over, lensProp
-const equals = curry((a, b) => {
+const equals = curry2((a, b) => {
     const typea = type(a);
     if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
         if (isNull(a) || isNull(b)) {
@@ -165,16 +199,17 @@ const equals = curry((a, b) => {
     return a === b;
 });
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
-const when = curry((cond, pipe, s) => ifElse(cond, pipe, identity, s));
+const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
 const compose = ((...fns) => (s = __) => {
     for (let i = length(fns) - 1; i > -1; i--) {
         s = s === __ ? fns[i]() : fns[i](s);
     }
     return s;
-}); // as F.Compose
-const bind = curry((fn, context) => fn.bind(context));
-const nth = curry((i, data) => data[i]);
-const includes = curry((s, ss) => {
+});
+const bind = curry2((fn, context) => fn.bind(context));
+const _nth = (i, data) => data[i];
+const nth = curry2(_nth);
+const includes = curry2((s, ss) => {
     if (isStr(ss)) {
         return ss.includes(s);
     }
@@ -187,11 +222,11 @@ const includes = curry((s, ss) => {
         return false;
     }
 });
-const slice = curry((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
+const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : Infinity)));
 const head = nth(0);
 const tail = slice(1, nul);
-const add = curry((n, m) => n + m);
-const subtract = curry((n, m) => m - n);
+const add = curry2((n, m) => n + m);
+const subtract = curry2((n, m) => m - n);
 const flip = (fn) => curry((b, a) => fn(a, b));
 const isNil = (s) => isNull(s) || isUndef(s);
 const length = (s) => s.length;
@@ -207,10 +242,10 @@ const complement = (fn) => (...args) => {
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
 const toPairs = (o) => Object.entries(o);
-const test = curry((re, s) => re.test(s));
-const tap = curry((fn, s) => { fn(s); return s; });
-const append = curry((s, xs) => [...xs, s]);
-const split = curry((s, xs) => xs.split(s));
+const test = curry2((re, s) => re.test(s));
+const tap = curry2((fn, s) => { fn(s); return s; });
+const append = curry2((s, xs) => [...xs, s]);
+const split = curry2((s, xs) => xs.split(s));
 const T = always(true);
 const F = always(false);
 const sizeof = (s) => {
@@ -223,10 +258,10 @@ const sizeof = (s) => {
     else
         return length(s);
 };
-const range = curry((from, to) => genBy(add(from), to - from));
+const range = curry2((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => includes(x, accum) ? accum : qappend(x, accum), [], xs);
-const intersection = curry((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
-const genBy = curry((generator, length) => [...Array(length)].map((_, i) => generator(i)));
+const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
+const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;
     return (...args) => {
@@ -240,50 +275,51 @@ const once = (fn) => {
     };
 };
 const reverse = (xs) => compose((ln) => reduce((nxs, _, i) => qappend(xs[ln - i], nxs), [], xs), add(-1), length)(xs);
-const gt = curry((a, b) => a > b);
-const lt = curry((a, b) => a < b);
-const gte = curry((a, b) => b >= a);
-const lte = curry((a, b) => b <= a);
-// : <U=any>(sortFn: (v: U)=>-1|1, xs: U[]) => U[] 
-const sort = curry((sortFn, xs) => xs.sort(sortFn));
-const find = curry((fn, s) => s.find(fn));
-const findIndex = curry((fn, s) => s.findIndex(fn));
-const indexOf = curry((x, xs) => findIndex(equals(x), xs));
+const gt = curry2((a, b) => a > b);
+const lt = curry2((a, b) => a < b);
+const gte = curry2((a, b) => b >= a);
+const lte = curry2((a, b) => b <= a);
+const sort = curry2((sortFn, xs) => xs.sort(sortFn));
+const find = curry2((fn, s) => s.find(fn));
+const findIndex = curry2((fn, s) => s.findIndex(fn));
+const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
-const cond = curry((pairs, s) => {
+const cond = curry2((pairs, s) => {
     for (const [cond, fn] of pairs) {
         if (cond(s)) {
             return fn(s);
         }
     }
 });
-const assoc = curry((prop, v, obj) => ({
+const assoc = curry3((prop, v, obj) => ({
     ...obj,
     [prop]: v
 }));
-const assocPath = curry((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
+const assocPath = curry3((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
     ? v
     : assocPath(slice(1, null, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
-const all = curry((pred, xs) => xs.every(pred));
-const any = curry((pred, xs) => xs.some(pred));
-const allPass = curry((preds, x) => preds.every((pred) => pred(x)));
-const anyPass = curry((preds, x) => preds.some((pred) => pred(x)));
-const prop = curry((key, o) => o[key]);
-const propEq = curry((key, value, o) => equals(o[key], value));
-const propsEq = curry((key, o1, o2) => equals(o1[key], o2[key]));
-const pathOr = curry((_default, path, o) => ifElse(length, () => isNil(o)
+const all = curry2((pred, xs) => xs.every(pred));
+const any = curry2((pred, xs) => xs.some(pred));
+const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
+const anyPass = curry2((preds, x) => preds.some((pred) => pred(x)));
+const prop = curry2((key, o) => o[key]);
+const propEq = curry3((key, value, o) => equals(o[key], value));
+const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));
+const pathOr = curry3((_default, path, o) => ifElse(length, () => isNil(o)
     ? _default
     : compose(ifElse(isNil, always(_default), (o) => pathOr(_default, slice(1, nul, path), o)), flip(prop)(o), head)(path), always(o), path));
 const path = pathOr(undef);
-const pathEq = curry((_path, value, o) => equals(path(_path, o), value));
-const pathsEq = curry((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
+const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
+const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
-const clone = (s) => {
+const clone = (s, shallow = false) => {
     const t = type(s);
     switch (t) {
         case 'Null': return s;
-        case 'Array': return map(clone, s);
+        case 'Array': return shallow ? [...s] : map(clone, s);
         case 'Object':
+            if (shallow)
+                return { ...s };
             const out = {};
             for (let k in s) {
                 out[k] = clone(s[k]);
@@ -295,12 +331,13 @@ const clone = (s) => {
         case 'Symbol':
             return s;
         default:
-            return typed_arr_re.test(t) ? map(clone, s) : s;
+            return typed_arr_re.test(t) ? s.constructor.from(s) : s;
     }
 };
-const reduce = curry((fn, accum, arr) => qreduce(fn, clone(accum), arr));
-const pickBy = curry((cond, o) => filter(cond, o));
-const pick = curry((props, o) => {
+const cloneShallow = (s) => clone(s, true);
+const reduce = curry3((fn, accum, arr) => qreduce(fn, clone(accum), arr));
+const pickBy = curry2((cond, o) => filter(cond, o));
+const pick = curry2((props, o) => {
     const out = {};
     for (const p of props) {
         if (p in o) {
@@ -309,13 +346,13 @@ const pick = curry((props, o) => {
     }
     return out;
 });
-const omit = curry((props, o) => filter((_, k) => !includes(k, props), o));
+const omit = curry2((props, o) => filter((_, k) => !includes(k, props), o));
 const fromPairs = (pairs) => reduce((o, pair) => assoc(...pair, o), {}, pairs);
-const concat = curry(((a, b) => a.concat(b)));
-const join = curry((delimeter, arr) => arr.join(delimeter));
-const map = curry((pipe, arr) => arr.map(pipe));
-const forEach = curry((pipe, arr) => arr.forEach(pipe));
-const both = curry((cond1, cond2, s) => cond2(s) && cond1(s));
+const concat = curry2(((a, b) => a.concat(b)));
+const join = curry2((delimeter, arr) => arr.join(delimeter));
+const map = curry2((pipe, arr) => arr.map(pipe));
+const forEach = curry2((pipe, arr) => arr.forEach(pipe));
+const both = curry3((cond1, cond2, s) => cond2(s) && cond1(s));
 const isEmpty = (s) => {
     switch (type(s)) {
         case 'String':
@@ -335,8 +372,8 @@ const empty = (s) => {
         default: return undef;
     }
 };
-const replace = curry((a, b, where) => where.replace(a, b));
-const filter = curry((cond, data) => isArray(data)
+const replace = curry3((a, b, where) => where.replace(a, b));
+const filter = curry2((cond, data) => isArray(data)
     ? data.filter(cond)
     : compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs)(data));
 const memoize = (fn) => {
@@ -344,13 +381,13 @@ const memoize = (fn) => {
     let cached = false;
     return () => cached ? cache : (cached = true, cache = fn());
 };
-const mergeShallow = curry((o1, o2) => Object.assign({}, o1, o2));
-const mergeDeep = curry((a, b) => qmergeDeep(clone(a), clone(b)));
-const mergeDeepX = curry((a, b) => qmergeDeepX(clone(a), clone(b)));
-const mergeDeepAdd = curry((a, b) => qmergeDeepAdd(clone(a), clone(b)));
-const overProp = curry((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
+const mergeShallow = curry2((o1, o2) => Object.assign({}, o1, o2));
+const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), clone(b)));
+const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), clone(b)));
+const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), clone(b)));
+const overProp = curry3((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const mapKeys = curry((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
+const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
 // ASYNCS
 /** One promise waits for another. */
 const forEachSerial = (() => {
@@ -360,12 +397,13 @@ const forEachSerial = (() => {
             await pipe(fn, items, ++i);
         }
     };
-    return curry((fn, items) => pipe(fn, items, 0));
+    return curry2((fn, items) => pipe(fn, items, 0));
 })();
 /** Promise.all wrapper for functional pipelining. */
 const waitAll = (promises) => Promise.all(promises);
+const waitTap = curry2(async (fn, s) => { await fn(s); return s; });
 /** Waits for all promises mapped by the fn. */
-const forEachAsync = curry((fn, items) => Promise.all(items.map(fn)));
+const forEachAsync = curry2((fn, items) => Promise.all(items.map(fn)));
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
 const composeAsync = (() => {
     const pipe = async (fns, data, i) => ~i ? await pipe(fns, await fns[i](data), --i) : data;
@@ -422,6 +460,9 @@ var pepka = /*#__PURE__*/Object.freeze({
   __proto__: null,
   __: __,
   curry: curry,
+  curry2: curry2,
+  curry3: curry3,
+  uncurry: uncurry,
   toLower: toLower,
   toUpper: toUpper,
   type: type,
@@ -486,6 +527,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   pathEq: pathEq,
   pathsEq: pathsEq,
   clone: clone,
+  cloneShallow: cloneShallow,
   reduce: reduce,
   pickBy: pickBy,
   pick: pick,
@@ -509,6 +551,7 @@ var pepka = /*#__PURE__*/Object.freeze({
   mapKeys: mapKeys,
   forEachSerial: forEachSerial,
   waitAll: waitAll,
+  waitTap: waitTap,
   forEachAsync: forEachAsync,
   composeAsync: composeAsync,
   mirror: mirror,
