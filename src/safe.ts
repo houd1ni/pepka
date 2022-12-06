@@ -44,8 +44,10 @@ export const when = curry3(
     s: any
   ) => ifElse(cond, pipe, identity, s)
 )
-export const compose: FT.Compose = (
-  (...fns: AnyFunc[]) =>
+/*: FT.Compose*/
+type Composed = <TIn = any, TOut = any>(x: TIn) => TOut
+export const compose = (
+  (...fns: AnyFunc[]): Composed =>
     (s: any = __) => {
       for(let i = length(fns)-1; i>-1; i--) {
         s = s===__ ? fns[i]() : fns[i](s)
@@ -139,7 +141,7 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
   }
 }
 export const reverse = (xs: any[]) => compose(
-  <T>(ln: number) => reduce(
+  <T>(ln: number) => reduce<any>(
     (nxs: T[], _: any, i: number) => qappend(xs[ln-i], nxs),
     [], xs
   ),
@@ -269,7 +271,7 @@ export const omit = curry2(
     o
   )
 )
-export const fromPairs = (pairs: [string, any][]) => reduce(
+export const fromPairs = (pairs: [string, any][]) => reduce<any>(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
   {}, pairs
 )
