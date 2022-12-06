@@ -9,11 +9,10 @@ export interface AnyObject {
 }
 export type AnyArgs = any[];
 export type Curried<Args extends AnyArgs = AnyArgs, ReturnT = any> = (arg: Args[number]) => Curried<Args> | ReturnT;
-export type Reducer = <T = any>(accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
 export type Placeholder = symbol;
 declare const __: Placeholder;
-export declare const curry: <Func extends AnyFunc<any, AnyArgs>>(fn: AnyFunc) => FT.Curry<Func>;
+export declare const curry: (fn: AnyFunc) => (...args: AnyArgs) => any;
 export type Func2 = (a: any, b: any) => any;
 export declare function curry2<Func extends Func2>(fn: Func): {
 	(a: Placeholder, b: Parameters<Func>[1]): (a: Parameters<Func>[0]) => ReturnType<Func>;
@@ -22,7 +21,7 @@ export declare function curry2<Func extends Func2>(fn: Func): {
 	(a: Parameters<Func>[0], b: Parameters<Func>[1]): ReturnType<Func>;
 };
 export type Func3 = (a: any, b: any, c: any) => any;
-export declare function curry3<Func extends Func3>(fn: Func): FT.Curry<Func>;
+export declare function curry3<Func extends Func3>(fn: Func): (...args: AnyArgs) => any;
 export declare const uncurry: <Args extends any[] = any[], ReturnT = any>(fn: Curried<Args, any>) => AnyFunc;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
@@ -33,8 +32,8 @@ export declare const equals: {
 	(a: any): (b: any) => boolean;
 	(a: any, b: any): boolean;
 };
-export declare const ifElse: FT.Curry<AnyFunc<any, AnyArgs>>;
-export declare const when: FT.Curry<(cond: (s: any) => boolean, pipe: (s: any) => any, s: any) => any>;
+export declare const ifElse: (...args: AnyArgs) => any;
+export declare const when: (...args: AnyArgs) => any;
 export declare const compose: FT.Compose;
 export declare const bind: {
 	(a: symbol, b: any): (a: any) => any;
@@ -54,9 +53,9 @@ export declare const includes: {
 	(a: unknown): (b: unknown[]) => boolean;
 	(a: unknown, b: unknown[]): boolean;
 };
-export declare const slice: FT.Curry<(from: number, to: number, o: any[] | string) => string | any[]>;
+export declare const slice: (...args: AnyArgs) => any;
 export declare const head: (b: string | unknown[]) => unknown;
-export declare const tail: FT.Curry<(o: string | any[]) => string | any[]>;
+export declare const tail: any;
 export declare const add: {
 	(a: symbol, b: number): (a: number) => number;
 	(a: number, b: symbol): (b: number) => number;
@@ -69,7 +68,7 @@ export declare const subtract: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const flip: (fn: Function) => FT.Curry<AnyFunc<any, AnyArgs>>;
+export declare const flip: (fn: Function) => (...args: AnyArgs) => any;
 export declare const isNil: (s: any) => boolean;
 export declare const length: (s: any[] | string) => number;
 export declare const always: <T = any>(s: T) => () => T;
@@ -131,10 +130,7 @@ export declare const genBy: {
 	(a: (i: number) => any, b: number): any[];
 };
 export declare const once: <Func extends AnyFunc<any, AnyArgs>>(fn: Func) => (...args: Parameters<Func>) => any;
-export declare const reverse: (xs: any[]) => FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
-] | [
-	accum: any
-]) => any>>;
+export declare const reverse: (xs: any[]) => any;
 export declare const gt: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
@@ -202,9 +198,7 @@ export declare const cond: {
 		Function
 	][], b: any): any;
 };
-export declare const assoc: FT.Curry<(prop: string, v: any, obj: AnyObject) => {
-	[x: string]: any;
-}>;
+export declare const assoc: (...args: AnyArgs) => any;
 export declare const assocPath: any;
 export declare const all: {
 	(a: symbol, b: any[]): (a: Cond) => boolean;
@@ -236,18 +230,15 @@ export declare const prop: {
 	(a: string): (b: AnyObject) => any;
 	(a: string, b: AnyObject): any;
 };
-export declare const propEq: FT.Curry<(key: string, value: any, o: AnyObject) => boolean>;
-export declare const propsEq: FT.Curry<(key: string, o1: any, o2: AnyObject) => boolean>;
-export declare const pathOr: FT.Curry<(_default: any, path: string[], o: any) => any>;
-export declare const path: FT.Curry<(path: string[], o: any) => any>;
-export declare const pathEq: FT.Curry<(_path: string[], value: any, o: AnyObject) => (a: any) => boolean>;
-export declare const pathsEq: FT.Curry<(_path: string[], o1: AnyObject, o2: AnyObject) => (a: any) => boolean>;
+export declare const propEq: (...args: AnyArgs) => any;
+export declare const propsEq: (...args: AnyArgs) => any;
+export declare const pathOr: (...args: AnyArgs) => any;
+export declare const path: any;
+export declare const pathEq: (...args: AnyArgs) => any;
+export declare const pathsEq: (...args: AnyArgs) => any;
 export declare const clone: (s: any, shallow?: boolean) => any;
 export declare const cloneShallow: (s: any) => any;
-export declare const reduce: FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
-] | [
-	accum: any
-]) => any>>;
+export declare const reduce: (...args: AnyArgs) => any;
 export declare const pickBy: {
 	(a: symbol, b: AnyObject): (a: Cond) => any;
 	(a: Cond, b: symbol): (b: AnyObject) => any;
@@ -269,10 +260,7 @@ export declare const omit: {
 export declare const fromPairs: (pairs: [
 	string,
 	any
-][]) => FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
-] | [
-	accum: any
-]) => any>>;
+][]) => any;
 export declare const concat: {
 	(a: symbol, b: string | any[]): (a: string | any[]) => string | any[];
 	(a: string | any[], b: symbol): (b: string | any[]) => string | any[];
@@ -297,10 +285,10 @@ export declare const forEach: {
 	(a: (s: any) => any): (b: any[]) => void;
 	(a: (s: any) => any, b: any[]): void;
 };
-export declare const both: FT.Curry<(cond1: Cond, cond2: Cond, s: any) => boolean>;
+export declare const both: (...args: AnyArgs) => any;
 export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
-export declare const replace: FT.Curry<(a: string | RegExp, b: string, where: string) => string>;
+export declare const replace: (...args: AnyArgs) => any;
 export declare const filter: any;
 export declare const memoize: (fn: Function) => () => any;
 export declare const mergeShallow: {
@@ -310,128 +298,24 @@ export declare const mergeShallow: {
 	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const mergeDeep: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => any;
+	(a: AnyObject, b: symbol): (b: AnyObject) => any;
+	(a: AnyObject): (b: AnyObject) => any;
+	(a: AnyObject, b: AnyObject): any;
 };
 export declare const mergeDeepX: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => any;
+	(a: AnyObject, b: symbol): (b: AnyObject) => any;
+	(a: AnyObject): (b: AnyObject) => any;
+	(a: AnyObject, b: AnyObject): any;
 };
 export declare const mergeDeepAdd: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => any;
+	(a: AnyObject, b: symbol): (b: AnyObject) => any;
+	(a: AnyObject): (b: AnyObject) => any;
+	(a: AnyObject, b: AnyObject): any;
 };
-export declare const overProp: FT.Curry<(prop: string, pipe: AnyFunc, data: any) => FT.Curry<(...p: [
-] | [
-	v: any,
-	obj: AnyObject
-] | [
-	obj: AnyObject
-] | [
-	v: any
-]) => any>>;
+export declare const overProp: (...args: AnyArgs) => any;
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const mapKeys: {
 	(a: symbol, b: AnyObject): (a: {
@@ -480,11 +364,11 @@ export declare const qappend: {
 	(a: any): (b: any[]) => any[];
 	(a: any, b: any[]): any[];
 };
-export declare const qassoc: import("ts-toolbelt/out/Function/Curry").Curry<(prop: string, v: any, obj: AnyObject) => AnyObject>;
-export declare const qreduce: import("ts-toolbelt/out/Function/Curry").Curry<(<T>(fn: Reducer, accum: any, arr: T[]) => any)>;
-export declare const qmergeDeep: import("ts-toolbelt/out/Function/Curry").Curry<(o1: AnyObject, o2: AnyObject) => AnyObject>;
-export declare const qmergeDeepX: import("ts-toolbelt/out/Function/Curry").Curry<(o1: AnyObject, o2: AnyObject) => AnyObject>;
-export declare const qmergeDeepAdd: import("ts-toolbelt/out/Function/Curry").Curry<(o1: AnyObject, o2: AnyObject) => AnyObject>;
+export declare const qassoc: (...args: AnyArgs) => any;
+export declare const qreduce: (...args: AnyArgs) => any;
+export declare const qmergeDeep: any;
+export declare const qmergeDeepX: any;
+export declare const qmergeDeepAdd: any;
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const qmapKeys: {
 	(a: symbol, b: AnyObject): (a: {

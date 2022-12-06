@@ -6,6 +6,6 @@ export const uncurry = <
   Args extends any[] = any[],
   ReturnT = any
 >(fn: Curried<Args>): AnyFunc =>
-  (...args: Args) => qreduce<any>(
+  (...args: Args) => qreduce(
     ((fn: Curried<Args>, arg: any) => fn ? fn(arg) : fn), fn, args
   ) as ReturnT

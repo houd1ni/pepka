@@ -1,5 +1,5 @@
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, nul, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
+import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
@@ -139,7 +139,7 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
   }
 }
 export const reverse = (xs: any[]) => compose(
-  <T>(ln: number) => reduce<any>(
+  <T>(ln: number) => reduce(
     (nxs: T[], _: any, i: number) => qappend(xs[ln-i], nxs),
     [], xs
   ),
@@ -269,7 +269,7 @@ export const omit = curry2(
     o
   )
 )
-export const fromPairs = (pairs: [string, any][]) => reduce<any>(
+export const fromPairs = (pairs: [string, any][]) => reduce(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
   {}, pairs
 )

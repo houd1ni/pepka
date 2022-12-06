@@ -46,11 +46,11 @@ const _curry = (fn: Function, args: AnyArgs, new_args: AnyArgs) => {
 }
 
 export const curry = (
-  <Func extends AnyFunc>(fn: AnyFunc) => (
+  /*<Func extends AnyFunc>*/(fn: AnyFunc) => (
     (...args: AnyArgs) => fn.length>countArgs(args)
       ? _curry(fn, [], args)
       : fn(...args)
-  ) as FT.Curry<Func>
+  )// as FT.Curry<Func>
 )
 const endlessph = <Func extends FT.Function>(fn: Func) => {
   type ReturnT = ReturnType<Func>
@@ -93,5 +93,5 @@ export function curry3<Func extends Func3>(fn: Func) {
   // type p2 = Parameters<Func>[2]
   // type ReturnT = ReturnType<Func>
   // TODO: optimize.
-  return curry(fn) as FT.Curry<Func>
+  return curry(fn)// as FT.Curry<Func>
 }
