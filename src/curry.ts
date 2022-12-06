@@ -1,8 +1,8 @@
 import { F as FT } from 'ts-toolbelt'
 import { AnyFunc, AnyArgs } from "./types"
 
-export const __ = Symbol('Placeholder')
-type Placeholder = typeof __
+type Placeholder = symbol
+export const __: Placeholder = Symbol('Placeholder')
 
 const countArgs = (s: AnyArgs) => {
   let i = 0

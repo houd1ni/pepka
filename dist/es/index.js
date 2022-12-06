@@ -4,3 +4,4 @@ export * from './common';
 export * from './safe';
 export * from './quick';
 export * from './strings';
+export { __ } from './curry';
