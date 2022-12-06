@@ -43,10 +43,10 @@ export declare const bind: {
 	(a: any, b: any): any;
 };
 export declare const nth: {
-	(a: symbol, b: unknown[]): (a: number) => unknown;
-	(a: number, b: symbol): (b: unknown[]) => unknown;
-	(a: number): (b: unknown[]) => unknown;
-	(a: number, b: unknown[]): unknown;
+	(a: symbol, b: string | unknown[]): (a: number) => unknown;
+	(a: number, b: symbol): (b: string | unknown[]) => unknown;
+	(a: number): (b: string | unknown[]) => unknown;
+	(a: number, b: string | unknown[]): unknown;
 };
 export declare const includes: {
 	(a: symbol, b: unknown[]): (a: unknown) => boolean;
@@ -55,7 +55,7 @@ export declare const includes: {
 	(a: unknown, b: unknown[]): boolean;
 };
 export declare const slice: FT.Curry<(from: number, to: number, o: any[] | string) => string | any[]>;
-export declare const head: (b: unknown[]) => unknown;
+export declare const head: (b: string | unknown[]) => unknown;
 export declare const tail: FT.Curry<(o: string | any[]) => string | any[]>;
 export declare const add: {
 	(a: symbol, b: number): (a: number) => number;

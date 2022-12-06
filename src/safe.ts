@@ -58,7 +58,7 @@ export const bind = curry2<AnyFunc>(
   (fn: AnyFunc, context: any) => fn.bind(context)
 )
 
-const _nth = <T=any>(i: number, data: T[]) => data[i]
+const _nth = <T=any>(i: number, data: T[] | string) => data[i]
 export const nth = curry2(_nth)
 
 export const includes = curry2(
