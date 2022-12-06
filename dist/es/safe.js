@@ -26,7 +26,7 @@ export const equals = curry2((a, b) => {
 });
 export const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 export const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
-export const compose = ((...fns) => (s = __) => {
+export const compose = ((...fns) => (s = Symbol()) => {
     for (let i = length(fns) - 1; i > -1; i--) {
         s = s === __ ? fns[i]() : fns[i](s);
     }

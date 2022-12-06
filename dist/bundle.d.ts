@@ -35,8 +35,8 @@ export declare const equals: {
 };
 export declare const ifElse: FT.Curry<AnyFunc<any, AnyArgs>>;
 export declare const when: FT.Curry<(cond: (s: any) => boolean, pipe: (s: any) => any, s: any) => any>;
-export type Composed = <TIn = any, TOut = any>(x: TIn) => TOut;
-export declare const compose: (...fns: AnyFunc[]) => Composed;
+export type Composed<TIn, TOut> = (x: TIn) => TOut;
+export declare const compose: <TIn = any, TOut = any>(...fns: AnyFunc[]) => Composed<TIn, TOut>;
 export declare const bind: {
 	(a: symbol, b: any): (a: any) => any;
 	(a: any, b: symbol): (b: any) => any;

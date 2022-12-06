@@ -3,7 +3,7 @@ import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } fro
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-import { F as FT, U } from 'ts-toolbelt'
+import { F as FT } from 'ts-toolbelt'
 // over, lensProp
 
 export const equals = curry2((a: any, b: any) => {
@@ -44,15 +44,14 @@ export const when = curry3(
     s: any
   ) => ifElse(cond, pipe, identity, s)
 )
-/*: FT.Compose*/
-type Composed = <TIn = any, TOut = any>(x: TIn) => TOut
+type Composed<TIn, TOut> = (x: TIn) => TOut
 export const compose = (
-  (...fns: AnyFunc[]): Composed =>
-    (s: any = __) => {
+  <TIn = any, TOut = any>(...fns: AnyFunc[]): Composed<TIn, TOut> =>
+    (s: TIn = Symbol() as any) => {
       for(let i = length(fns)-1; i>-1; i--) {
         s = s===__ ? fns[i]() : fns[i](s)
       }
-      return s
+      return s as any as TOut
     }
 )
 

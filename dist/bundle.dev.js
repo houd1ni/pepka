@@ -198,7 +198,7 @@ const equals = curry2((a, b) => {
 });
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
-const compose = ((...fns) => (s = __) => {
+const compose = ((...fns) => (s = Symbol()) => {
     for (let i = length(fns) - 1; i > -1; i--) {
         s = s === __ ? fns[i]() : fns[i](s);
     }
