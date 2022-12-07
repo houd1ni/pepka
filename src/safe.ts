@@ -311,8 +311,9 @@ export const empty = (s: any) => {
 export const replace = curry3(
   (
     a: string | RegExp,
-    b: string,
+    b: string | ((substring: string, ...ps: any[]) => string),
     where: string
+    // @ts-ignore-next Some bug with overload.
   ) => where.replace(a, b)
 )
 export const filter = curry2(
@@ -385,7 +386,7 @@ export const composeAsync = (() => {
     ~i ? await pipe(fns, await fns[i](data), --i) : data
   return <T = any>(...fns: AnyFunc[]) =>
     (data?: any) => pipe(fns, data, fns.length-1) as Promise<T>
-})() as FT.Compose<'async'>
+})()// as FT.Compose<'async'>
 
 // ALIASES
 export const mirror = identity

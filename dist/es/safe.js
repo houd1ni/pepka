@@ -198,7 +198,9 @@ export const empty = (s) => {
         default: return undef;
     }
 };
-export const replace = curry3((a, b, where) => where.replace(a, b));
+export const replace = curry3((a, b, where
+// @ts-ignore-next Some bug with overload.
+) => where.replace(a, b));
 export const filter = curry2((cond, data) => isArray(data)
     ? data.filter(cond)
     : compose(fromPairs, filter(([k, v]) => cond(v, k)), toPairs)(data));
@@ -234,7 +236,7 @@ export const forEachAsync = curry2((fn, items) => Promise.all(items.map(fn)));
 export const composeAsync = (() => {
     const pipe = async (fns, data, i) => ~i ? await pipe(fns, await fns[i](data), --i) : data;
     return (...fns) => (data) => pipe(fns, data, fns.length - 1);
-})();
+})(); // as FT.Compose<'async'>
 // ALIASES
 export const mirror = identity;
 export const reflect = identity;

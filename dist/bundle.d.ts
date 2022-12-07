@@ -298,7 +298,7 @@ export declare const forEach: {
 export declare const both: FT.Curry<(cond1: Cond, cond2: Cond, s: any) => boolean>;
 export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
-export declare const replace: FT.Curry<(a: string | RegExp, b: string, where: string) => string>;
+export declare const replace: FT.Curry<(a: string | RegExp, b: string | ((substring: string, ...ps: any[]) => string), where: string) => string>;
 export declare const filter: any;
 export declare const memoize: (fn: Function) => () => any;
 export declare const mergeShallow: {
@@ -468,7 +468,7 @@ export declare const forEachAsync: {
 	(a: (item: any) => Promise<any>, b: any[]): Promise<any[]>;
 };
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
-export declare const composeAsync: import("ts-toolbelt/out/Function/Compose/Multi/Async").ComposeMultiAsync;
+export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (data?: any) => Promise<T>;
 export declare const mirror: (s: any) => any;
 export declare const reflect: (s: any) => any;
 export declare const echo: (s: any) => any;
