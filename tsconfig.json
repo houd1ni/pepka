@@ -11,7 +11,6 @@
     "experimentalDecorators": true,
     "noUnusedParameters": true,
     "noUnusedLocals": false,
-    "outDir": "dist/es",
     "rootDir": "src",
     "baseUrl": "."
   },

@@ -1,18 +1,21 @@
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
-import { terser } from 'rollup-plugin-terser'
-import replace from 'rollup-plugin-replace'
+import terser from '@rollup/plugin-terser'
+import replace from '@rollup/plugin-replace'
 import tsc from 'typescript'
 
 export default {
   input: process.env.NODE_ENV=='development' ? 'test/in-browser.ts' : 'src/index.ts',
   output: {
-    file: process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.dev.js',
+    file: process.env.NODE_ENV=='development'
+      ? 'dist/bundle.dev.js'
+      : process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.esm.js',
     format: process.env.BUILD == 'cjs' ? 'cjs' : 'es',
-    exports: 'named',
+    // exports: 'named',
     name: 'pepka'
   },
+  treeshake: { moduleSideEffects: false },
   plugins: [
     resolve(),
     commonjs(),
@@ -29,7 +32,10 @@ export default {
     }),
     process.env.NODE_ENV!='development' && terser(),
     replace({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      preventAssignment: true,
+      values: {
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      }
     })
   ]
 }
