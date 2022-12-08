@@ -3,7 +3,6 @@ import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } fro
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-import { F as FT } from 'ts-toolbelt'
 // over, lensProp
 
 export const equals = curry2((a: any, b: any) => {

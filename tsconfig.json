@@ -12,7 +12,8 @@
     "noUnusedParameters": true,
     "noUnusedLocals": false,
     "rootDir": "src",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "outDir": "dist/ts"
   },
   "include": [ "src/**/*" ]
 }
