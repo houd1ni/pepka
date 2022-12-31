@@ -27,16 +27,23 @@ export declare const uncurry: <Args extends any[] = any[], ReturnT = any>(fn: Cu
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
 export declare const type: (s: any) => any;
+export declare const typeIs: {
+	(a: symbol, b: any): (a: string) => boolean;
+	(a: string, b: symbol): (b: any) => boolean;
+	(a: string): (b: any) => boolean;
+	(a: string, b: any): boolean;
+};
+export declare const take: (argN: number) => (...args: any[]) => any;
 export declare const equals: {
 	(a: symbol, b: any): (a: any) => boolean;
 	(a: any, b: symbol): (b: any) => boolean;
 	(a: any): (b: any) => boolean;
 	(a: any, b: any): boolean;
 };
-export declare const ifElse: FT.Curry<AnyFunc<any, AnyArgs>>;
-export declare const when: FT.Curry<(cond: (s: any) => boolean, pipe: (s: any) => any, s: any) => any>;
-export type Composed<TIn, TOut> = (x: TIn) => TOut;
-export declare const compose: <TIn = any, TOut = any>(...fns: AnyFunc[]) => Composed<TIn, TOut>;
+export declare const ifElse: import("ts-toolbelt/out/Function/Curry").Curry<AnyFunc<any, AnyArgs>>;
+export declare const when: import("ts-toolbelt/out/Function/Curry").Curry<(cond: (s: any) => boolean, pipe: (s: any) => any, s: any) => any>;
+export type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut;
+export declare const compose: <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, TOut>;
 export declare const bind: {
 	(a: symbol, b: any): (a: any) => any;
 	(a: any, b: symbol): (b: any) => any;
@@ -55,9 +62,9 @@ export declare const includes: {
 	(a: unknown): (b: unknown[]) => boolean;
 	(a: unknown, b: unknown[]): boolean;
 };
-export declare const slice: FT.Curry<(from: number, to: number, o: any[] | string) => string | any[]>;
+export declare const slice: import("ts-toolbelt/out/Function/Curry").Curry<(from: number, to: number, o: any[] | string) => string | any[]>;
 export declare const head: (b: string | unknown[]) => unknown;
-export declare const tail: FT.Curry<(o: string | any[]) => string | any[]>;
+export declare const tail: import("ts-toolbelt/out/Function/Curry").Curry<(o: string | any[]) => string | any[]>;
 export declare const add: {
 	(a: symbol, b: number): (a: number) => number;
 	(a: number, b: symbol): (b: number) => number;
@@ -70,7 +77,19 @@ export declare const subtract: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const flip: (fn: Function) => FT.Curry<AnyFunc<any, AnyArgs>>;
+export declare const multiply: {
+	(a: symbol, b: number): (a: number) => number;
+	(a: number, b: symbol): (b: number) => number;
+	(a: number): (b: number) => number;
+	(a: number, b: number): number;
+};
+export declare const divide: {
+	(a: symbol, b: number): (a: number) => number;
+	(a: number, b: symbol): (b: number) => number;
+	(a: number): (b: number) => number;
+	(a: number, b: number): number;
+};
+export declare const flip: (fn: Function) => import("ts-toolbelt/out/Function/Curry").Curry<AnyFunc<any, AnyArgs>>;
 export declare const isNil: (s: any) => boolean;
 export declare const length: (s: any[] | string) => number;
 export declare const always: <T = any>(s: T) => () => T;
@@ -104,10 +123,10 @@ export declare const append: {
 	(a: any, b: any[]): any[];
 };
 export declare const split: {
-	(a: symbol, b: string): (a: string) => string[];
-	(a: string, b: symbol): (b: string) => string[];
-	(a: string): (b: string) => string[];
-	(a: string, b: string): string[];
+	(a: symbol, b: string): (a: string | RegExp) => string[];
+	(a: string | RegExp, b: symbol): (b: string) => string[];
+	(a: string | RegExp): (b: string) => string[];
+	(a: string | RegExp, b: string): string[];
 };
 export declare const T: (...args: any[]) => true;
 export declare const F: (...args: any[]) => false;
@@ -200,7 +219,7 @@ export declare const cond: {
 		Function
 	][], b: any): any;
 };
-export declare const assoc: FT.Curry<(prop: string, v: any, obj: AnyObject) => {
+export declare const assoc: import("ts-toolbelt/out/Function/Curry").Curry<(prop: string, v: any, obj: AnyObject) => {
 	[x: string]: any;
 }>;
 export declare const assocPath: any;
@@ -234,15 +253,15 @@ export declare const prop: {
 	(a: string): (b: AnyObject) => any;
 	(a: string, b: AnyObject): any;
 };
-export declare const propEq: FT.Curry<(key: string, value: any, o: AnyObject) => boolean>;
-export declare const propsEq: FT.Curry<(key: string, o1: any, o2: AnyObject) => boolean>;
-export declare const pathOr: FT.Curry<(_default: any, path: string[], o: any) => any>;
-export declare const path: FT.Curry<(path: string[], o: any) => any>;
-export declare const pathEq: FT.Curry<(_path: string[], value: any, o: AnyObject) => (a: any) => boolean>;
-export declare const pathsEq: FT.Curry<(_path: string[], o1: AnyObject, o2: AnyObject) => (a: any) => boolean>;
+export declare const propEq: import("ts-toolbelt/out/Function/Curry").Curry<(key: string, value: any, o: AnyObject) => boolean>;
+export declare const propsEq: import("ts-toolbelt/out/Function/Curry").Curry<(key: string, o1: any, o2: AnyObject) => boolean>;
+export declare const pathOr: import("ts-toolbelt/out/Function/Curry").Curry<(_default: any, path: string[], o: any) => any>;
+export declare const path: import("ts-toolbelt/out/Function/Curry").Curry<(path: string[], o: any) => any>;
+export declare const pathEq: import("ts-toolbelt/out/Function/Curry").Curry<(_path: string[], value: any, o: AnyObject) => (a: any) => boolean>;
+export declare const pathsEq: import("ts-toolbelt/out/Function/Curry").Curry<(_path: string[], o1: AnyObject, o2: AnyObject) => (a: any) => boolean>;
 export declare const clone: (s: any, shallow?: boolean) => any;
 export declare const cloneShallow: (s: any) => any;
-export declare const reduce: FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
+export declare const reduce: import("ts-toolbelt/out/Function/Curry").Curry<(fn: Reducer, accum: any, arr: any[]) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 ] | [
 	accum: any
 ]) => any>>;
@@ -267,7 +286,7 @@ export declare const omit: {
 export declare const fromPairs: (pairs: [
 	string,
 	any
-][]) => FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
+][]) => import("ts-toolbelt/out/Function/Curry").Curry<(fn: Reducer, accum: any, arr: any[]) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 ] | [
 	accum: any
 ]) => any>>;
@@ -295,10 +314,10 @@ export declare const forEach: {
 	(a: (s: any) => any): (b: any[]) => void;
 	(a: (s: any) => any, b: any[]): void;
 };
-export declare const both: FT.Curry<(cond1: Cond, cond2: Cond, s: any) => boolean>;
+export declare const both: import("ts-toolbelt/out/Function/Curry").Curry<(cond1: Cond, cond2: Cond, s: any) => boolean>;
 export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
-export declare const replace: FT.Curry<(a: string | RegExp, b: string | ((substring: string, ...ps: any[]) => string), where: string) => string>;
+export declare const replace: import("ts-toolbelt/out/Function/Curry").Curry<(a: string | RegExp, b: string | ((substring: string, ...ps: any[]) => string), where: string) => string>;
 export declare const filter: any;
 export declare const memoize: (fn: Function) => () => any;
 export declare const mergeShallow: {
@@ -308,7 +327,7 @@ export declare const mergeShallow: {
 	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const mergeDeep: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
+	(a: symbol, b: AnyObject): (a: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -317,7 +336,7 @@ export declare const mergeDeep: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject, b: symbol): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -326,7 +345,7 @@ export declare const mergeDeep: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -335,7 +354,7 @@ export declare const mergeDeep: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
+	(a: AnyObject, b: AnyObject): import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -346,7 +365,7 @@ export declare const mergeDeep: {
 	]) => any>;
 };
 export declare const mergeDeepX: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
+	(a: symbol, b: AnyObject): (a: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -355,7 +374,7 @@ export declare const mergeDeepX: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject, b: symbol): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -364,7 +383,7 @@ export declare const mergeDeepX: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -373,7 +392,7 @@ export declare const mergeDeepX: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
+	(a: AnyObject, b: AnyObject): import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -384,7 +403,7 @@ export declare const mergeDeepX: {
 	]) => any>;
 };
 export declare const mergeDeepAdd: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
+	(a: symbol, b: AnyObject): (a: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -393,7 +412,7 @@ export declare const mergeDeepAdd: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject, b: symbol): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -402,7 +421,7 @@ export declare const mergeDeepAdd: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
+	(a: AnyObject): (b: AnyObject) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -411,7 +430,7 @@ export declare const mergeDeepAdd: {
 	] | [
 		o1: AnyObject
 	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
+	(a: AnyObject, b: AnyObject): import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 	] | [
 		o1: AnyObject,
 		o2: AnyObject
@@ -421,7 +440,7 @@ export declare const mergeDeepAdd: {
 		o1: AnyObject
 	]) => any>;
 };
-export declare const overProp: FT.Curry<(prop: string, pipe: AnyFunc, data: any) => FT.Curry<(...p: [
+export declare const overProp: import("ts-toolbelt/out/Function/Curry").Curry<(prop: string, pipe: AnyFunc, data: any) => import("ts-toolbelt/out/Function/Curry").Curry<(...p: [
 ] | [
 	v: any,
 	obj: AnyObject

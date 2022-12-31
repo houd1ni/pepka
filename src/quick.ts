@@ -3,6 +3,8 @@ import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray } from "./utils"
 
+// TODO: qmap, qfilter.
+
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3(
   (prop: string, v: any, obj: AnyObject) => {

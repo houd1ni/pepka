@@ -1,3 +1,4 @@
+import { curry2 } from "./curry"
 import { to, isNull } from "./utils"
 
 // It's faster that toUpperCase() !
@@ -13,3 +14,4 @@ export const type = (s: any) => {
     ? isNull(s) ? 'Null' : s.constructor.name
     : caseMap[t[0]] + t.slice(1)
 }
+export const typeIs = curry2((t: string, s: any) => type(s)===t)

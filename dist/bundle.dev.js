@@ -91,7 +91,9 @@ const type = (s) => {
         ? isNull(s) ? 'Null' : s.constructor.name
         : caseMap[t[0]] + t.slice(1);
 };
+const typeIs = curry2((t, s) => type(s) === t);
 
+// TODO: qmap, qfilter.
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => {
     obj[prop] = v;
@@ -174,7 +176,17 @@ const qindexOf = curry2((x, xs) => xs.indexOf(x));
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
-// over, lensProp
+// SomeType, totype, over, lensProp
+// take (if not exsit in ramda):
+/* res = code.replace(/css\`((.|\s)*?)\`/g, (_, g1) => {
+    return compressRules(g1)
+  }) ->
+  res = code.replace(/css\`((.|\s)*?)\`/g, compose(
+    compressRules,
+    take(2) // second arg
+  ))
+*/
+const take = (argN) => (...args) => args[argN];
 const equals = curry2((a, b) => {
     const typea = type(a);
     if (typea === type(b) && (typea === 'Object' || typea == 'Array')) {
@@ -198,9 +210,16 @@ const equals = curry2((a, b) => {
 });
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
-const compose = ((...fns) => (s = Symbol()) => {
+const compose = ((...fns) => (...args) => {
+    let first = true;
+    let s;
     for (let i = length(fns) - 1; i > -1; i--) {
-        s = s === __ ? fns[i]() : fns[i](s);
+        if (first) {
+            first = false;
+            s = fns[i](...args);
+        }
+        else
+            s = s === __ ? fns[i]() : fns[i](s);
     }
     return s;
 });
@@ -225,6 +244,8 @@ const head = nth(0);
 const tail = slice(1, inf); // typeshit.
 const add = curry2((n, m) => n + m);
 const subtract = curry2((n, m) => m - n);
+const multiply = curry2((n, m) => n * m);
+const divide = curry2((n, m) => n / m);
 const flip = (fn) => curry((b, a) => fn(a, b));
 const isNil = (s) => isNull(s) || isUndef(s);
 const length = (s) => s.length;
@@ -466,6 +487,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   toLower: toLower,
   toUpper: toUpper,
   type: type,
+  typeIs: typeIs,
+  take: take,
   equals: equals,
   ifElse: ifElse,
   when: when,
@@ -478,6 +501,8 @@ var pepka = /*#__PURE__*/Object.freeze({
   tail: tail,
   add: add,
   subtract: subtract,
+  multiply: multiply,
+  divide: divide,
   flip: flip,
   isNil: isNil,
   length: length,

@@ -3,8 +3,9 @@ import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } fro
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-// over, lensProp
+// SomeType, totype, over, lensProp
 
+export const take = (argN: number) => (...args: any[]) => args[argN]
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)
   if(typea===type(b) && (typea==='Object' || typea=='Array')) {
@@ -43,12 +44,18 @@ export const when = curry3(
     s: any
   ) => ifElse(cond, pipe, identity, s)
 )
-type Composed<TIn, TOut> = (x: TIn) => TOut
+type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut
 export const compose = (
-  <TIn = any, TOut = any>(...fns: AnyFunc[]): Composed<TIn, TOut> =>
-    (s: TIn = Symbol() as any) => {
+  <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]): Composed<TIn, TOut> =>
+    (...args: TIn) => {
+      let first = true
+      let s: any
       for(let i = length(fns)-1; i>-1; i--) {
-        s = s===__ ? fns[i]() : fns[i](s)
+        if(first) {
+          first = false
+          s = fns[i](...args)
+        } else
+          s = s===__ ? fns[i]() : fns[i](s)
       }
       return s as any as TOut
     }
@@ -83,6 +90,8 @@ export const head = nth(0)
 export const tail = slice(1, inf) // typeshit.
 export const add = curry2((n: number, m: number) => n+m)
 export const subtract = curry2((n: number, m: number) => m-n)
+export const multiply = curry2((n: number, m: number) => n*m)
+export const divide = curry2((n: number, m: number) => n/m)
 export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
@@ -101,7 +110,7 @@ export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
 export const tap = curry2((fn: Function, s: any) => { fn(s); return s })
 export const append = curry2((s: any, xs: any[]) => [...xs, s])
-export const split = curry2((s: string, xs: string) => xs.split(s))
+export const split = curry2((s: string|RegExp, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
 export const sizeof = (s: any[] | string | AnyObject) => {
