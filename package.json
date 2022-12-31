@@ -21,8 +21,10 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./dist/bundle.esm.js",
-    "./cjs": "./dist/bundle.js"
+    ".": {
+      "module": "./dist/bundle.mjs",
+      "commonjs": "./dist/bundle.cjs"
+    }
   },
   "name": "pepka",
   "repository": {
@@ -42,7 +44,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.14.0-beta2",
+  "version": "0.14.0-beta3",
   "ava": {
     "files": [ "./test/specs/*.ts" ],
     "failFast": true,

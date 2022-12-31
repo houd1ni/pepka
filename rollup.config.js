@@ -10,9 +10,8 @@ export default {
   output: {
     file: process.env.NODE_ENV=='development'
       ? 'dist/bundle.dev.js'
-      : process.env.BUILD == 'cjs' ? 'dist/bundle.js' : 'dist/bundle.esm.js',
+      : process.env.BUILD == 'cjs' ? 'dist/bundle.cjs' : 'dist/bundle.mjs',
     format: process.env.BUILD == 'cjs' ? 'cjs' : 'es',
-    // exports: 'named',
     name: 'pepka'
   },
   treeshake: { moduleSideEffects: false },

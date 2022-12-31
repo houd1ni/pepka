@@ -11,6 +11,7 @@ export type AnyArgs = any[];
 export type Curried<Args extends AnyArgs = AnyArgs, ReturnT = any> = (arg: Args[number]) => Curried<Args> | ReturnT;
 export type Reducer = <T = any>(accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
+export type TupleFn<ARG1 = any, ARG2 = any, Out = any> = (a: ARG1, b: ARG2) => Out;
 export type Placeholder = symbol;
 declare const __: Placeholder;
 export declare const curry: <Func extends AnyFunc<any, AnyArgs>>(fn: AnyFunc) => FT.Curry<Func>;
@@ -63,7 +64,6 @@ export declare const includes: {
 	(a: unknown, b: unknown[]): boolean;
 };
 export declare const slice: FT.Curry<(from: number, to: number, o: any[] | string) => string | any[]>;
-export type TupleFn<ARG1 = any, ARG2 = any, Out = any> = (a: ARG1, b: ARG2) => Out;
 export declare const flip: <ARG1 = any, ARG2 = any, Out = any>(fn: FT.Curry<TupleFn<ARG1, ARG2, Out>>) => FT.Curry<TupleFn<ARG2, ARG1, Out>>;
 export declare const head: (b: string | unknown[]) => unknown;
 export declare const tail: FT.Curry<(o: string | any[]) => string | any[]>;
