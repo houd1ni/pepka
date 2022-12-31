@@ -11,7 +11,9 @@ export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
   const keymap: string[] = []
   const len = tmpl.length
-  let i = 0, s, ln, start = 0, open = false, hasEcran = head(tmpl), hasEcranNext = false
+  let i = 0, s, ln, start = 0, open = false,
+      hasEcran = head(tmpl), hasEcranNext = false,
+      nextChar: string
   for(i=0; i<len; i++) {
     s = tmpl[i]
     switch(s) {
