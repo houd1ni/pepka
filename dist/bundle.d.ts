@@ -256,8 +256,8 @@ export declare const prop: {
 };
 export declare const propEq: FT.Curry<(key: string, value: any, o: AnyObject) => boolean>;
 export declare const propsEq: FT.Curry<(key: string, o1: any, o2: AnyObject) => boolean>;
-export declare const pathOr: FT.Curry<(_default: any, path: string[], o: any) => any>;
-export declare const path: FT.Curry<(path: string[], o: any) => any>;
+export declare const pathOr: FT.Curry<(_default: any, path: (string | number)[], o: any) => any>;
+export declare const path: FT.Curry<(path: (string | number)[], o: any) => any>;
 export declare const pathEq: FT.Curry<(_path: string[], value: any, o: AnyObject) => (a: any) => boolean>;
 export declare const pathsEq: FT.Curry<(_path: string[], o1: AnyObject, o2: AnyObject) => (a: any) => boolean>;
 export declare const clone: (s: any, shallow?: boolean) => any;

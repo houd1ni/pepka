@@ -213,7 +213,7 @@ export const propsEq = curry3(
   (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 )
 export const pathOr = curry3(
-  (_default: any, path: string[], o: any) =>
+  (_default: any, path: (string | number)[], o: any) =>
     ifElse(length,
       () => isNil(o)
         ? _default
