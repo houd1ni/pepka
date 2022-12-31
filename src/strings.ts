@@ -1,30 +1,40 @@
 import { AnyObject } from "./types"
-import { path } from "./safe"
+import { head, path } from "./safe"
+
+type StrTmpl = ((data: AnyObject) => string)
+const ecran = '\\'
 
 // TODO: make it splicy, not accumulatie by symbols.
+// Supports ecrans: '\{"json": {yes} \}'
 // get_tmpl(one{meme}two)({meme: 42}) -> one42two
-type StrTmpl = ((data: AnyObject) => string)
 export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
   const keymap: string[] = []
   const len = tmpl.length
-  let i = 0, s: string, ln: number, start = 0, open = false
+  let i = 0, s, ln, start = 0, open = false, hasEcran = head(tmpl), hasEcranNext = false
   for(i=0; i<len; i++) {
     s = tmpl[i]
     switch(s) {
       case '{':
-        open = true; start = i;
-        break
+        if(!hasEcran) {
+          open = true; start = i;
+          break
+        }
       case '}':
-        open = false; parts.push('')
-        keymap.push(tmpl.slice(start+1, i))
-        break
+        if(!hasEcran) {
+          open = false; parts.push('')
+          keymap.push(tmpl.slice(start+1, i))
+          break
+        }
       default:
-        if(!open) {
+        nextChar = tmpl[i+1]
+        hasEcranNext = s === ecran
+        if(!open && (!hasEcranNext || nextChar!=='{' && nextChar!=='}')) {
           ln = parts.length-1
           if(ln<0) { parts.push(''); ln++ }
           parts[ln] += s
         }
+        hasEcran = hasEcranNext
         break
     }
   }
