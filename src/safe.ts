@@ -87,10 +87,10 @@ export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
 )
-export const flip = <ARG1=any, ARG2=any, Out=any>(
-  fn: FT.Curry<TupleFn<ARG1, ARG2, Out>>
-): FT.Curry<TupleFn<ARG2, ARG1, Out>> =>
-  curry2((b: ARG2, a: ARG1) => fn(a as any, b as any))
+export const flip =
+  <T extends AnyFunc>(fn: T) => curry2(
+    (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
+  )
 export const head = nth(0)
 export const tail = slice(1, inf) // typeshit.
 export const add = curry2((n: number, m: number) => n+m)
