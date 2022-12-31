@@ -295,7 +295,7 @@ export const join = curry2(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
 )
 export const map = curry2(
-  <T = any>(pipe: (s: T, i?: number, list?: T[]) => any, arr: T[]) => arr.map(pipe)
+  (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => arr.map(pipe)
 )
 export const forEach = curry2(
   (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)
