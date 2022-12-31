@@ -259,7 +259,7 @@ export const clone = (s: any, shallow = false) => {
 export const cloneShallow = (s: any) => clone(s, true)
 
 export const reduce = curry3(
-  (fn: Reducer, accum: any, arr: any[]) =>
+  <T = any>(fn: Reducer<T>, accum: T, arr: any[]) =>
     qreduce(fn, clone(accum), arr)
 )
 export const pickBy = curry2(

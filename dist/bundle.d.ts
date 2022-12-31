@@ -9,7 +9,7 @@ export interface AnyObject {
 }
 export type AnyArgs = any[];
 export type Curried<Args extends AnyArgs = AnyArgs, ReturnT = any> = (arg: Args[number]) => Curried<Args> | ReturnT;
-export type Reducer = <T = any>(accum: T, cur: any, index: number) => T;
+export type Reducer<T = any> = (accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
 export type Placeholder = symbol;
 declare const __: Placeholder;
@@ -266,10 +266,10 @@ export declare const pathEq: FT.Curry<(_path: string[], value: any, o: AnyObject
 export declare const pathsEq: FT.Curry<(_path: string[], o1: AnyObject, o2: AnyObject) => (a: any) => boolean>;
 export declare const clone: (s: any, shallow?: boolean) => any;
 export declare const cloneShallow: (s: any) => any;
-export declare const reduce: FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
+export declare const reduce: FT.Curry<(<T = any>(fn: Reducer<T>, accum: T, arr: any[]) => FT.Curry<(...p: [
 ] | [
 	accum: any
-]) => any>>;
+]) => any>)>;
 export declare const pickBy: {
 	(a: symbol, b: AnyObject): (a: Cond) => any;
 	(a: Cond, b: symbol): (b: AnyObject) => any;
@@ -291,7 +291,7 @@ export declare const omit: {
 export declare const fromPairs: (pairs: [
 	string,
 	any
-][]) => FT.Curry<(fn: Reducer, accum: any, arr: any[]) => FT.Curry<(...p: [
+][]) => FT.Curry<(fn: Reducer<unknown>, accum: unknown, arr: any[]) => FT.Curry<(...p: [
 ] | [
 	accum: any
 ]) => any>>;
