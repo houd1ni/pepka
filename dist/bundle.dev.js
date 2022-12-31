@@ -177,15 +177,6 @@ const qindexOf = curry2((x, xs) => xs.indexOf(x));
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
 // SomeType, totype, over, lensProp
-// take (if not exsit in ramda):
-/* res = code.replace(/css\`((.|\s)*?)\`/g, (_, g1) => {
-    return compressRules(g1)
-  }) ->
-  res = code.replace(/css\`((.|\s)*?)\`/g, compose(
-    compressRules,
-    take(2) // second arg
-  ))
-*/
 const take = (argN) => (...args) => args[argN];
 const equals = curry2((a, b) => {
     const typea = type(a);
@@ -240,13 +231,13 @@ const includes = curry2((s, ss) => {
     }
 });
 const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
+const flip = (fn) => curry2((b, a) => fn(a, b));
 const head = nth(0);
 const tail = slice(1, inf); // typeshit.
 const add = curry2((n, m) => n + m);
 const subtract = curry2((n, m) => m - n);
 const multiply = curry2((n, m) => n * m);
 const divide = curry2((n, m) => n / m);
-const flip = (fn) => curry((b, a) => fn(a, b));
 const isNil = (s) => isNull(s) || isUndef(s);
 const length = (s) => s.length;
 const always = (s) => () => s;
@@ -335,7 +326,7 @@ const clone = (s, shallow = false) => {
     const t = type(s);
     switch (t) {
         case 'Null': return s;
-        case 'Array': return shallow ? [...s] : map(clone, s);
+        case 'Array': return shallow ? [...s] : map(compose(clone, take(0)), s);
         case 'Object':
             if (shallow)
                 return { ...s };
@@ -435,25 +426,35 @@ const mirror = identity;
 const reflect = identity;
 const echo = identity;
 
+const ecran = '\\';
+// TODO: make it splicy, not accumulatie by symbols.
+// Supports ecrans: '\{"json": {yes} \}'
+// get_tmpl(one{meme}two)({meme: 42}) -> one42two
 const getTmpl = (tmpl) => {
     const parts = [];
     const keymap = [];
     const len = tmpl.length;
-    let i = 0, s, ln, start = 0, open = false;
+    let i = 0, s, ln, start = 0, open = false, hasEcran = head(tmpl), hasEcranNext = false, nextChar;
     for (i = 0; i < len; i++) {
         s = tmpl[i];
         switch (s) {
             case '{':
-                open = true;
-                start = i;
-                break;
+                if (!hasEcran) {
+                    open = true;
+                    start = i;
+                    break;
+                }
             case '}':
-                open = false;
-                parts.push('');
-                keymap.push(tmpl.slice(start + 1, i));
-                break;
+                if (!hasEcran) {
+                    open = false;
+                    parts.push('');
+                    keymap.push(tmpl.slice(start + 1, i));
+                    break;
+                }
             default:
-                if (!open) {
+                nextChar = tmpl[i + 1];
+                hasEcranNext = s === ecran;
+                if (!open && (!hasEcranNext || nextChar !== '{' && nextChar !== '}')) {
                     ln = parts.length - 1;
                     if (ln < 0) {
                         parts.push('');
@@ -461,6 +462,7 @@ const getTmpl = (tmpl) => {
                     }
                     parts[ln] += s;
                 }
+                hasEcran = hasEcranNext;
                 break;
         }
     }
@@ -497,13 +499,13 @@ var pepka = /*#__PURE__*/Object.freeze({
   nth: nth,
   includes: includes,
   slice: slice,
+  flip: flip,
   head: head,
   tail: tail,
   add: add,
   subtract: subtract,
   multiply: multiply,
   divide: divide,
-  flip: flip,
   isNil: isNil,
   length: length,
   always: always,

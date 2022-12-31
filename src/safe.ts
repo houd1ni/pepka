@@ -2,7 +2,7 @@ import { F as FT } from 'ts-toolbelt'
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
-import { AnyFunc, Cond, AnyObject, Reducer, Curried } from './types'
+import { AnyFunc, Cond, AnyObject, Reducer, Curried, TupleFn } from './types'
 import { type } from './common'
 // SomeType, totype, over, lensProp
 
@@ -87,7 +87,6 @@ export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
 )
-type TupleFn<ARG1=any, ARG2=any, Out=any> = (a: ARG1, b: ARG2) => Out
 export const flip = <ARG1=any, ARG2=any, Out=any>(
   fn: FT.Curry<TupleFn<ARG1, ARG2, Out>>
 ): FT.Curry<TupleFn<ARG2, ARG1, Out>> =>
@@ -242,7 +241,7 @@ export const clone = (s: any, shallow = false) => {
   const t = type(s)
   switch(t) {
     case 'Null': return s
-    case 'Array': return shallow ? [...s] : map(clone, s)
+    case 'Array': return shallow ? [...s] : map(compose(clone, take(0)), s)
     case 'Object':
       if(shallow) return {...s}
       const out = {}
@@ -296,7 +295,7 @@ export const join = curry2(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
 )
 export const map = curry2(
-  (pipe: (s: any) => any, arr: any[]) => arr.map(pipe)
+  <T = any>(pipe: (s: T, i?: number, list?: T[]) => any, arr: T[]) => arr.map(pipe)
 )
 export const forEach = curry2(
   (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)

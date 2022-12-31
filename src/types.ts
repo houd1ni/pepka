@@ -12,3 +12,4 @@ export type AnyFunc<
   ReturnT = any,
   Args extends AnyArgs = AnyArgs
 > = (...args: Args) => ReturnT
+export type TupleFn<ARG1=any, ARG2=any, Out=any> = (a: ARG1, b: ARG2) => Out

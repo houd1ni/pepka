@@ -304,10 +304,10 @@ export declare const join: {
 	(a: string, b: string[]): string;
 };
 export declare const map: {
-	(a: symbol, b: any[]): (a: (s: any) => any) => any[];
-	(a: (s: any) => any, b: symbol): (b: any[]) => any[];
-	(a: (s: any) => any): (b: any[]) => any[];
-	(a: (s: any) => any, b: any[]): any[];
+	(a: symbol, b: unknown[]): (a: (s: unknown, i?: number, list?: unknown[] | undefined) => any) => any[];
+	(a: (s: unknown, i?: number, list?: unknown[] | undefined) => any, b: symbol): (b: unknown[]) => any[];
+	(a: (s: unknown, i?: number, list?: unknown[] | undefined) => any): (b: unknown[]) => any[];
+	(a: (s: unknown, i?: number, list?: unknown[] | undefined) => any, b: unknown[]): any[];
 };
 export declare const forEach: {
 	(a: symbol, b: any[]): (a: (s: any) => any) => void;
