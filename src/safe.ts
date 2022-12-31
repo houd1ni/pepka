@@ -1,7 +1,8 @@
+import { F as FT } from 'ts-toolbelt'
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
-import { AnyFunc, Cond, AnyObject, Reducer } from './types'
+import { AnyFunc, Cond, AnyObject, Reducer, Curried } from './types'
 import { type } from './common'
 // SomeType, totype, over, lensProp
 
@@ -86,13 +87,17 @@ export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
 )
+type TupleFn<ARG1=any, ARG2=any, Out=any> = (a: ARG1, b: ARG2) => Out
+export const flip = <ARG1=any, ARG2=any, Out=any>(
+  fn: FT.Curry<TupleFn<ARG1, ARG2, Out>>
+): FT.Curry<TupleFn<ARG2, ARG1, Out>> =>
+  curry2((b: ARG2, a: ARG1) => fn(a as any, b as any))
 export const head = nth(0)
 export const tail = slice(1, inf) // typeshit.
 export const add = curry2((n: number, m: number) => n+m)
 export const subtract = curry2((n: number, m: number) => m-n)
 export const multiply = curry2((n: number, m: number) => n*m)
 export const divide = curry2((n: number, m: number) => n/m)
-export const flip = (fn: Function) => curry((b: any, a: any) => fn(a, b))
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
 export const always = <T=any>(s: T) => () => s

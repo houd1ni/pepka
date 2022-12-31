@@ -1,4 +1,4 @@
-import { F as FT } from 'ts-toolbelt'
+import { A, F as FT } from 'ts-toolbelt'
 import { AnyFunc, AnyArgs } from "./types"
 
 type Placeholder = symbol
