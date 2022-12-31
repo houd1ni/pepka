@@ -23,7 +23,7 @@
   "exports": {
     ".": {
       "module": "./dist/bundle.mjs",
-      "commonjs": "./dist/bundle.cjs"
+      "require": "./dist/bundle.cjs"
     }
   },
   "name": "pepka",
@@ -44,7 +44,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.14.0-beta3",
+  "version": "0.14.0-beta4",
   "ava": {
     "files": [ "./test/specs/*.ts" ],
     "failFast": true,
