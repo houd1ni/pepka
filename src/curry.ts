@@ -1,4 +1,3 @@
-import { A, F as FT } from 'ts-toolbelt'
 import { AnyFunc, AnyArgs } from "./types"
 
 type Placeholder = symbol
@@ -45,14 +44,12 @@ const _curry = (fn: Function, args: AnyArgs, new_args: AnyArgs) => {
   }
 }
 
-export const curry = (
-  <Func extends AnyFunc>(fn: AnyFunc) => (
-    (...args: AnyArgs) => fn.length>countArgs(args)
-      ? _curry(fn, [], args)
-      : fn(...args)
-  ) as FT.Curry<Func>
+export const curry = (fn: AnyFunc) => (
+  (...args: AnyArgs) => fn.length>countArgs(args)
+    ? _curry(fn, [], args)
+    : fn(...args)
 )
-const endlessph = <Func extends FT.Function>(fn: Func) => {
+const endlessph = <Func extends AnyFunc>(fn: Func) => {
   type ReturnT = ReturnType<Func>
   type p0 = Parameters<Func>[0]
   function _endlessph(a: p0): ReturnT
@@ -93,5 +90,7 @@ export function curry3<Func extends Func3>(fn: Func) {
   // type p2 = Parameters<Func>[2]
   // type ReturnT = ReturnType<Func>
   // TODO: optimize.
-  return curry(fn) as FT.Curry<Func>
+  // Cannot use ts-toolbelt due to this error:
+  // Excessive stack depth comparing types 'GapsOf<?, L2>' and 'GapsOf<?, L2>'
+  return curry(fn)
 }

@@ -5,7 +5,6 @@
   "bugs": {
     "url": "https://github.com/houd1ni/pepka/issues"
   },
-  "bundleDependencies": [],
   "deprecated": false,
   "description": "An ultra lightweight or unsafe-speedy ramda alternative.",
   "homepage": "https://houd1ni.github.io/pepka/",
@@ -44,16 +43,19 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.14.0-beta10",
+  "version": "0.14.0-beta12",
   "ava": {
-    "files": [ "./test/specs/*.ts" ],
+    "files": [
+      "./test/specs/*.ts"
+    ],
     "failFast": true,
     "timeout": "2m",
-    "extensions": [ "ts" ],
-    "require": [ "ts-node/register" ]
-  },
-  "dependencies": {
-    "ts-toolbelt": "^9.6.0"
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.3",

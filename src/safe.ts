@@ -1,4 +1,3 @@
-import { F as FT } from 'ts-toolbelt'
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
@@ -152,7 +151,7 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
   }
 }
 export const reverse = (xs: any[]) => compose(
-  <T>(ln: number) => reduce<any>(
+  <T>(ln: number) => reduce(
     (nxs: T[], _: any, i: number) => qappend(xs[ln-i], nxs),
     [], xs
   ),
@@ -282,7 +281,7 @@ export const omit = curry2(
     o
   )
 )
-export const fromPairs = (pairs: [string, any][]) => reduce<any>(
+export const fromPairs = (pairs: [string, any][]) => reduce(
   (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
   {}, pairs
 )
