@@ -350,13 +350,13 @@ export const mergeShallow = curry2(
     Object.assign({}, o1, o2)
 )
 export const mergeDeep = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), clone(b))
+  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), clone(b)) as AnyObject
 )
 export const mergeDeepX = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeepX(clone(a), clone(b))
+  (a: AnyObject, b: AnyObject) => qmergeDeepX(clone(a), clone(b)) as AnyObject
 )
 export const mergeDeepAdd = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), clone(b))
+  (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), clone(b)) as AnyObject
 )
 export const overProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) =>

@@ -332,118 +332,22 @@ export declare const mergeShallow: {
 	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const mergeDeep: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
+	(a: AnyObject, b: symbol): (b: AnyObject) => AnyObject;
+	(a: AnyObject): (b: AnyObject) => AnyObject;
+	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const mergeDeepX: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
+	(a: AnyObject, b: symbol): (b: AnyObject) => AnyObject;
+	(a: AnyObject): (b: AnyObject) => AnyObject;
+	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const mergeDeepAdd: {
-	(a: symbol, b: AnyObject): (a: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: symbol): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject): (b: AnyObject) => FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
-	(a: AnyObject, b: AnyObject): FT.Curry<(...p: [
-	] | [
-		o1: AnyObject,
-		o2: AnyObject
-	] | [
-		o2: AnyObject
-	] | [
-		o1: AnyObject
-	]) => any>;
+	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
+	(a: AnyObject, b: symbol): (b: AnyObject) => AnyObject;
+	(a: AnyObject): (b: AnyObject) => AnyObject;
+	(a: AnyObject, b: AnyObject): AnyObject;
 };
 export declare const overProp: FT.Curry<(prop: string, pipe: AnyFunc, data: any) => FT.Curry<(...p: [
 ] | [
