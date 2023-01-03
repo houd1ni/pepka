@@ -6,7 +6,7 @@
     "url": "https://github.com/houd1ni/pepka/issues"
   },
   "deprecated": false,
-  "description": "An ultra lightweight or unsafe-speedy ramda alternative.",
+  "description": "An ultra lightweight, async or unsafe-speedy ramda alternative.",
   "homepage": "https://houd1ni.github.io/pepka/",
   "keywords": [
     "ramda",
@@ -21,7 +21,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "module": "./dist/bundle.mjs",
+      "import": "./dist/bundle.mjs",
       "require": "./dist/bundle.cjs"
     }
   },
@@ -43,7 +43,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "0.14.0-beta12",
+  "version": "0.14.0",
   "ava": {
     "files": [
       "./test/specs/*.ts"

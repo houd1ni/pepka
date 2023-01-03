@@ -1,9 +1,9 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
-import { AnyFunc, Cond, AnyObject, Reducer, Curried, TupleFn } from './types'
+import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-// SomeType, totype, over, lensProp
+// over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
 export const equals = curry2((a: any, b: any) => {
@@ -178,6 +178,11 @@ export const cond = curry2(
     }
   }
 )
+/** Assigns a prop to an object.
+ * @param prop string
+ * @param value any
+ * @param object AnyObject
+ */
 export const assoc = curry3(
   (prop: string, v: any, obj: AnyObject) => ({
     ...obj,
@@ -257,9 +262,14 @@ export const clone = (s: any, shallow = false) => {
 }
 export const cloneShallow = (s: any) => clone(s, true)
 
+/** types T1, T2
+ *  @param reducer (accum: T1, current: T2, index: number) => newAccum: T1
+ *  @param accum T1
+ *  @param array T2[]
+*/
 export const reduce = curry3(
-  <T = any>(fn: Reducer<T>, accum: T, arr: any[]) =>
-    qreduce(fn, clone(accum), arr)
+  <T = any>(reducer: Reducer<T>, accum: T, arr: any[]) =>
+    qreduce(reducer, clone(accum), arr)
 )
 export const pickBy = curry2(
   (cond: Cond, o: AnyObject) => filter(cond, o)
@@ -367,6 +377,24 @@ export const mapKeys = curry2(
     keyMap: {[oldKey: string]: string},
     o: AnyObject
   ) => qmapKeys(keyMap, Object.assign({}, o))
+)
+export const zip = curry2(
+  <T1 = any, T2 = any>(a: T1[], b: T2[]) => map((s: T1, i: number) => [s, b[i]], a)
+)
+export const zipObj = curry2(
+  <T1 = any, T2 = any>(a: T1[], b: T2[]) =>
+    reduce((ac: AnyObject, s: T1, i: number) => assoc(s, b[i], ac), {}, a)
+)
+// TODO: Tuple curried functions to replace these `AnyFuncs`.
+/** zips through a pipe. Types T1, T2, T3.
+ * @returns T3[]
+ * @param pipe (T1, T2) => T3
+ * @param a T1[]
+ * @param b T2[]
+ */
+export const zipWith = curry3(
+  <T1 = any, T2 = any>(pipe: AnyFunc, a: T1[], b: T2[]) =>
+    map((s: T1, i: number) => pipe(s, b[i]), a)
 )
 
 // ASYNCS
