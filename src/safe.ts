@@ -90,7 +90,7 @@ export const flip =
   <T extends AnyFunc>(fn: T) => curry2(
     (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
   )
-export const head = nth(0)
+export const head = nth(0) as <T = any>(xs: T[] | string) => T
 export const tail = slice(1, inf) // typeshit.
 export const add = curry2((n: number, m: number) => n+m)
 export const subtract = curry2((n: number, m: number) => m-n)
@@ -116,6 +116,8 @@ export const append = curry2((s: any, xs: any[]) => [...xs, s])
 export const split = curry2((s: string|RegExp, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
+export const callWith = curry2((args: any[], fn: AnyFunc) => fn(...args))
+export const noop = (..._args: any[]) => {}
 export const sizeof = (s: any[] | string | AnyObject) => {
   if(type(s) === 'Object') {
     let len = 0
@@ -298,7 +300,7 @@ export const fromPairs = (pairs: [string, any][]) => reduce(
 type Concat = ((a: string, b: string) => string)
             | ((a: any[], b: any[]) => any[])
 export const concat = curry2(
-  ((a, b) => a.concat(b)) as Concat
+  ((a, b) => b.concat(a)) as Concat
 )
 export const join = curry2(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
@@ -431,3 +433,4 @@ export const composeAsync = (() => {
 export const mirror = identity
 export const reflect = identity
 export const echo = identity
+export const notf = complement

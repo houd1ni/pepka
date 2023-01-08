@@ -67,7 +67,7 @@ export declare const flip: <T extends AnyFunc<any, AnyArgs>>(fn: T) => {
 	(a: Parameters<T>[1]): (b: Parameters<T>[0]) => any;
 	(a: Parameters<T>[1], b: Parameters<T>[0]): any;
 };
-export declare const head: (b: string | unknown[]) => unknown;
+export declare const head: <T = any>(xs: string | T[]) => T;
 export declare const tail: any;
 export declare const add: {
 	(a: symbol, b: number): (a: number) => number;
@@ -133,6 +133,13 @@ export declare const split: {
 };
 export declare const T: (...args: any[]) => true;
 export declare const F: (...args: any[]) => false;
+export declare const callWith: {
+	(a: symbol, b: AnyFunc<any, AnyArgs>): (a: any[]) => any;
+	(a: any[], b: symbol): (b: AnyFunc<any, AnyArgs>) => any;
+	(a: any[]): (b: AnyFunc<any, AnyArgs>) => any;
+	(a: any[], b: AnyFunc<any, AnyArgs>): any;
+};
+export declare const noop: (..._args: any[]) => void;
 export declare const sizeof: (s: any[] | string | AnyObject) => number;
 export declare const range: {
 	(a: symbol, b: number): (a: number) => any[];
@@ -411,6 +418,7 @@ export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (data?: any) 
 export declare const mirror: (s: any) => any;
 export declare const reflect: (s: any) => any;
 export declare const echo: (s: any) => any;
+export declare const notf: (fn: AnyFunc) => (...args: any) => boolean | any;
 export declare const qappend: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];
