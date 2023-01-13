@@ -3,7 +3,7 @@ import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray } from "./utils"
 
-// TODO: qmap, qfilter, qoverProp, qover array ?
+// TODO: qmap, qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3(
@@ -75,7 +75,12 @@ export const qmapKeys = curry2(
     return o
   }
 )
-
+export const qmap = curry2(
+  (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => {
+    for(let i in arr) arr[i] = pipe(arr[i], +i, arr)
+    return arr
+  }
+)
 export const qfilter = curry2(
   (
     cond: (v: any, k: string | number) => boolean,

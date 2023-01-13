@@ -451,6 +451,12 @@ export declare const qmapKeys: {
 		[oldKey: string]: string;
 	}, b: AnyObject): AnyObject;
 };
+export declare const qmap: {
+	(a: symbol, b: any[]): (a: (s: any, i?: number, list?: any[]) => any) => any[];
+	(a: (s: any, i?: number, list?: any[]) => any, b: symbol): (b: any[]) => any[];
+	(a: (s: any, i?: number, list?: any[]) => any): (b: any[]) => any[];
+	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
+};
 export declare const qfilter: {
 	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any[] | AnyObject;
 	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any[] | AnyObject;
