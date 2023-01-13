@@ -419,6 +419,12 @@ export declare const mirror: (s: any) => any;
 export declare const reflect: (s: any) => any;
 export declare const echo: (s: any) => any;
 export declare const notf: (fn: AnyFunc) => (...args: any) => boolean | any;
+export declare const push: {
+	(a: symbol, b: any[]): (a: any) => any[];
+	(a: any, b: symbol): (b: any[]) => any[];
+	(a: any): (b: any[]) => any[];
+	(a: any, b: any[]): any[];
+};
 export declare const qappend: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];

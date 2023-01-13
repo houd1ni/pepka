@@ -70,14 +70,9 @@ export const nth = curry2(_nth)
 
 export const includes = curry2(
   <T>(s: T, ss: T[]) => {
-    if(isStr(ss)) {
-      return ss.includes(s)
-    } else {
-      for(const a of ss) {
-        if(equals(a, s)) {
-          return true
-        }
-      }
+    if(isStr(ss)) return ss.includes(s)
+    else {
+      for(const a of ss) if(equals(a, s)) return true
       return false
     }
   }
@@ -105,7 +100,8 @@ export const last = (s: any[] | string) => s[length(s)-1]
 export const not = (o: boolean) => !o
 export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
-  return (isFunc(out) && (out as any).$args_left) ? complement(out) : not(out)
+  const f = isFunc(out)
+  return !f || f&&out.$args_left<=0 ? not(out) : complement(out)
 }
 export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
@@ -434,3 +430,4 @@ export const mirror = identity
 export const reflect = identity
 export const echo = identity
 export const notf = complement
+export const push = append
