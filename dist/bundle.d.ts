@@ -87,81 +87,6 @@ export declare const multiply: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const divide: {
-	(a: symbol, b: number): (a: number) => number;
-	(a: number, b: symbol): (b: number) => number;
-	(a: number): (b: number) => number;
-	(a: number, b: number): number;
-};
-export declare const isNil: (s: any) => boolean;
-export declare const length: (s: any[] | string) => number;
-export declare const always: <T = any>(s: T) => () => T;
-export declare const identity: (s: any) => any;
-export declare const trim: (s: string) => string;
-export declare const last: (s: any[] | string) => any;
-export declare const not: (o: boolean) => boolean;
-export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | any;
-export declare const keys: (o: AnyObject | any[]) => string[];
-export declare const values: (o: AnyObject | any[]) => any[];
-export declare const toPairs: (o: AnyObject | any[]) => [
-	string,
-	any
-][];
-export declare const test: {
-	(a: symbol, b: string): (a: RegExp) => boolean;
-	(a: RegExp, b: symbol): (b: string) => boolean;
-	(a: RegExp): (b: string) => boolean;
-	(a: RegExp, b: string): boolean;
-};
-export declare const tap: {
-	(a: symbol, b: any): (a: Function) => any;
-	(a: Function, b: symbol): (b: any) => any;
-	(a: Function): (b: any) => any;
-	(a: Function, b: any): any;
-};
-export declare const append: {
-	(a: symbol, b: any[]): (a: any) => any[];
-	(a: any, b: symbol): (b: any[]) => any[];
-	(a: any): (b: any[]) => any[];
-	(a: any, b: any[]): any[];
-};
-export declare const split: {
-	(a: symbol, b: string): (a: string | RegExp) => string[];
-	(a: string | RegExp, b: symbol): (b: string) => string[];
-	(a: string | RegExp): (b: string) => string[];
-	(a: string | RegExp, b: string): string[];
-};
-export declare const T: (...args: any[]) => true;
-export declare const F: (...args: any[]) => false;
-export declare const callWith: {
-	(a: symbol, b: AnyFunc<any, AnyArgs>): (a: any[]) => any;
-	(a: any[], b: symbol): (b: AnyFunc<any, AnyArgs>) => any;
-	(a: any[]): (b: AnyFunc<any, AnyArgs>) => any;
-	(a: any[], b: AnyFunc<any, AnyArgs>): any;
-};
-export declare const noop: (..._args: any[]) => void;
-export declare const sizeof: (s: any[] | string | AnyObject) => number;
-export declare const range: {
-	(a: symbol, b: number): (a: number) => any[];
-	(a: number, b: symbol): (b: number) => any[];
-	(a: number): (b: number) => any[];
-	(a: number, b: number): any[];
-};
-export declare const uniq: (xs: any[]) => any;
-export declare const intersection: {
-	(a: symbol, b: any[]): (a: any[]) => any[];
-	(a: any[], b: symbol): (b: any[]) => any[];
-	(a: any[]): (b: any[]) => any[];
-	(a: any[], b: any[]): any[];
-};
-export declare const genBy: {
-	(a: symbol, b: number): (a: (i: number) => any) => any[];
-	(a: (i: number) => any, b: symbol): (b: number) => any[];
-	(a: (i: number) => any): (b: number) => any[];
-	(a: (i: number) => any, b: number): any[];
-};
-export declare const once: <Func extends AnyFunc<any, AnyArgs>>(fn: Func) => (...args: Parameters<Func>) => any;
-export declare const reverse: (xs: any[]) => any;
 export declare const gt: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
@@ -210,6 +135,81 @@ export declare const indexOf: {
 	(a: any): (b: any[]) => number;
 	(a: any, b: any[]): number;
 };
+export declare const divide: {
+	(a: symbol, b: number): (a: number) => number;
+	(a: number, b: symbol): (b: number) => number;
+	(a: number): (b: number) => number;
+	(a: number, b: number): number;
+};
+export declare const isNil: (s: any) => boolean;
+export declare const length: (s: any[] | string) => number;
+export declare const always: <T = any>(s: T) => () => T;
+export declare const identity: (s: any) => any;
+export declare const trim: (s: string) => string;
+export declare const last: (s: any[] | string) => any;
+export declare const not: (o: boolean) => boolean;
+export declare const keys: (o: AnyObject | any[]) => string[];
+export declare const values: (o: AnyObject | any[]) => any[];
+export declare const toPairs: (o: AnyObject | any[]) => [
+	string,
+	any
+][];
+export declare const test: {
+	(a: symbol, b: string): (a: RegExp) => boolean;
+	(a: RegExp, b: symbol): (b: string) => boolean;
+	(a: RegExp): (b: string) => boolean;
+	(a: RegExp, b: string): boolean;
+};
+export declare const tap: {
+	(a: symbol, b: any): (a: Function) => any;
+	(a: Function, b: symbol): (b: any) => any;
+	(a: Function): (b: any) => any;
+	(a: Function, b: any): any;
+};
+export declare const append: {
+	(a: symbol, b: any[]): (a: any) => any[];
+	(a: any, b: symbol): (b: any[]) => any[];
+	(a: any): (b: any[]) => any[];
+	(a: any, b: any[]): any[];
+};
+export declare const split: {
+	(a: symbol, b: string): (a: string | RegExp) => string[];
+	(a: string | RegExp, b: symbol): (b: string) => string[];
+	(a: string | RegExp): (b: string) => string[];
+	(a: string | RegExp, b: string): string[];
+};
+export declare const T: (...args: any[]) => true;
+export declare const F: (...args: any[]) => false;
+export declare const callWith: {
+	(a: symbol, b: AnyFunc<any, AnyArgs>): (a: any[]) => any;
+	(a: any[], b: symbol): (b: AnyFunc<any, AnyArgs>) => any;
+	(a: any[]): (b: AnyFunc<any, AnyArgs>) => any;
+	(a: any[], b: AnyFunc<any, AnyArgs>): any;
+};
+export declare const noop: (..._args: any[]) => void;
+export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | any;
+export declare const sizeof: (s: any[] | string | AnyObject) => number;
+export declare const range: {
+	(a: symbol, b: number): (a: number) => any[];
+	(a: number, b: symbol): (b: number) => any[];
+	(a: number): (b: number) => any[];
+	(a: number, b: number): any[];
+};
+export declare const uniq: (xs: any[]) => any;
+export declare const intersection: {
+	(a: symbol, b: any[]): (a: any[]) => any[];
+	(a: any[], b: symbol): (b: any[]) => any[];
+	(a: any[]): (b: any[]) => any[];
+	(a: any[], b: any[]): any[];
+};
+export declare const genBy: {
+	(a: symbol, b: number): (a: (i: number) => any) => any[];
+	(a: (i: number) => any, b: symbol): (b: number) => any[];
+	(a: (i: number) => any): (b: number) => any[];
+	(a: (i: number) => any, b: number): any[];
+};
+export declare const once: <Func extends AnyFunc<any, AnyArgs>>(fn: Func) => (...args: Parameters<Func>) => any;
+export declare const reverse: (xs: any[]) => any;
 export declare const explore: (caption: string, level?: string) => (b: any) => any;
 export declare const cond: {
 	(a: symbol, b: any): (a: [
@@ -332,7 +332,12 @@ export declare const both: (...args: AnyArgs) => any;
 export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
 export declare const replace: (...args: AnyArgs) => any;
-export declare const filter: any;
+export declare const filter: {
+	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any;
+	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any;
+	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any;
+	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any;
+};
 export declare const memoize: (fn: Function) => () => any;
 export declare const mergeShallow: {
 	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
@@ -402,11 +407,16 @@ export declare const forEachSerial: {
 };
 /** Promise.all wrapper for functional pipelining. */
 export declare const waitAll: (promises: Promise<any>[]) => Promise<any[]>;
+/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
+ * @param {AnyFunc<Promise>} fn - function to wait.
+ * @param {T} s - any value to tap and return back
+ * @returns {T}
+ */
 export declare const waitTap: {
-	(a: symbol, b: any): (a: Function) => Promise<any>;
-	(a: Function, b: symbol): (b: any) => Promise<any>;
-	(a: Function): (b: any) => Promise<any>;
-	(a: Function, b: any): Promise<any>;
+	(a: symbol, b: any): (a: AnyFunc<any, AnyArgs>) => Promise<any>;
+	(a: AnyFunc<any, AnyArgs>, b: symbol): (b: any) => Promise<any>;
+	(a: AnyFunc<any, AnyArgs>): (b: any) => Promise<any>;
+	(a: AnyFunc<any, AnyArgs>, b: any): Promise<any>;
 };
 /** Waits for all promises mapped by the fn. */
 export declare const forEachAsync: {
@@ -476,13 +486,6 @@ export declare const qfilter: {
 	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any[] | AnyObject;
 	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any[] | AnyObject;
 	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any[] | AnyObject;
-};
-/** @deprecated */
-export declare const qindexOf: {
-	(a: symbol, b: any[]): (a: any) => number;
-	(a: any, b: symbol): (b: any[]) => number;
-	(a: any): (b: any[]) => number;
-	(a: any, b: any[]): number;
 };
 export type StrTmpl = ((data: AnyObject) => string);
 export declare const getTmpl: (tmpl: string) => StrTmpl;

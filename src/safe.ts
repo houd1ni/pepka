@@ -1,6 +1,6 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
 // over, lensProp
@@ -9,22 +9,14 @@ export const take = (argN: number) => (...args: any[]) => args[argN]
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)
   if(typea===type(b) && (typea==='Object' || typea=='Array')) {
-    if(isNull(a) || isNull(b)) {
-      return a===b
-    }
-    if(a===b) {
-      return true
-    }
-    for(const v of [a, b]) {
-      for(const k in v) {
+    if(isNull(a) || isNull(b)) return a===b
+    if(a===b) return true
+    for(const v of [a, b])
+      for(const k in v)
         if(
           !((v===b) && (k in a)) &&
           !((v===a) && (k in b) && equals(a[k], b[k]))
-        ) {
-          return false
-        }
-      }
-    }
+        ) return false
     return true
   }
   return a===b
@@ -60,14 +52,10 @@ export const compose = (
       return s as any as TOut
     }
 )
-
 export const bind = curry2<AnyFunc>(
   (fn: AnyFunc, context: any) => fn.bind(context)
 )
-
-const _nth = <T=any>(i: number, data: T[] | string) => data[i]
-export const nth = curry2(_nth)
-
+export const nth = curry2(<T=any>(i: number, data: T[] | string) => data[i])
 export const includes = curry2(
   <T>(s: T, ss: T[]) => {
     if(isStr(ss)) return ss.includes(s)
@@ -81,15 +69,22 @@ export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
 )
-export const flip =
-  <T extends AnyFunc>(fn: T) => curry2(
-    (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
-  )
+export const flip = <T extends AnyFunc>(fn: T) => curry2(
+  (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
+)
 export const head = nth(0) as <T = any>(xs: T[] | string) => T
-export const tail = slice(1, inf) // typeshit.
+export const tail = slice(1, inf)
 export const add = curry2((n: number, m: number) => n+m)
 export const subtract = curry2((n: number, m: number) => m-n)
 export const multiply = curry2((n: number, m: number) => n*m)
+export const gt = curry2( (a: number, b: number) => a>b )
+export const lt = curry2( (a: number, b: number) => a<b )
+export const gte = curry2( (a: number, b: number) => b>=a )
+export const lte = curry2( (a: number, b: number) => b<=a )
+export const sort = curry2((sortFn: any, xs: any[]) => xs.sort(sortFn))
+export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
+export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
+export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
 export const divide = curry2((n: number, m: number) => n/m)
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const length = (s: any[] | string) => s.length
@@ -98,11 +93,6 @@ export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
 export const not = (o: boolean) => !o
-export const complement = (fn: AnyFunc) => (...args: any) => {
-  const out = fn(...args)
-  const f = isFunc(out)
-  return !f || f&&out.$args_left<=0 ? not(out) : complement(out)
-}
 export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
@@ -114,6 +104,11 @@ export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
 export const callWith = curry2((args: any[], fn: AnyFunc) => fn(...args))
 export const noop = (..._args: any[]) => {}
+export const complement = (fn: AnyFunc) => (...args: any) => {
+  const out = fn(...args)
+  const f = isFunc(out)
+  return !f || f&&out.$args_left<=0 ? not(out) : complement(out)
+}
 export const sizeof = (s: any[] | string | AnyObject) => {
   if(type(s) === 'Object') {
     let len = 0
@@ -156,14 +151,6 @@ export const reverse = (xs: any[]) => compose(
   add(-1),
   length
 )(xs)
-export const gt = curry2( (a: number, b: number) => a>b )
-export const lt = curry2( (a: number, b: number) => a<b )
-export const gte = curry2( (a: number, b: number) => b>=a )
-export const lte = curry2( (a: number, b: number) => b<=a )
-export const sort = curry2((sortFn: any, xs: any[]) => xs.sort(sortFn))
-export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
-export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
-export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
 )
@@ -247,9 +234,7 @@ export const clone = (s: any, shallow = false) => {
     case 'Object':
       if(shallow) return {...s}
       const out = {}
-      for(let k in s) {
-        out[k] = clone(s[k])
-      }
+      for(let k in s) out[k] = clone(s[k])
       return out
     case 'String': case 'Number':
     case 'Boolean': case 'Symbol':
@@ -275,11 +260,8 @@ export const pickBy = curry2(
 export const pick = curry2(
   (props: string[], o: AnyObject) => {
     const out = {}
-    for(const p of props) {
-      if(p in o) {
-        out[p] = o[p]
-      }
-    }
+    for(const p of props)
+      if(p in o) out[p] = o[p]
     return out
   }
 )
@@ -329,7 +311,7 @@ export const replace = curry3(
     a: string | RegExp,
     b: string | ((substring: string, ...ps: any[]) => string),
     where: string
-    // @ts-ignore-next Some bug with overload.
+    // @ts-ignore Some bug with overload.
   ) => where.replace(a, b)
 )
 export const filter = curry2(
@@ -338,11 +320,7 @@ export const filter = curry2(
     data: any[] | AnyObject
   ) => isArray(data)
     ? data.filter(cond)
-    : compose(
-      fromPairs,
-      filter(([k, v]) => cond(v, k)),
-      toPairs
-    )(data)
+    : qfilter(cond, {...data})
 )
 export const memoize = (fn: Function) => {
   let cache: any
@@ -408,7 +386,12 @@ export const forEachSerial = (() => {
 })()
 /** Promise.all wrapper for functional pipelining. */
 export const waitAll = (promises: Promise<any>[]) => Promise.all(promises)
-export const waitTap = curry2(async (fn: Function, s: any) => { await fn(s); return s })
+/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
+ * @param {AnyFunc<Promise>} fn - function to wait.
+ * @param {T} s - any value to tap and return back
+ * @returns {T}
+ */
+export const waitTap = curry2(async (fn: AnyFunc, s: any) => { await fn(s); return s })
 /** Waits for all promises mapped by the fn. */
 export const forEachAsync = curry2(
   (fn: (item: any) => Promise<any>, items: any[]) =>
@@ -420,7 +403,7 @@ export const composeAsync = (() => {
     ~i ? await pipe(fns, await fns[i](data), --i) : data
   return <T = any>(...fns: AnyFunc[]) =>
     (data?: any) => pipe(fns, data, fns.length-1) as Promise<T>
-})()// as FT.Compose<'async'>
+})()
 
 // ALIASES
 export const mirror = identity

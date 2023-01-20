@@ -13,32 +13,25 @@ export const qassoc = curry3(
   }
 )
 export const qreduce = curry3(
-  <T>(fn: Reducer, accum: any, arr: T[]) =>
-    arr.reduce(fn, accum)
+  <T>(fn: Reducer, accum: any, arr: T[]) => arr.reduce(fn, accum)
 )
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
 const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObject => {
   for(let k in o2) {
     switch(type(o2[k])) {
       case 'Array':
-        if(strategy>1 && type(o1[k])==='Array') {
+        if(strategy>1 && type(o1[k])==='Array')
           switch(strategy) {
             case 2:
               const o1k = o1[k], o2k = o2[k]
-              for(const i in o2k) {
-                if(o1k[i]) {
-                  mergeDeep(strategy, o1k[i], o2k[i])
-                } else {
-                  o1k[i] = o2k[i]
-                }
-              }
+              for(const i in o2k)
+                if(o1k[i]) mergeDeep(strategy, o1k[i], o2k[i])
+                else o1k[i] = o2k[i]
               break
             case 3: o1[k].push(...o2[k])
             default: break
           }
-        } else {
-          o1[k] = o2[k]
-        }
+        else o1[k] = o2[k]
         break
       case 'Object':
         if(type(o1[k])==='Object') {
@@ -55,10 +48,7 @@ const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObj
 export const qmergeDeep = mergeDeep(1)
 export const qmergeDeepX = mergeDeep(2)
 export const qmergeDeepAdd = mergeDeep(3)
-export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => {
-  for(let k in o2) o1[k] = o2[k]
-  return o1
-})
+export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => Object.assign(o1, o2))
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const qmapKeys = curry2(
   (
@@ -72,9 +62,7 @@ export const qmapKeys = curry2(
         ? (mapped as unknown as AnyFunc)(o)
         : [mapped, o[k]]
       o[newKey] = newValue
-      if(k !== newKey) {
-        delete o[k]
-      }
+      if(k !== newKey) delete o[k]
     }
     return o
   }
@@ -91,20 +79,19 @@ export const qfilter = curry2(
     data: any[] | AnyObject
   ) => {
     const isArr = isArray(data)
-    for(let k in data) {
-      if(!cond(data[k], k)) {
-        if(isArr) {
-          data.splice(k, 1)
-        } else {
-          // TODO: handle Maps and Sets ?
-          delete data[k]
-        }
-      }
+    let indicies_offset: number, indicies2rm: number[]
+    if(isArr) {
+      indicies_offset = 0
+      indicies2rm = []
     }
+    for(let k in data)
+      if(!cond(data[k], k)) // @ts-ignore
+        if(isArr) indicies2rm.push(+k)
+        else
+          delete data[k]
+    if(isArr)// @ts-ignore
+      for(const i of indicies2rm) // @ts-ignore
+        data.splice(i - indicies_offset++, 1)
     return data
   }
-)
-/** @deprecated */
-export const qindexOf = curry2(
-  (x: any, xs: any[]) => xs.indexOf(x)
 )
