@@ -289,10 +289,7 @@ export const omit = curry2(
     o
   )
 )
-export const fromPairs = (pairs: [string, any][]) => reduce(
-  (o: AnyObject, pair: [string, any]) => assoc(...pair, o),
-  {}, pairs
-)
+export const fromPairs = (pairs: [string, any][]) => Object.fromEntries(pairs)
 type Concat = ((a: string, b: string) => string)
             | ((a: any[], b: any[]) => any[])
 export const concat = curry2(
@@ -431,3 +428,4 @@ export const reflect = identity
 export const echo = identity
 export const notf = complement
 export const push = append
+export const some = any

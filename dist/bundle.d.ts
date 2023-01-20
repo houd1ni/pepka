@@ -301,7 +301,9 @@ export declare const omit: {
 export declare const fromPairs: (pairs: [
 	string,
 	any
-][]) => any;
+][]) => {
+	[k: string]: any;
+};
 export declare const concat: {
 	(a: symbol, b: string | any[]): (a: string | any[]) => string | any[];
 	(a: string | any[], b: symbol): (b: string | any[]) => string | any[];
@@ -425,6 +427,12 @@ export declare const push: {
 	(a: any): (b: any[]) => any[];
 	(a: any, b: any[]): any[];
 };
+export declare const some: {
+	(a: symbol, b: any[]): (a: Cond) => boolean;
+	(a: Cond, b: symbol): (b: any[]) => boolean;
+	(a: Cond): (b: any[]) => boolean;
+	(a: Cond, b: any[]): boolean;
+};
 export declare const qappend: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];
@@ -436,6 +444,12 @@ export declare const qreduce: (...args: AnyArgs) => any;
 export declare const qmergeDeep: any;
 export declare const qmergeDeepX: any;
 export declare const qmergeDeepAdd: any;
+export declare const qmergeShallow: {
+	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
+	(a: AnyObject, b: symbol): (b: AnyObject) => AnyObject;
+	(a: AnyObject): (b: AnyObject) => AnyObject;
+	(a: AnyObject, b: AnyObject): AnyObject;
+};
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const qmapKeys: {
 	(a: symbol, b: AnyObject): (a: {

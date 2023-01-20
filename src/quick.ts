@@ -3,7 +3,7 @@ import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray } from "./utils"
 
-// TODO: qmap, qoverProp, qover array ?
+// TODO: qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3(
@@ -55,6 +55,10 @@ const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObj
 export const qmergeDeep = mergeDeep(1)
 export const qmergeDeepX = mergeDeep(2)
 export const qmergeDeepAdd = mergeDeep(3)
+export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => {
+  for(let k in o2) o1[k] = o2[k]
+  return o1
+})
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const qmapKeys = curry2(
   (
