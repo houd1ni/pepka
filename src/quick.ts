@@ -56,7 +56,7 @@ export const qmapKeys = curry2(
     o: AnyObject
   ) => {
     let k: string, mapped: string | AnyFunc, newKey: string, newValue: any
-    for(k in keyMap) {
+    for(k in keyMap) if(k in o) {
       mapped = keyMap[k]
       ;[newKey, newValue] = isFunc(mapped)
         ? (mapped as AnyFunc)(o[k], o)
