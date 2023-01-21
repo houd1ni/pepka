@@ -52,14 +52,14 @@ export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => Object.ass
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const qmapKeys = curry2(
   (
-    keyMap: {[oldKey: string]: string},
+    keyMap: {[oldKey: string]: string | AnyFunc},
     o: AnyObject
   ) => {
     let k: string, mapped: string | AnyFunc, newKey: string, newValue: any
     for(k in keyMap) {
       mapped = keyMap[k]
       ;[newKey, newValue] = isFunc(mapped)
-        ? (mapped as unknown as AnyFunc)(o)
+        ? (mapped as AnyFunc)(o[k], k, o)
         : [mapped, o[k]]
       o[newKey] = newValue
       if(k !== newKey) delete o[k]

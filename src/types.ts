@@ -1,4 +1,4 @@
-export type Cond = (...xs: any[]) => boolean
+export type Cond = (x1?: any, x2?: any, x3?: any) => boolean
 export interface AnyObject {
   [k: string]: any
 }
