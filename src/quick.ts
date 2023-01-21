@@ -59,8 +59,8 @@ export const qmapKeys = curry2(
     for(k in keyMap) {
       mapped = keyMap[k]
       ;[newKey, newValue] = isFunc(mapped)
-        ? (mapped as AnyFunc)(o[k], k, o)
-        : [mapped, o[k]]
+        ? (mapped as AnyFunc)(o[k], o)
+        : [mapped || k, o[k]]
       o[newKey] = newValue
       if(k !== newKey) delete o[k]
     }
