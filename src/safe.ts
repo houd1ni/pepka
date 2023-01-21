@@ -401,7 +401,7 @@ export const forEachAsync = curry2(
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
 export const composeAsync = (() => {
   const pipe = async (fns: AnyFunc[], input: any[], i: number): Promise<any> =>
-    ~i ? await pipe(fns, await fns[i](...input), --i) : head(input)
+    ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input)
   return <T = any>(...fns: AnyFunc[]) =>
     (...input: any[]) => pipe(fns, input, fns.length-1) as Promise<T>
 })()
