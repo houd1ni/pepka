@@ -2,8 +2,9 @@ import { curry2, curry3 } from "./curry"
 import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray } from "./utils"
+import { isNil } from "./safe"
 
-// TODO: qoverProp, qover array ?
+// TODO: qassocPath, qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3(
@@ -60,8 +61,8 @@ export const qmapKeys = curry2(
       mapped = keyMap[k]
       ;[newKey, newValue] = isFunc(mapped)
         ? (mapped as AnyFunc)(o[k], k, o)
-        : [mapped || k, o[k]]
-      o[newKey] = newValue
+        : [mapped, o[k]]
+      o[isNil(newKey) ? k : newKey] = newValue
       if(k !== newKey) delete o[k]
     }
     return o
@@ -87,11 +88,15 @@ export const qfilter = curry2(
     for(let k in data)
       if(!cond(data[k], k)) // @ts-ignore
         if(isArr) indicies2rm.push(+k)
-        else
-          delete data[k]
+        else delete data[k]
     if(isArr)// @ts-ignore
       for(const i of indicies2rm) // @ts-ignore
         data.splice(i - indicies_offset++, 1)
     return data
   }
 )
+export const qempty = (o: AnyObject|any[]) => {
+  if(isArray(o)) o.splice(0) 
+  else for(const i in o) delete o[i]
+  return o
+}

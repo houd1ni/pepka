@@ -3,23 +3,25 @@ import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } fro
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-// over, lensProp
+// prepend, qprepend, over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
+export const eq = curry2((a: any, b: any) => a===b)
+export const weakEq = curry2((a: any, b: any) => a==b)
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)
-  if(typea===type(b) && (typea==='Object' || typea=='Array')) {
-    if(isNull(a) || isNull(b)) return a===b
-    if(a===b) return true
+  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array'))) {
+    if(isNull(a) || isNull(b)) return eq(a, b)
+    if(eq(a, b)) return true
     for(const v of [a, b])
       for(const k in v)
         if(
-          !((v===b) && (k in a)) &&
-          !((v===a) && (k in b) && equals(a[k], b[k]))
+          !((eq(v, b)) && (k in a)) &&
+          !((eq(v, a)) && (k in b) && equals(a[k], b[k]))
         ) return false
     return true
   }
-  return a===b
+  return eq(a, b)
 })
 export const ifElse = curry(
   (
@@ -103,7 +105,12 @@ export const split = curry2((s: string|RegExp, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
 export const callWith = curry2((args: any[], fn: AnyFunc) => fn(...args))
-export const noop = (..._args: any[]) => {}
+export const noop = (()=>{}) as (...args: any[]) => any
+/** Calls a func from object.
+ * @param {any[]} [args] - arguments for the function.
+ * @param {string} [fnName] - property name of the function.
+ * @param {AnyObject} [o] - the object with the function. */
+export const callFrom = curry((args: any[], fn: string, o: AnyObject) => o[fn](...args))
 export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
   const f = isFunc(out)
@@ -119,6 +126,7 @@ export const sizeof = (s: any[] | string | AnyObject) => {
 export const range = curry2((from: number, to: number) =>
   genBy(add(from), to-from)
 )
+// TODO: make it using equals for deep stuff !
 export const uniq = (xs: any[]) => qreduce(
   <T>(accum: any, x: T) =>
     includes(x, accum) ? accum : qappend(x, accum),
@@ -348,7 +356,7 @@ export const overProp = curry3(
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry2(
   (
-    keyMap: {[oldKey: string]: string},
+    keyMap: {[oldKey: string]: string | AnyFunc},
     o: AnyObject
   ) => qmapKeys(keyMap, Object.assign({}, o))
 )
