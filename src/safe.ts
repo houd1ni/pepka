@@ -3,7 +3,7 @@ import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } fro
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-// prepend, qprepend, over, lensProp
+// flat, prepend, qprepend, over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
 export const eq = curry2((a: any, b: any) => a===b)
