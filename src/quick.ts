@@ -1,10 +1,9 @@
 import { curry2, curry3 } from "./curry"
 import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
-import { isFunc, isArray } from "./utils"
+import { isFunc, isArray, isObj } from "./utils"
 import { isNil } from "./safe"
-
-// TODO: qassoc, qassocPath, qoverProp, qover array ?
+// TODO: qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3(
@@ -75,10 +74,10 @@ export const qmap = curry2(
   }
 )
 export const qfilter = curry2(
-  (
+  <T extends any[] | AnyObject>(
     cond: (v: any, k: string | number) => boolean,
-    data: any[] | AnyObject
-  ) => {
+    data: T
+  ): T => {
     const isArr = isArray(data)
     let indicies_offset: number, indicies2rm: number[]
     if(isArr) {
@@ -100,3 +99,21 @@ export const qempty = (o: AnyObject|any[]) => {
   else for(const i in o) delete o[i]
   return o
 }
+export const qfreeze = <T extends AnyObject>(o: T): Readonly<T> => {
+  let v: any
+  for(const k in o) {
+    v = o[k]
+    if(isObj(v)) qfreeze(v)
+  }
+  return Object.freeze(o)
+}
+export const qfreezeShallow = <T extends AnyObject>(o: T): Readonly<T> => Object.freeze(o)
+export const qprepend = curry2((x: any, xs: any[]) => xs.unshift(x))
+export const qassocPath = curry3((_path: string[], v: any, o: AnyObject) => {
+  const first = _path[0]
+  return qassoc(first, _path.length<2
+    ? v
+    : qassocPath(_path.slice(1), v, isObj(o[first]) ? o[first] : {}),
+    o
+  )
+})

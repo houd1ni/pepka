@@ -1,9 +1,9 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { type } from './common'
-// flat, prepend, qprepend, over, lensProp
+// over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
 export const eq = curry2((a: any, b: any) => a===b)
@@ -99,8 +99,12 @@ export const keys = (o: AnyObject | any[]) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
-export const tap = curry2((fn: Function, s: any) => { fn(s); return s })
-export const append = curry2((s: any, xs: any[]) => [...xs, s])
+export const tap = curry2((fn: Function, x: any) => { fn(x); return x })
+export const append = curry2((x: any, xs: any[]) => [...xs, x])
+export const prepend = curry2((x: any, xs: any[]) => [...xs, x])
+export const flat = (xs: any[]) => xs.flat(inf)
+export const flatShallow = (xs: any[]) => xs.flat()
+export const flatTo = curry2((depth: number, xs: any[]) => xs.flat(depth))
 export const split = curry2((s: string|RegExp, xs: string) => xs.split(s))
 export const T = always<true>(true) as (...args: any[]) => true
 export const F = always<false>(false) as (...args: any[]) => false
@@ -252,6 +256,8 @@ export const clone = (s: any, shallow = false) => {
   }
 }
 export const cloneShallow = (s: any) => clone(s, true)
+export const freeze = <T extends AnyObject>(o: T): Readonly<T> => qfreeze(clone(o))
+export const freezeShallow = <T extends AnyObject>(o: T): Readonly<T> => qfreezeShallow(clone(o))
 
 /** types T1, T2
  *  @param reducer (accum: T1, current: T2, index: number) => newAccum: T1
