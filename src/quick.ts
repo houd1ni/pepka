@@ -117,3 +117,4 @@ export const qassocPath = curry3((_path: string[], v: any, o: AnyObject) => {
     o
   )
 })
+export const qreverse = (arr: any[]) => arr.reverse()

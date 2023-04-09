@@ -94,8 +94,20 @@ export const always = <T=any>(s: T) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
-export const not = (o: boolean) => !o
-export const keys = (o: AnyObject | any[]) => Object.keys(o)
+type NotOverload = {
+  (x: true): false
+  (x: false): true
+  (x: any): boolean
+}
+export const not: NotOverload = (x: any) => !x as any
+type IndexesOfArray<A> = Exclude<keyof A, keyof []>
+type KeysOverload = {
+  <T extends any[]>(o: T): string[]
+  <T extends readonly any[]>(o: T): IndexesOfArray<T>[]
+  <T extends AnyObject>(o: T): (keyof T)[]
+}
+export const keys: KeysOverload = (o: number[]) => Object.keys(o)
+
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
@@ -147,12 +159,9 @@ export const genBy = curry2(
 export const once = <Func extends AnyFunc>(fn: Func) => {
   let done = false, cache: any
   return (...args: Parameters<Func>) => {
-    if(done) {
-      return cache
-    } else {
-      done = true
-      return cache = fn(...args)
-    }
+    if(done) return cache
+    done = true
+    return cache = fn(...args)
   }
 }
 export const reverse = (xs: any[]) => compose(
