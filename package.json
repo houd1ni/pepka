@@ -36,14 +36,14 @@
     "test:report": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:lazy": "ava",
     "dts-fix": "node dts-fix.js",
-    "gentypes": "dts-bundle-generator --no-check -o dist/bundle.d.ts src/index.ts && npm run dts-fix",
+    "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts && npm run dts-fix",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "ava": {
     "files": [
       "./test/specs/*.ts"
@@ -59,21 +59,21 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.4.0",
     "@types/node": "^18.15.11",
     "ava": "^5.2.0",
     "codecov": "^3.8.3",
     "cross-env": "^7.0.3",
-    "dts-bundle-generator": "^7.2.0",
+    "dts-bundle-generator": "^8.0.0",
     "nyc": "^15.1.0",
     "prepend": "^1.0.2",
     "rollup": "^3.20.2",
     "rollup-plugin-typescript2": "^0.34.1",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   },
   "types": "./dist/bundle.d.ts",
   "sideEffects": false
