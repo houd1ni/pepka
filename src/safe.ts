@@ -337,7 +337,7 @@ export const replace = curry3(
     // @ts-ignore Some bug with overload.
   ) => where.replace(a, b)
 )
-// TODO: it thinks cond is a symbol in usage !!!
+// FIXME: it thinks cond is a symbol in usage !!!
 export const filter = curry2(
   (
     cond: (v: any, k: string | number) => boolean,
