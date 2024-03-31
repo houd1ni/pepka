@@ -2,7 +2,7 @@ import { curry2, curry3 } from "./curry"
 import { type } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj } from "./utils"
-import { isNil } from "./safe"
+import { includes, isNil } from "./safe"
 // TODO: qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
@@ -118,3 +118,9 @@ export const qassocPath = curry3((_path: string[], v: any, o: AnyObject) => {
   )
 })
 export const qreverse = (arr: any[]) => arr.reverse()
+export const qomit = curry2(
+  (props: string[], o: AnyObject) => qfilter(
+    (_: any, k: string) => !includes(k, props),
+    o
+  )
+)
