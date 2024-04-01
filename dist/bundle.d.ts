@@ -24,6 +24,7 @@ export declare function curry2<Func extends Func2>(fn: Func): {
 type Func3 = (a: any, b: any, c: any) => any;
 export declare function curry3<Func extends Func3>(fn: Func): (...args: AnyArgs) => any;
 export declare const uncurry: <Args extends any[] = any[], ReturnT = any>(fn: Curried<Args>) => AnyFunc;
+export declare const symbol: unique symbol;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
 export declare const type: (s: any) => any;
@@ -313,10 +314,11 @@ export declare const prop: {
 };
 export declare const propEq: (...args: AnyArgs) => any;
 export declare const propsEq: (...args: AnyArgs) => any;
-export declare const pathOr: (...args: AnyArgs) => any;
+export declare const pathOr: any;
 export declare const path: any;
 export declare const pathEq: (...args: AnyArgs) => any;
 export declare const pathsEq: (...args: AnyArgs) => any;
+export declare const pathExists: Composed<any[], any>;
 export declare const clone: (s: any, shallow?: boolean) => any;
 export declare const cloneShallow: (s: any) => any;
 export declare const freeze: <T extends AnyObject>(o: T) => Readonly<T>;

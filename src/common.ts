@@ -6,6 +6,7 @@ const caseMap = {
   u: 'U', b: 'B', n: 'N', s: 'S', f: 'F'
 }
 
+export const symbol = Symbol()
 export const toLower = (s: string) => s.toLowerCase()
 export const toUpper = (s: string) => s.toUpperCase()
 export const type = (s: any) => {

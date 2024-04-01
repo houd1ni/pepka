@@ -2,7 +2,7 @@ import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
-import { type } from './common'
+import { symbol, type } from './common'
 // over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
@@ -223,20 +223,14 @@ export const propsEq = curry3(
   (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 )
 export const pathOr = curry3(
-  (_default: any, path: (string | number)[], o: any) =>
-    ifElse(length,
-      () => isNil(o)
-        ? _default
-        : compose(
-            ifElse(isNil,
-              always(_default),
-              (o: any) => pathOr(_default, slice(1, inf, path), o)
-            ),
-            flip(prop)(o),
-            head
-          )(path),
-      always(o),
-    path)
+  (_default: any, path: (string | number)[], o: any) => length(path)
+    ? isNil(o)
+      ? _default
+      : compose(
+          (k) => k in o ? pathOr(_default, slice(1, inf, path), o[k]) : _default,
+          head
+        )(path)
+    : o
 )
 export const path = pathOr(undef)
 export const pathEq = curry3(
@@ -246,6 +240,7 @@ export const pathsEq = curry3(
   (_path: string[], o1: AnyObject, o2: AnyObject) =>
     equals(path(_path, o1), path(_path, o2))
 )
+export const pathExists = compose(ifElse(equals(symbol), F, T), pathOr(symbol))
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/
 export const clone = (s: any, shallow = false) => {
   const t = type(s)
