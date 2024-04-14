@@ -1,6 +1,6 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { symbol, type } from './common'
 // over, lensProp
@@ -293,13 +293,16 @@ export const fromPairs = (pairs: [string, any][]) => Object.fromEntries(pairs)
 type Concat = ((a: string, b: string) => string)
             | ((a: any[], b: any[]) => any[])
 export const concat = curry2(
-  ((a, b) => b.concat(a)) as Concat
+  ((a: any, b: string | any[]) => b.concat(a)) as Concat
 )
 export const join = curry2(
   (delimeter: string, arr: string[]) => arr.join(delimeter)
 )
 export const map = curry2(
   (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => arr.map(pipe)
+)
+export const mapObj = curry2(
+  (pipe: (s: any, i?: string, list?: any[]) => any, o: AnyObject) => qmapObj(pipe, cloneShallow(o))
 )
 export const forEach = curry2(
   (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)

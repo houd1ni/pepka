@@ -371,6 +371,12 @@ export declare const map: {
 	(a: (s: any, i?: number, list?: any[]) => any): (b: any[]) => any[];
 	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
 };
+export declare const mapObj: {
+	(a: symbol, b: AnyObject): (a: (s: any, i?: string, list?: any[]) => any) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+};
 export declare const forEach: {
 	(a: symbol, b: any[]): (a: (s: any) => any) => void;
 	(a: (s: any) => any, b: symbol): (b: any[]) => void;
@@ -529,6 +535,12 @@ export declare const qmap: {
 	(a: (s: any, i?: number, list?: any[]) => any, b: symbol): (b: any[]) => any[];
 	(a: (s: any, i?: number, list?: any[]) => any): (b: any[]) => any[];
 	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
+};
+export declare const qmapObj: {
+	(a: symbol, b: AnyObject): (a: (s: any, k?: string, list?: any[]) => any) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
+	(a: (s: any, k?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
+	(a: (s: any, k?: string, list?: any[]) => any): (b: AnyObject) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
+	(a: (s: any, k?: string, list?: any[]) => any, b: AnyObject): (a: (s: any, i?: number, list?: any[]) => any) => any[];
 };
 export declare const qfilter: {
 	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any[] | AnyObject;

@@ -6,15 +6,8 @@ import { includes, isNil } from "./safe"
 // TODO: qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
-export const qassoc = curry3(
-  (prop: string, v: any, obj: AnyObject) => {
-    obj[prop] = v
-    return obj
-  }
-)
-export const qreduce = curry3(
-  <T>(fn: Reducer, accum: any, arr: T[]) => arr.reduce(fn, accum)
-)
+export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
+export const qreduce = curry3(<T>(fn: Reducer, accum: any, arr: T[]) => arr.reduce(fn, accum))
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
 const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObject => {
   for(let k in o2) {
@@ -72,6 +65,9 @@ export const qmap = curry2(
     for(let i in arr) arr[i] = pipe(arr[i], +i, arr)
     return arr
   }
+)
+export const qmapObj = curry2(
+  (pipe: (s: any, k?: string, list?: any[]) => any, o: AnyObject) => qmap(pipe as any, o as any[])
 )
 export const qfilter = curry2(
   <T extends any[] | AnyObject>(
