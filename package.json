@@ -36,14 +36,14 @@
     "test:report": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:lazy": "ava",
     "dts-fix": "node dts-fix.js",
-    "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts && npm run dts-fix",
+    "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "ava": {
     "files": [
       "./test/specs/*.ts"
@@ -66,10 +66,10 @@
     "ava": "^6.1.2",
     "codecov": "^3.8.3",
     "cross-env": "^7.0.3",
-    "dts-bundle-generator": "^9.3.1",
+    "dts-bundle-generator": "^9.4.0",
     "nyc": "^15.1.0",
     "prepend": "^1.0.2",
-    "rollup": "^4.14.2",
+    "rollup": "^4.14.3",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.2",
     "tslint": "^6.1.3",

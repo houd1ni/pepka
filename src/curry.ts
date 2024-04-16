@@ -73,7 +73,7 @@ export function curry2<Func extends Func2>(fn: Func) {
     const aln = arguments.length
     if(aln === 1 && withPlaceholder1)
       throw new Error('Senseless placeholder usage.')
-    return arguments.length>1
+    return aln>1
     ? withPlaceholder1
       ? endlessph((a: p0) => fn(a, b))
       : fn(a, b) as ReturnType<Func>
