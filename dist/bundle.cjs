@@ -1,1 +1,713 @@
-"use strict";const e=Symbol("Placeholder"),t=t=>{let r=0;for(const s of t)s!==e&&r++;return r},r=(t,r)=>{const s=t.length,o=t.slice(),p=r.length;let n=p,x=0;for(;n&&x<s;x++)o[x]===e&&(o[x]=r[p-n],n--);for(x=s;n;x++,n--)o[x]=r[p-n];return o},s=(e,o,p)=>{const n=e.length-o.length-t(p);if(n<1)return e(...r(o,p));{const t=(...t)=>s(e,r(o,p),t);return t.$args_left=n,t}},o=e=>(...r)=>e.length>t(r)?s(e,[],r):e(...r);function p(t){return function(r,s){const o=r===e,p=arguments.length;if(1===p&&o)throw new Error("Senseless placeholder usage.");return p>1?o?(t=>function(r){return r===e?t:t(r)})((e=>t(e,s))):t(r,s):e=>t(r,e)}}function n(e){return o(e)}const x=void 0,a=1/0,c=e=>typeof e,l=e=>null===e,i=e=>"number"==c(e),u=e=>Array.isArray(e),f=e=>"function"===c(e),h=e=>!l(e)&&"object"===c(e),m={u:"U",b:"B",n:"N",s:"S",f:"F"},y=Symbol(),d=e=>{const t=c(e);return"object"===t?l(e)?"Null":e.constructor.name:m[t[0]]+t.slice(1)},g=p(((e,t)=>d(t)===e)),b=e=>e.length,q=e=>l(e)||(e=>e===x)(e),w=p(((e,t)=>e===t)),j=p(((e,t)=>{const r=d(e);if(w(r,d(t))&&(w(r,"Object")||w(r,"Array"))){if(l(e)||l(t))return w(e,t);if(w(e,t))return!0;for(const r of[e,t])for(const s in r)if(!(w(r,t)&&s in e||w(r,e)&&s in t&&j(e[s],t[s])))return!1;return!0}return w(e,t)})),O=p(((e,t)=>{if((e=>"string"===c(e))(t))return t.includes(e);for(const r of t)if(j(r,e))return!0;return!1})),A=e=>p(((t,r)=>{const s=b(t);if(s>b(r))return!1;for(let o=0;o<s;o++)if(!e(r[o],t[o]))return!1;return!0})),S=p(((e,t)=>(t.push(e),t))),E=n(((e,t,r)=>(r[e]=t,r))),k=n(((e,t,r)=>r.reduce(e,t))),z=n(((e,t,r)=>{for(let s in r)switch(d(r[s])){case"Array":if(e>1&&"Array"===d(t[s]))switch(e){case 2:const o=t[s],p=r[s];for(const t in p)o[t]?z(e,o[t],p[t]):o[t]=p[t];break;case 3:t[s].push(...r[s])}else t[s]=r[s];break;case"Object":if("Object"===d(t[s])){z(e,t[s],r[s]);break}default:t[s]=r[s]}return t})),v=z(1),P=z(2),D=z(3),W=p(((e,t)=>Object.assign(e,t))),N=p(((e,t)=>{let r,s,o,p;for(r in e)r in t&&(s=e[r],[o,p]=f(s)?s(t[r],r,t):[s,t[r]],t[q(o)?r:o]=p,r!==o&&delete t[r]);return t})),B=p(((e,t)=>{for(let r in t)t[r]=e(t[r],+r,t);return t})),T=p(((e,t)=>B(e,t))),_=p(((e,t)=>{const r=u(t);let s,o;r&&(s=0,o=[]);for(let s in t)e(t[s],s)||(r?o.push(+s):delete t[s]);if(r)for(const e of o)t.splice(e-s++,1);return t})),C=e=>{let t;for(const r in e)t=e[r],h(t)&&C(t);return Object.freeze(e)},F=e=>Object.freeze(e),I=p(((e,t)=>t.unshift(e))),U=n(((e,t,r)=>{const s=e[0];return E(s,e.length<2?t:U(e.slice(1),t,h(r[s])?r[s]:{}),r)})),$=p(((e,t)=>_(((t,r)=>!O(r,e)),t))),K=A(w),L=e=>(...t)=>t[e],X=p(((e,t)=>e==t)),G=o(((e,t,r,s)=>e(s)?t(s):r(s))),H=n(((e,t,r)=>G(e,t,fe,r))),J=(...t)=>(...r)=>{let s,o=!0;for(let p=b(t)-1;p>-1;p--)o?(o=!1,s=t[p](...r)):s=s===e?t[p]():t[p](s);return s},M=p(((e,t)=>e.bind(t))),Q=p(((e,t)=>t[e])),R=n(((e,t,r)=>r.slice(e,i(t)?t:a))),V=e=>p(((t,r)=>e(r,t))),Y=Q(0),Z=R(1,a),ee=p(((e,t)=>e+t)),te=p(((e,t)=>t-e)),re=p(((e,t)=>e*t)),se=p(((e,t)=>e<t)),oe=p(((e,t)=>e>t)),pe=p(((e,t)=>e<=t)),ne=p(((e,t)=>e>=t)),xe=p(((e,t)=>t.sort(e))),ae=p(((e,t)=>t.find(e))),ce=p(((e,t)=>t.findIndex(e))),le=p(((e,t)=>ce(j(e),t))),ie=p(((e,t)=>e/t)),ue=e=>()=>e,fe=e=>e,he=A(((e,t)=>j(e,t))),me=e=>!e,ye=p(((e,t)=>e.test(t))),de=p(((e,t)=>(e(t),t))),ge=p(((e,t)=>[...t,e])),be=p(((e,t)=>[...t,e])),qe=p(((e,t)=>t.flat(e))),we=p(((e,t)=>t.split(e))),je=ue(!0),Oe=ue(!1),Ae=p(((e,t)=>t(...e))),Se=o(((e,t,r)=>r[t](...e))),Ee=e=>(...t)=>{const r=e(...t),s=f(r);return!s||s&&r.$args_left<=0?me(r):Ee(r)},ke=p(((e,t)=>ve(ee(e),t-e))),ze=p(((e,t)=>e.filter(V(O)(t)))),ve=p(((e,t)=>[...Array(t)].map(((t,r)=>e(r))))),Pe=p(((e,t)=>{for(const[r,s]of e)if(r(t))return s(t)})),De=n(((e,t,r)=>({...r,[e]:t}))),We=n(((e,t,r)=>J((s=>De(s,b(e)<2?t:We(R(1,a,e),t,h(r[s])?r[s]:{}),r)),Y)(e))),Ne=p(((e,t)=>t.every(e))),Be=p(((e,t)=>t.some(e))),Te=p(((e,t)=>e.every((e=>e(t))))),_e=p(((e,t)=>e.some((e=>e(t))))),Ce=p(((e,t)=>t[e])),Fe=n(((e,t,r)=>j(r[e],t))),Ie=n(((e,t,r)=>j(t[e],r[e]))),Ue=n(((e,t,r)=>b(t)?q(r)?e:J((s=>s in r?Ue(e,R(1,a,t),r[s]):e),Y)(t):r)),$e=Ue(x),Ke=n(((e,t,r)=>j($e(e,r),t))),Le=n(((e,t,r)=>j($e(e,t),$e(e,r)))),Xe=J(G(j(y),Oe,je),Ue(y)),Ge=/^(.*?)(8|16|32|64)(Clamped)?Array$/,He=(e,t=!1)=>{const r=d(e);switch(r){case"Null":case"String":case"Number":case"Boolean":case"Symbol":return e;case"Array":return t?[...e]:Ze(J(He,L(0)),e);case"Object":if(t)return{...e};const s={};for(let t in e)s[t]=He(e[t]);return s;default:return Ge.test(r)?e.constructor.from(e):e}},Je=e=>He(e,!0),Me=n(((e,t,r)=>k(e,He(t),r))),Qe=p(((e,t)=>pt(e,t))),Re=p(((e,t)=>{const r={};for(const s of e)s in t&&(r[s]=t[s]);return r})),Ve=p(((e,t)=>pt(((t,r)=>!O(r,e)),t))),Ye=p(((e,t)=>t.concat(e))),Ze=p(((e,t)=>t.map(e))),et=p(((e,t)=>T(e,Je(t)))),tt=p(((e,t)=>t.join(e))),rt=p(((e,t)=>t.forEach(e))),st=n(((e,t,r)=>t(r)&&e(r))),ot=n(((e,t,r)=>r.replace(e,t))),pt=p(((e,t)=>u(t)?t.filter(e):_(e,{...t}))),nt=p(((e,t)=>Object.assign({},e,t))),xt=p(((e,t)=>v(He(e),He(t)))),at=p(((e,t)=>P(He(e),He(t)))),ct=p(((e,t)=>D(He(e),He(t)))),lt=n(((e,t,r)=>De(e,t(r[e]),r))),it=p(((e,t)=>N(e,Object.assign({},t)))),ut=p(((e,t)=>Ze(((e,r)=>[e,t[r]]),e))),ft=p(((e,t)=>Me(((e,r,s)=>De(r,t[s],e)),{},e))),ht=n(((e,t,r)=>Ze(((t,s)=>e(t,r[s])),t))),mt=fe,yt=fe,dt=fe,gt=Ee,bt=ge,qt=Be,wt=(()=>{const e=async(t,r,s)=>{s<r.length&&(await t(r[s]),await e(t,r,++s))};return p(((t,r)=>e(t,r,0)))})(),jt=p((async(e,t)=>(await e(t),t))),Ot=p(((e,t)=>Promise.all(t.map(e)))),At=(()=>{const e=async(t,r,s)=>~s?await e(t,[await t[s](...r)],--s):Y(r);return(...t)=>(...r)=>e(t,r,t.length-1)})();exports.F=Oe,exports.T=je,exports.__=e,exports.add=ee,exports.all=Ne,exports.allPass=Te,exports.always=ue,exports.any=Be,exports.anyPass=_e,exports.append=ge,exports.assoc=De,exports.assocPath=We,exports.bind=M,exports.both=st,exports.callFrom=Se,exports.callWith=Ae,exports.clone=He,exports.cloneShallow=Je,exports.complement=Ee,exports.compose=J,exports.composeAsync=At,exports.concat=Ye,exports.cond=Pe,exports.curry=o,exports.curry2=p,exports.curry3=n,exports.divide=ie,exports.echo=dt,exports.empty=e=>{switch(d(e)){case"String":return"";case"Object":return{};case"Array":return[];default:return x}},exports.eq=w,exports.equals=j,exports.explore=(e,t="log")=>de((r=>console[t](e,r))),exports.filter=pt,exports.find=ae,exports.findIndex=ce,exports.flat=e=>e.flat(a),exports.flatShallow=e=>e.flat(),exports.flatTo=qe,exports.flip=V,exports.forEach=rt,exports.forEachAsync=Ot,exports.forEachSerial=wt,exports.freeze=e=>C(He(e)),exports.freezeShallow=e=>F(He(e)),exports.fromPairs=e=>Object.fromEntries(e),exports.genBy=ve,exports.getTmpl=e=>{const t=[],r=[],s=e.length;let o,p,n,x=0,a=0,c=!1,l=Y(e),i=!1;for(x=0;x<s;x++)switch(o=e[x],o){case"{":if(!l){c=!0,a=x;break}case"}":if(!l){c=!1,t.push(""),r.push(e.slice(a+1,x));break}default:n=e[x+1],i="\\"===o,c||i&&("{"===n||"}"===n)||(p=t.length-1,p<0&&(t.push(""),p++),t[p]+=o),l=i}return e=>{const s=[],o=t.length-1;for(const p in t)x=+p,s.push(t[x]),x!==o&&s.push($e(r[x].split("."),e));return s.join("")}},exports.gt=se,exports.gte=pe,exports.head=Y,exports.identity=fe,exports.ifElse=G,exports.includes=O,exports.indexOf=le,exports.intersection=ze,exports.isEmpty=e=>{switch(d(e)){case"String":case"Array":return 0==b(e);case"Object":for(const t in e)return!1;return!0;default:return null}},exports.isNil=q,exports.join=tt,exports.keys=e=>Object.keys(e),exports.last=e=>e[b(e)-1],exports.length=b,exports.lt=oe,exports.lte=ne,exports.map=Ze,exports.mapKeys=it,exports.mapObj=et,exports.memoize=e=>{let t,r=!1;return()=>r?t:(r=!0,t=e())},exports.mergeDeep=xt,exports.mergeDeepAdd=ct,exports.mergeDeepX=at,exports.mergeShallow=nt,exports.mirror=mt,exports.multiply=re,exports.noop=()=>{},exports.not=me,exports.notf=gt,exports.nth=Q,exports.omit=Ve,exports.once=e=>{let t,r=!1;return(...s)=>r?t:(r=!0,t=e(...s))},exports.overProp=lt,exports.path=$e,exports.pathEq=Ke,exports.pathExists=Xe,exports.pathOr=Ue,exports.pathsEq=Le,exports.pick=Re,exports.pickBy=Qe,exports.prepend=be,exports.prop=Ce,exports.propEq=Fe,exports.propsEq=Ie,exports.push=bt,exports.qappend=S,exports.qassoc=E,exports.qassocPath=U,exports.qempty=e=>{if(u(e))e.splice(0);else for(const t in e)delete e[t];return e},exports.qfilter=_,exports.qfreeze=C,exports.qfreezeShallow=F,exports.qmap=B,exports.qmapKeys=N,exports.qmapObj=T,exports.qmergeDeep=v,exports.qmergeDeepAdd=D,exports.qmergeDeepX=P,exports.qmergeShallow=W,exports.qomit=$,exports.qprepend=I,exports.qreduce=k,exports.qreverse=e=>e.reverse(),exports.qstartsWith=K,exports.qstartsWithWith=A,exports.range=ke,exports.reduce=Me,exports.reflect=yt,exports.replace=ot,exports.reverse=e=>J((t=>Me(((r,s,o)=>S(e[t-o],r)),[],e)),ee(-1),b)(e),exports.sizeof=e=>{if("Object"===d(e)){let t=0;for(let r in e)t++;return t}return b(e)},exports.slice=R,exports.some=qt,exports.sort=xe,exports.split=we,exports.startsWith=he,exports.subtract=te,exports.symbol=y,exports.tail=Z,exports.take=L,exports.tap=de,exports.test=ye,exports.toLower=e=>e.toLowerCase(),exports.toPairs=e=>Object.entries(e),exports.toUpper=e=>e.toUpperCase(),exports.trim=e=>e.trim(),exports.type=d,exports.typeIs=g,exports.uncurry=e=>(...t)=>k(((e,t)=>e?e(t):e),e,t),exports.uniq=e=>k(((e,t)=>ae(j(t),e)?e:S(t,e)),[],e),exports.values=e=>Object.values(e),exports.waitAll=e=>Promise.all(e),exports.waitTap=jt,exports.weakEq=X,exports.when=H,exports.zip=ut,exports.zipObj=ft,exports.zipWith=ht;
+'use strict';
+
+const __ = Symbol('Placeholder');
+const countArgs = (s) => {
+    let i = 0;
+    for (const v of s)
+        v !== __ && i++;
+    return i;
+};
+// TODO: try to make it mutable.
+// { 0: __, 1: 10 }, [ 11 ]
+const addArgs = (args, _args) => {
+    const len = args.length;
+    const new_args = args.slice();
+    const _args_len = _args.length;
+    let _args_left = _args_len;
+    let i = 0;
+    for (; _args_left && i < len; i++) {
+        if (new_args[i] === __) {
+            new_args[i] = _args[_args_len - _args_left];
+            _args_left--;
+        }
+    }
+    for (i = len; _args_left; i++, _args_left--) {
+        new_args[i] = _args[_args_len - _args_left];
+    }
+    return new_args;
+};
+const _curry = (fn, args, new_args) => {
+    const args2add = fn.length - args.length - countArgs(new_args);
+    if (args2add < 1) {
+        return fn(...addArgs(args, new_args));
+    }
+    else {
+        const curried = (...__args) => _curry(fn, addArgs(args, new_args), __args);
+        curried.$args_left = args2add;
+        return curried;
+    }
+};
+const curry = (fn) => ((...args) => fn.length > countArgs(args)
+    ? _curry(fn, [], args)
+    : fn(...args));
+const endlessph = (fn) => {
+    function _endlessph(a) {
+        return a === __ ? fn : fn(a);
+    }
+    return _endlessph;
+};
+function curry2(fn) {
+    function curried2(a, b) {
+        const withPlaceholder1 = a === __;
+        const aln = arguments.length;
+        if (aln === 1 && withPlaceholder1)
+            throw new Error('Senseless placeholder usage.');
+        return aln > 1
+            ? withPlaceholder1
+                ? endlessph((a) => fn(a, b))
+                : fn(a, b)
+            : (b) => fn(a, b);
+    }
+    return curried2;
+}
+function curry3(fn) {
+    // type p0 = Parameters<Func>[0]
+    // type p1 = Parameters<Func>[1]
+    // type p2 = Parameters<Func>[2]
+    // type ReturnT = ReturnType<Func>
+    // TODO: optimize.
+    // Cannot use ts-toolbelt due to this error:
+    // Excessive stack depth comparing types 'GapsOf<?, L2>' and 'GapsOf<?, L2>'
+    return curry(fn);
+}
+
+const undef = undefined;
+const nul = null;
+const inf = Infinity;
+const to = (s) => typeof s;
+const isNull = (s) => s === nul;
+const isUndef = (s) => s === undef;
+const isNum = (s) => to(s) == 'number';
+const isArray = (s) => Array.isArray(s);
+const isFunc = (s) => to(s) === 'function';
+const isStr = (s) => to(s) === 'string';
+const isObj = (s) => !isNull(s) && to(s) === 'object';
+
+// It's faster that toUpperCase() !
+const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F' };
+const symbol = Symbol();
+const toLower = (s) => s.toLowerCase();
+const toUpper = (s) => s.toUpperCase();
+const type = (s) => {
+    const t = to(s);
+    return t === 'object'
+        ? isNull(s) ? 'Null' : s.constructor.name
+        : caseMap[t[0]] + t.slice(1);
+};
+const typeIs = curry2((t, s) => type(s) === t);
+const length = (s) => s.length;
+const isNil = (s) => isNull(s) || isUndef(s);
+const eq = curry2((a, b) => a === b);
+const equals = curry2((a, b) => {
+    const typea = type(a);
+    if (eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array'))) {
+        if (isNull(a) || isNull(b))
+            return eq(a, b);
+        if (eq(a, b))
+            return true;
+        for (const v of [a, b])
+            for (const k in v)
+                if (!((eq(v, b)) && (k in a)) &&
+                    !((eq(v, a)) && (k in b) && equals(a[k], b[k])))
+                    return false;
+        return true;
+    }
+    return eq(a, b);
+});
+const includes = curry2((s, ss) => {
+    if (isStr(ss))
+        return ss.includes(s);
+    else {
+        for (const a of ss)
+            if (equals(a, s))
+                return true;
+        return false;
+    }
+});
+/** @param start string | any[] @param s string | any[] */
+const qstartsWithWith = (comparator) => curry2((start, s) => {
+    const len_start = length(start);
+    const len_s = length(s);
+    if (len_start > len_s)
+        return false;
+    for (let i = 0; i < len_start; i++)
+        if (!comparator(s[i], start[i]))
+            return false;
+    return true;
+});
+
+// TODO: qflat, qoverProp, qover array ?
+const qappend = curry2((s, xs) => { xs.push(s); return xs; });
+const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
+const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
+// strategy is for arrays: 1->clean, 2->merge, 3->push.
+const mergeDeep$1 = curry3((strategy, o1, o2) => {
+    for (let k in o2) {
+        switch (type(o2[k])) {
+            case 'Array':
+                if (strategy > 1 && type(o1[k]) === 'Array')
+                    switch (strategy) {
+                        case 2:
+                            const o1k = o1[k], o2k = o2[k];
+                            for (const i in o2k)
+                                if (o1k[i])
+                                    mergeDeep$1(strategy, o1k[i], o2k[i]);
+                                else
+                                    o1k[i] = o2k[i];
+                            break;
+                        case 3: o1[k].push(...o2[k]);
+                    }
+                else
+                    o1[k] = o2[k];
+                break;
+            case 'Object':
+                if (type(o1[k]) === 'Object') {
+                    mergeDeep$1(strategy, o1[k], o2[k]);
+                    break;
+                }
+            default:
+                o1[k] = o2[k];
+                break;
+        }
+    }
+    return o1;
+});
+const qmergeDeep = mergeDeep$1(1);
+const qmergeDeepX = mergeDeep$1(2);
+const qmergeDeepAdd = mergeDeep$1(3);
+const qmergeShallow = curry2((o1, o2) => Object.assign(o1, o2));
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+const qmapKeys = curry2((keyMap, o) => {
+    let k, mapped, newKey, newValue;
+    for (k in keyMap)
+        if (k in o) {
+            mapped = keyMap[k];
+            [newKey, newValue] = isFunc(mapped)
+                ? mapped(o[k], k, o)
+                : [mapped, o[k]];
+            o[isNil(newKey) ? k : newKey] = newValue;
+            if (k !== newKey)
+                delete o[k];
+        }
+    return o;
+});
+const qmap = curry2((pipe, arr) => {
+    for (let i in arr)
+        arr[i] = pipe(arr[i], +i, arr);
+    return arr;
+});
+const qmapObj = curry2((pipe, o) => qmap(pipe, o));
+const qfilter = curry2((cond, data) => {
+    const isArr = isArray(data);
+    let indicies_offset, indicies2rm;
+    if (isArr) {
+        indicies_offset = 0;
+        indicies2rm = [];
+    }
+    for (let k in data)
+        if (!cond(data[k], k)) // @ts-ignore
+            if (isArr)
+                indicies2rm.push(+k);
+            else
+                delete data[k];
+    if (isArr) // @ts-ignore
+        for (const i of indicies2rm) // @ts-ignore
+            data.splice(i - indicies_offset++, 1);
+    return data;
+});
+const qempty = (o) => {
+    if (isArray(o))
+        o.splice(0);
+    else
+        for (const i in o)
+            delete o[i];
+    return o;
+};
+const qfreeze = (o) => {
+    let v;
+    for (const k in o) {
+        v = o[k];
+        if (isObj(v))
+            qfreeze(v);
+    }
+    return Object.freeze(o);
+};
+const qfreezeShallow = (o) => Object.freeze(o);
+const qprepend = curry2((x, xs) => xs.unshift(x));
+const qassocPath = curry3((_path, v, o) => {
+    const first = _path[0];
+    return qassoc(first, _path.length < 2
+        ? v
+        : qassocPath(_path.slice(1), v, isObj(o[first]) ? o[first] : {}), o);
+});
+const qreverse = (arr) => arr.reverse();
+const qomit = curry2((props, o) => qfilter((_, k) => !includes(k, props), o));
+/** @param start string | any[] @param s string | any[] */
+const qstartsWith = qstartsWithWith(eq);
+
+// TODO: possibly introduce a second argument limiting unfolding.
+const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
+
+// over, lensProp
+const take = (argN) => (...args) => args[argN];
+const weakEq = curry2((a, b) => a == b);
+const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
+const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
+const compose = ((...fns) => (...args) => {
+    let first = true;
+    let s;
+    for (let i = length(fns) - 1; i > -1; i--) {
+        if (first) {
+            first = false;
+            s = fns[i](...args);
+        }
+        else
+            s = s === __ ? fns[i]() : fns[i](s);
+    }
+    return s;
+});
+const bind = curry2((fn, context) => fn.bind(context));
+const nth = curry2((i, data) => data[i]);
+const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
+const flip = (fn) => curry2((b, a) => fn(a, b));
+/** @returns first element of an array. */
+const head = nth(0);
+/** @returns last element of an array. */
+const tail = slice(1, inf);
+/** @param a @param b @returns a+b  */
+const add = curry2((a, b) => a + b);
+/** @param a @param b @returns b-a  */
+const subtract = curry2((a, b) => b - a);
+/**@param a @param b @returns a*b  */
+const multiply = curry2((a, b) => a * b);
+/** @param a @param b @returns a<b  */
+const gt = curry2((a, b) => a < b);
+/** @param a @param b @returns a>b  */
+const lt = curry2((a, b) => a > b);
+/** @param a @param b @returns a<=b  */
+const gte = curry2((a, b) => a <= b);
+/** @param a @param b @returns a>=b  */
+const lte = curry2((a, b) => a >= b);
+const sort = curry2((sortFn, xs) => xs.sort(sortFn));
+const find = curry2((fn, s) => s.find(fn));
+const findIndex = curry2((fn, s) => s.findIndex(fn));
+const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
+const divide = curry2((n, m) => n / m);
+const always = (s) => () => s;
+const identity = (s) => s;
+const trim = (s) => s.trim();
+const last = (s) => s[length(s) - 1];
+/** @param start string | any[] @param s string | any[] */
+const startsWith = qstartsWithWith((x, y) => equals(x, y));
+const not = (x) => !x;
+const keys = (o) => Object.keys(o);
+const values = (o) => Object.values(o);
+const toPairs = (o) => Object.entries(o);
+const test = curry2((re, s) => re.test(s));
+const tap = curry2((fn, x) => { fn(x); return x; });
+const append = curry2((x, xs) => [...xs, x]);
+const prepend = curry2((x, xs) => [...xs, x]);
+const flat = (xs) => xs.flat(inf);
+const flatShallow = (xs) => xs.flat();
+const flatTo = curry2((depth, xs) => xs.flat(depth));
+const split = curry2((s, xs) => xs.split(s));
+const T = always(true);
+const F = always(false);
+const callWith = curry2((args, fn) => fn(...args));
+const noop = (() => { });
+/** Calls a func from object.
+ * @param {any[]} [args] - arguments for the function.
+ * @param {string} [fnName] - property name of the function.
+ * @param {AnyObject} [o] - the object with the function. */
+const callFrom = curry((args, fn, o) => o[fn](...args));
+const complement = (fn) => (...args) => {
+    const out = fn(...args);
+    const f = isFunc(out);
+    return !f || f && out.$args_left <= 0 ? not(out) : complement(out);
+};
+const sizeof = (s) => {
+    if (type(s) === 'Object') {
+        let len = 0;
+        for (let _k in s)
+            len++;
+        return len;
+    }
+    else
+        return length(s);
+};
+const range = curry2((from, to) => genBy(add(from), to - from));
+/** @param xs any[] @returns xs without duplicates.  */
+const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
+const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
+const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
+const once = (fn) => {
+    let done = false, cache;
+    return (...args) => {
+        if (done)
+            return cache;
+        done = true;
+        return cache = fn(...args);
+    };
+};
+const reverse = (xs) => compose((ln) => reduce((nxs, _, i) => qappend(xs[ln - i], nxs), [], xs), add(-1), length)(xs);
+const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
+const cond = curry2((pairs, s) => {
+    for (const [cond, fn] of pairs)
+        if (cond(s))
+            return fn(s);
+});
+/** Assigns a prop to an object.
+ * @param prop string
+ * @param value any
+ * @param object AnyObject
+ */
+const assoc = curry3((prop, v, obj) => ({ ...obj, [prop]: v }));
+const assocPath = curry3((_path, v, o) => compose((first) => assoc(first, length(_path) < 2
+    ? v
+    : assocPath(slice(1, inf, _path), v, isObj(o[first]) ? o[first] : {}), o), head)(_path));
+const all = curry2((pred, xs) => xs.every(pred));
+const any = curry2((pred, xs) => xs.some(pred));
+const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
+const anyPass = curry2((preds, x) => preds.some((pred) => pred(x)));
+/** @param key string @param o AnyObject @returns o[key] */
+const prop = curry2((key, o) => o[key]);
+/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
+const propEq = curry3((key, value, o) => equals(o[key], value));
+/** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
+const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));
+const pathOr = curry3((_default, path, o) => length(path)
+    ? isNil(o)
+        ? _default
+        : compose((k) => k in o ? pathOr(_default, slice(1, inf, path), o[k]) : _default, head)(path)
+    : o);
+const path = pathOr(undef);
+const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
+const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
+const pathExists = compose(ifElse(equals(symbol), F, T), pathOr(symbol));
+const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
+const clone = (s, shallow = false) => {
+    const t = type(s);
+    switch (t) {
+        case 'Null': return s;
+        case 'Array': return shallow ? [...s] : map(compose(clone, take(0)), s);
+        case 'Object':
+            if (shallow)
+                return { ...s };
+            const out = {};
+            for (let k in s)
+                out[k] = clone(s[k]);
+            return out;
+        case 'String':
+        case 'Number':
+        case 'Boolean':
+        case 'Symbol':
+            return s;
+        default:
+            return typed_arr_re.test(t) ? s.constructor.from(s) : s;
+    }
+};
+const cloneShallow = (s) => clone(s, true);
+const freeze = (o) => qfreeze(clone(o));
+const freezeShallow = (o) => qfreezeShallow(clone(o));
+/** types T1, T2
+ *  @param reducer (accum: T1, current: T2, index: number) => newAccum: T1
+ *  @param accum T1
+ *  @param array T2[]
+*/
+const reduce = curry3((reducer, accum, arr) => qreduce(reducer, clone(accum), arr));
+const pickBy = curry2((cond, o) => filter(cond, o));
+const pick = curry2((props, o) => {
+    const out = {};
+    for (const p of props)
+        if (p in o)
+            out[p] = o[p];
+    return out;
+});
+const omit = curry2((props, o) => filter((_, k) => !includes(k, props), o));
+const fromPairs = (pairs) => Object.fromEntries(pairs);
+const concat = curry2(((a, b) => b.concat(a)));
+const map = curry2((pipe, arr) => arr.map(pipe));
+const mapObj = curry2((pipe, o) => qmapObj(pipe, cloneShallow(o)));
+const join = curry2((delimeter, arr) => arr.join(delimeter));
+const forEach = curry2((pipe, arr) => arr.forEach(pipe));
+const both = curry3((cond1, cond2, s) => cond2(s) && cond1(s));
+const isEmpty = (s) => {
+    switch (type(s)) {
+        case 'String':
+        case 'Array': return length(s) == 0;
+        case 'Object':
+            for (const _k in s)
+                return false;
+            return true;
+        default: return null;
+    }
+};
+const empty = (s) => {
+    switch (type(s)) {
+        case 'String': return '';
+        case 'Object': return {};
+        case 'Array': return [];
+        default: return undef;
+    }
+};
+const replace = curry3((a, b, where
+// @ts-ignore Some bug with overload.
+) => where.replace(a, b));
+// FIXME: it thinks cond is a symbol in usage !!!
+const filter = curry2((cond, data) => isArray(data)
+    ? data.filter(cond)
+    : qfilter(cond, { ...data }));
+const memoize = (fn) => {
+    let cache;
+    let cached = false;
+    return () => cached ? cache : (cached = true, cache = fn());
+};
+const mergeShallow = curry2((o1, o2) => Object.assign({}, o1, o2));
+const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), clone(b)));
+const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), clone(b)));
+const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), clone(b)));
+const overProp = curry3((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
+/** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
+const zip = curry2((a, b) => map((s, i) => [s, b[i]], a));
+const zipObj = curry2((a, b) => reduce((ac, s, i) => assoc(s, b[i], ac), {}, a));
+// TODO: Tuple curried functions to replace these `AnyFuncs`.
+/** zips through a pipe. Types T1, T2, T3.
+ * @returns T3[]
+ * @param pipe (T1, T2) => T3
+ * @param a T1[]
+ * @param b T2[]
+ */
+const zipWith = curry3((pipe, a, b) => map((s, i) => pipe(s, b[i]), a));
+// ALIASES
+const mirror = identity;
+const reflect = identity;
+const echo = identity;
+const notf = complement;
+const push = append;
+const some = any;
+
+const ecran = '\\';
+// TODO: make it splicy, not accumulatie by symbols.
+/** Supports ecrans: '\\{"json": {yes} \\}'
+  @returns get_tmpl(one{meme}two)({meme: 42}) -> one42two */
+const getTmpl = (tmpl) => {
+    const parts = [];
+    const keymap = [];
+    const len = tmpl.length;
+    let i = 0, s, ln, start = 0, open = false, hasEcran = head(tmpl), hasEcranNext = false, nextChar;
+    for (i = 0; i < len; i++) {
+        s = tmpl[i];
+        switch (s) {
+            case '{':
+                if (!hasEcran) {
+                    open = true;
+                    start = i;
+                    break;
+                }
+            case '}':
+                if (!hasEcran) {
+                    open = false;
+                    parts.push('');
+                    keymap.push(tmpl.slice(start + 1, i));
+                    break;
+                }
+            default:
+                nextChar = tmpl[i + 1];
+                hasEcranNext = s === ecran;
+                if (!open && (!hasEcranNext || nextChar !== '{' && nextChar !== '}')) {
+                    ln = parts.length - 1;
+                    if (ln < 0) {
+                        parts.push('');
+                        ln++;
+                    }
+                    parts[ln] += s;
+                }
+                hasEcran = hasEcranNext;
+                break;
+        }
+    }
+    return (data) => {
+        const out = [];
+        const ln = parts.length - 1;
+        for (const j in parts) {
+            i = +j;
+            out.push(parts[i]);
+            if (i !== ln)
+                out.push(path(keymap[i].split('.'), data));
+        }
+        return out.join('');
+    };
+};
+
+/** One promise waits for another. */
+const forEachSerial = (() => {
+    const pipe = async (fn, items, i) => {
+        if (i < items.length) {
+            await fn(items[i]);
+            await pipe(fn, items, ++i);
+        }
+    };
+    return curry2((fn, items) => pipe(fn, items, 0));
+})();
+/** Promise.all wrapper for functional pipelining. */
+const waitAll = (promises) => Promise.all(promises);
+/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
+ * @param {AnyFunc<Promise>} fn - function to wait.
+ * @param {T} s - any value to tap and return back
+ * @returns {T}
+ */
+const waitTap = curry2(async (fn, s) => { await fn(s); return s; });
+/** Waits for all promises mapped by the fn. */
+const forEachAsync = curry2((fn, items) => Promise.all(items.map(fn)));
+/** The same as compose, but waits for promises in chains and returns a Promise.  */
+const composeAsync = (() => {
+    const pipe = async (fns, input, i) => ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input);
+    return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
+})();
+
+exports.F = F;
+exports.T = T;
+exports.__ = __;
+exports.add = add;
+exports.all = all;
+exports.allPass = allPass;
+exports.always = always;
+exports.any = any;
+exports.anyPass = anyPass;
+exports.append = append;
+exports.assoc = assoc;
+exports.assocPath = assocPath;
+exports.bind = bind;
+exports.both = both;
+exports.callFrom = callFrom;
+exports.callWith = callWith;
+exports.clone = clone;
+exports.cloneShallow = cloneShallow;
+exports.complement = complement;
+exports.compose = compose;
+exports.composeAsync = composeAsync;
+exports.concat = concat;
+exports.cond = cond;
+exports.curry = curry;
+exports.curry2 = curry2;
+exports.curry3 = curry3;
+exports.divide = divide;
+exports.echo = echo;
+exports.empty = empty;
+exports.eq = eq;
+exports.equals = equals;
+exports.explore = explore;
+exports.filter = filter;
+exports.find = find;
+exports.findIndex = findIndex;
+exports.flat = flat;
+exports.flatShallow = flatShallow;
+exports.flatTo = flatTo;
+exports.flip = flip;
+exports.forEach = forEach;
+exports.forEachAsync = forEachAsync;
+exports.forEachSerial = forEachSerial;
+exports.freeze = freeze;
+exports.freezeShallow = freezeShallow;
+exports.fromPairs = fromPairs;
+exports.genBy = genBy;
+exports.getTmpl = getTmpl;
+exports.gt = gt;
+exports.gte = gte;
+exports.head = head;
+exports.identity = identity;
+exports.ifElse = ifElse;
+exports.includes = includes;
+exports.indexOf = indexOf;
+exports.intersection = intersection;
+exports.isEmpty = isEmpty;
+exports.isNil = isNil;
+exports.join = join;
+exports.keys = keys;
+exports.last = last;
+exports.length = length;
+exports.lt = lt;
+exports.lte = lte;
+exports.map = map;
+exports.mapKeys = mapKeys;
+exports.mapObj = mapObj;
+exports.memoize = memoize;
+exports.mergeDeep = mergeDeep;
+exports.mergeDeepAdd = mergeDeepAdd;
+exports.mergeDeepX = mergeDeepX;
+exports.mergeShallow = mergeShallow;
+exports.mirror = mirror;
+exports.multiply = multiply;
+exports.noop = noop;
+exports.not = not;
+exports.notf = notf;
+exports.nth = nth;
+exports.omit = omit;
+exports.once = once;
+exports.overProp = overProp;
+exports.path = path;
+exports.pathEq = pathEq;
+exports.pathExists = pathExists;
+exports.pathOr = pathOr;
+exports.pathsEq = pathsEq;
+exports.pick = pick;
+exports.pickBy = pickBy;
+exports.prepend = prepend;
+exports.prop = prop;
+exports.propEq = propEq;
+exports.propsEq = propsEq;
+exports.push = push;
+exports.qappend = qappend;
+exports.qassoc = qassoc;
+exports.qassocPath = qassocPath;
+exports.qempty = qempty;
+exports.qfilter = qfilter;
+exports.qfreeze = qfreeze;
+exports.qfreezeShallow = qfreezeShallow;
+exports.qmap = qmap;
+exports.qmapKeys = qmapKeys;
+exports.qmapObj = qmapObj;
+exports.qmergeDeep = qmergeDeep;
+exports.qmergeDeepAdd = qmergeDeepAdd;
+exports.qmergeDeepX = qmergeDeepX;
+exports.qmergeShallow = qmergeShallow;
+exports.qomit = qomit;
+exports.qprepend = qprepend;
+exports.qreduce = qreduce;
+exports.qreverse = qreverse;
+exports.qstartsWith = qstartsWith;
+exports.qstartsWithWith = qstartsWithWith;
+exports.range = range;
+exports.reduce = reduce;
+exports.reflect = reflect;
+exports.replace = replace;
+exports.reverse = reverse;
+exports.sizeof = sizeof;
+exports.slice = slice;
+exports.some = some;
+exports.sort = sort;
+exports.split = split;
+exports.startsWith = startsWith;
+exports.subtract = subtract;
+exports.symbol = symbol;
+exports.tail = tail;
+exports.take = take;
+exports.tap = tap;
+exports.test = test;
+exports.toLower = toLower;
+exports.toPairs = toPairs;
+exports.toUpper = toUpper;
+exports.trim = trim;
+exports.type = type;
+exports.typeIs = typeIs;
+exports.uncurry = uncurry;
+exports.uniq = uniq;
+exports.values = values;
+exports.waitAll = waitAll;
+exports.waitTap = waitTap;
+exports.weakEq = weakEq;
+exports.when = when;
+exports.zip = zip;
+exports.zipObj = zipObj;
+exports.zipWith = zipWith;
