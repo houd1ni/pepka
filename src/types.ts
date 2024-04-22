@@ -8,3 +8,4 @@ export type Curried<
   Args extends AnyArgs = AnyArgs,
   ReturnT = any
 > = (arg: Args[number]) => Curried<Args> | ReturnT
+export type BasicType = 'String'|'Object'|'Number'|'Symbol'|'Array'|'Null'|'Undefined'

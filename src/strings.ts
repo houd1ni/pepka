@@ -5,8 +5,8 @@ type StrTmpl = ((data: AnyObject) => string)
 const ecran = '\\'
 
 // TODO: make it splicy, not accumulatie by symbols.
-// Supports ecrans: '\{"json": {yes} \}'
-// get_tmpl(one{meme}two)({meme: 42}) -> one42two
+/** Supports ecrans: '\\{"json": {yes} \\}'
+  @returns get_tmpl(one{meme}two)({meme: 42}) -> one42two */
 export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
   const keymap: string[] = []

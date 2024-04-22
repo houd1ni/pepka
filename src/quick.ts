@@ -1,9 +1,8 @@
 import { curry2, curry3 } from "./curry"
-import { type } from "./common"
+import { includes, isNil, type, length, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj } from "./utils"
-import { includes, isNil } from "./safe"
-// TODO: qoverProp, qover array ?
+// TODO: qflat, qoverProp, qover array ?
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
@@ -91,7 +90,7 @@ export const qfilter = curry2(
   }
 )
 export const qempty = (o: AnyObject|any[]) => {
-  if(isArray(o)) o.splice(0) 
+  if(isArray(o)) o.splice(0)
   else for(const i in o) delete o[i]
   return o
 }
@@ -120,3 +119,5 @@ export const qomit = curry2(
     o
   )
 )
+/** @param start string | any[] @param s string | any[] */
+export const qstartsWith = qstartsWithWith(eq)

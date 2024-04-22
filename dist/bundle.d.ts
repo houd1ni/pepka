@@ -9,6 +9,7 @@ export type Reducer<T = any> = (accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
 export type TupleFn<ARG1 = any, ARG2 = any, Out = any> = (a: ARG1, b: ARG2) => Out;
 export type Curried<Args extends AnyArgs = AnyArgs, ReturnT = any> = (arg: Args[number]) => Curried<Args> | ReturnT;
+export type BasicType = "String" | "Object" | "Number" | "Symbol" | "Array" | "Null" | "Undefined";
 type Placeholder = symbol;
 export declare const __: Placeholder;
 export declare const curry: (fn: AnyFunc) => (...args: AnyArgs) => any;
@@ -25,27 +26,42 @@ export declare const uncurry: <Args extends any[] = any[], ReturnT = any>(fn: Cu
 export declare const symbol: unique symbol;
 export declare const toLower: (s: string) => string;
 export declare const toUpper: (s: string) => string;
-export declare const type: (s: any) => any;
+export declare const type: (s: any) => string;
 export declare const typeIs: {
 	(a: symbol, b: any): (a: string) => boolean;
 	(a: string, b: symbol): (b: any) => boolean;
 	(a: string): (b: any) => boolean;
 	(a: string, b: any): boolean;
 };
-export declare const take: (argN: number) => (...args: any[]) => any;
+declare const length$1: (s: any[] | string) => number;
+export declare const isNil: (s: any) => boolean;
 export declare const eq: {
 	(a: symbol, b: any): (a: any) => boolean;
 	(a: any, b: symbol): (b: any) => boolean;
 	(a: any): (b: any) => boolean;
 	(a: any, b: any): boolean;
 };
-export declare const weakEq: {
+export declare const equals: {
 	(a: symbol, b: any): (a: any) => boolean;
 	(a: any, b: symbol): (b: any) => boolean;
 	(a: any): (b: any) => boolean;
 	(a: any, b: any): boolean;
 };
-export declare const equals: {
+export declare const includes: {
+	(a: symbol, b: unknown[]): (a: unknown) => boolean;
+	(a: unknown, b: symbol): (b: unknown[]) => boolean;
+	(a: unknown): (b: unknown[]) => boolean;
+	(a: unknown, b: unknown[]): boolean;
+};
+/** @param start string | any[] @param s string | any[] */
+export declare const qstartsWithWith: (comparator: (x: any, y: any) => boolean) => {
+	(a: symbol, b: string | any[]): (a: string | any[]) => boolean;
+	(a: string | any[], b: symbol): (b: string | any[]) => boolean;
+	(a: string | any[]): (b: string | any[]) => boolean;
+	(a: string | any[], b: string | any[]): boolean;
+};
+export declare const take: (argN: number) => (...args: any[]) => any;
+export declare const weakEq: {
 	(a: symbol, b: any): (a: any) => boolean;
 	(a: any, b: symbol): (b: any) => boolean;
 	(a: any): (b: any) => boolean;
@@ -67,12 +83,6 @@ export declare const nth: {
 	(a: number): (b: string | unknown[]) => unknown;
 	(a: number, b: string | unknown[]): unknown;
 };
-export declare const includes: {
-	(a: symbol, b: unknown[]): (a: unknown) => boolean;
-	(a: unknown, b: symbol): (b: unknown[]) => boolean;
-	(a: unknown): (b: unknown[]) => boolean;
-	(a: unknown, b: unknown[]): boolean;
-};
 export declare const slice: (...args: AnyArgs) => any;
 export declare const flip: <T extends AnyFunc>(fn: T) => {
 	(a: symbol, b: Parameters<T>[0]): (a: Parameters<T>[1]) => any;
@@ -80,44 +90,53 @@ export declare const flip: <T extends AnyFunc>(fn: T) => {
 	(a: Parameters<T>[1]): (b: Parameters<T>[0]) => any;
 	(a: Parameters<T>[1], b: Parameters<T>[0]): any;
 };
+/** @returns first element of an array. */
 export declare const head: <T = any>(xs: T[] | string) => T;
+/** @returns last element of an array. */
 export declare const tail: any;
+/** @param a @param b @returns a+b  */
 export declare const add: {
 	(a: symbol, b: number): (a: number) => number;
 	(a: number, b: symbol): (b: number) => number;
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
+/** @param a @param b @returns b-a  */
 export declare const subtract: {
 	(a: symbol, b: number): (a: number) => number;
 	(a: number, b: symbol): (b: number) => number;
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
+/**@param a @param b @returns a*b  */
 export declare const multiply: {
 	(a: symbol, b: number): (a: number) => number;
 	(a: number, b: symbol): (b: number) => number;
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
+/** @param a @param b @returns a<b  */
 export declare const gt: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
 	(a: number): (b: number) => boolean;
 	(a: number, b: number): boolean;
 };
+/** @param a @param b @returns a>b  */
 export declare const lt: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
 	(a: number): (b: number) => boolean;
 	(a: number, b: number): boolean;
 };
+/** @param a @param b @returns a<=b  */
 export declare const gte: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
 	(a: number): (b: number) => boolean;
 	(a: number, b: number): boolean;
 };
+/** @param a @param b @returns a>=b  */
 export declare const lte: {
 	(a: symbol, b: number): (a: number) => boolean;
 	(a: number, b: symbol): (b: number) => boolean;
@@ -154,12 +173,17 @@ export declare const divide: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const isNil: (s: any) => boolean;
-declare const length$1: (s: any[] | string) => number;
 export declare const always: <T = any>(s: T) => () => T;
 export declare const identity: (s: any) => any;
 export declare const trim: (s: string) => string;
 export declare const last: (s: any[] | string) => any;
+/** @param start string | any[] @param s string | any[] */
+export declare const startsWith: {
+	(a: symbol, b: string | any[]): (a: string | any[]) => boolean;
+	(a: string | any[], b: symbol): (b: string | any[]) => boolean;
+	(a: string | any[]): (b: string | any[]) => boolean;
+	(a: string | any[], b: string | any[]): boolean;
+};
 type NotOverload = {
 	(x: true): false;
 	(x: false): true;
@@ -239,6 +263,7 @@ export declare const range: {
 	(a: number): (b: number) => any[];
 	(a: number, b: number): any[];
 };
+/** @param xs any[] @returns xs without duplicates.  */
 export declare const uniq: (xs: any[]) => any;
 export declare const intersection: {
 	(a: symbol, b: any[]): (a: any[]) => any[];
@@ -304,13 +329,16 @@ export declare const anyPass: {
 	(a: Cond[]): (b: any) => boolean;
 	(a: Cond[], b: any): boolean;
 };
+/** @param key string @param o AnyObject @returns o[key] */
 export declare const prop: {
 	(a: symbol, b: AnyObject): (a: string) => any;
 	(a: string, b: symbol): (b: AnyObject) => any;
 	(a: string): (b: AnyObject) => any;
 	(a: string, b: AnyObject): any;
 };
+/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
 export declare const propEq: (...args: AnyArgs) => any;
+/** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 export declare const propsEq: (...args: AnyArgs) => any;
 export declare const pathOr: any;
 export declare const path: any;
@@ -357,12 +385,6 @@ export declare const concat: {
 	(a: string | any[]): (b: string | any[]) => string | any[];
 	(a: string | any[], b: string | any[]): string | any[];
 };
-export declare const join: {
-	(a: symbol, b: string[]): (a: string) => string;
-	(a: string, b: symbol): (b: string[]) => string;
-	(a: string): (b: string[]) => string;
-	(a: string, b: string[]): string;
-};
 export declare const map: {
 	(a: symbol, b: any[]): (a: (s: any, i?: number, list?: any[]) => any) => any[];
 	(a: (s: any, i?: number, list?: any[]) => any, b: symbol): (b: any[]) => any[];
@@ -374,6 +396,12 @@ export declare const mapObj: {
 	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
 	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
 	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+};
+export declare const join: {
+	(a: symbol, b: string[]): (a: string) => string;
+	(a: string, b: symbol): (b: string[]) => string;
+	(a: string): (b: string[]) => string;
+	(a: string, b: string[]): string;
 };
 export declare const forEach: {
 	(a: symbol, b: any[]): (a: (s: any) => any) => void;
@@ -451,35 +479,6 @@ export declare const zipObj: {
  * @param b T2[]
  */
 export declare const zipWith: (...args: AnyArgs) => any;
-/** One promise waits for another. */
-export declare const forEachSerial: {
-	(a: symbol, b: any[]): (a: AnyFunc) => Promise<void>;
-	(a: AnyFunc, b: symbol): (b: any[]) => Promise<void>;
-	(a: AnyFunc): (b: any[]) => Promise<void>;
-	(a: AnyFunc, b: any[]): Promise<void>;
-};
-/** Promise.all wrapper for functional pipelining. */
-export declare const waitAll: (promises: Promise<any>[]) => Promise<any[]>;
-/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
- * @param {AnyFunc<Promise>} fn - function to wait.
- * @param {T} s - any value to tap and return back
- * @returns {T}
- */
-export declare const waitTap: {
-	(a: symbol, b: any): (a: AnyFunc) => Promise<any>;
-	(a: AnyFunc, b: symbol): (b: any) => Promise<any>;
-	(a: AnyFunc): (b: any) => Promise<any>;
-	(a: AnyFunc, b: any): Promise<any>;
-};
-/** Waits for all promises mapped by the fn. */
-export declare const forEachAsync: {
-	(a: symbol, b: any[]): (a: (item: any) => Promise<any>) => Promise<any[]>;
-	(a: (item: any) => Promise<any>, b: symbol): (b: any[]) => Promise<any[]>;
-	(a: (item: any) => Promise<any>): (b: any[]) => Promise<any[]>;
-	(a: (item: any) => Promise<any>, b: any[]): Promise<any[]>;
-};
-/** The same as compose, but waits for promises in chains and returns a Promise.  */
-export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (...input: any[]) => Promise<T>;
 export declare const mirror: (s: any) => any;
 export declare const reflect: (s: any) => any;
 export declare const echo: (s: any) => any;
@@ -563,8 +562,46 @@ export declare const qomit: {
 	(a: string[]): (b: AnyObject) => any[] | AnyObject;
 	(a: string[], b: AnyObject): any[] | AnyObject;
 };
+/** @param start string | any[] @param s string | any[] */
+export declare const qstartsWith: {
+	(a: symbol, b: string | any[]): (a: string | any[]) => boolean;
+	(a: string | any[], b: symbol): (b: string | any[]) => boolean;
+	(a: string | any[]): (b: string | any[]) => boolean;
+	(a: string | any[], b: string | any[]): boolean;
+};
 type StrTmpl = ((data: AnyObject) => string);
+/** Supports ecrans: '\\{"json": {yes} \\}'
+  @returns get_tmpl(one{meme}two)({meme: 42}) -> one42two */
 export declare const getTmpl: (tmpl: string) => StrTmpl;
+/** One promise waits for another. */
+export declare const forEachSerial: {
+	(a: symbol, b: any[]): (a: AnyFunc) => Promise<void>;
+	(a: AnyFunc, b: symbol): (b: any[]) => Promise<void>;
+	(a: AnyFunc): (b: any[]) => Promise<void>;
+	(a: AnyFunc, b: any[]): Promise<void>;
+};
+/** Promise.all wrapper for functional pipelining. */
+export declare const waitAll: (promises: Promise<any>[]) => Promise<any[]>;
+/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
+ * @param {AnyFunc<Promise>} fn - function to wait.
+ * @param {T} s - any value to tap and return back
+ * @returns {T}
+ */
+export declare const waitTap: {
+	(a: symbol, b: any): (a: AnyFunc) => Promise<any>;
+	(a: AnyFunc, b: symbol): (b: any) => Promise<any>;
+	(a: AnyFunc): (b: any) => Promise<any>;
+	(a: AnyFunc, b: any): Promise<any>;
+};
+/** Waits for all promises mapped by the fn. */
+export declare const forEachAsync: {
+	(a: symbol, b: any[]): (a: (item: any) => Promise<any>) => Promise<any[]>;
+	(a: (item: any) => Promise<any>, b: symbol): (b: any[]) => Promise<any[]>;
+	(a: (item: any) => Promise<any>): (b: any[]) => Promise<any[]>;
+	(a: (item: any) => Promise<any>, b: any[]): Promise<any[]>;
+};
+/** The same as compose, but waits for promises in chains and returns a Promise.  */
+export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (...input: any[]) => Promise<T>;
 
 export {
 	length$1 as length,

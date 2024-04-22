@@ -1,28 +1,12 @@
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, isUndef, undef, isNull, isArray, isFunc, isStr, isObj, inf } from './utils'
+import { isNum, undef, isNull, isArray, isFunc, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
-import { symbol, type } from './common'
+import { symbol, type, length, equals, includes, isNil, qstartsWithWith } from './common'
 // over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
-export const eq = curry2((a: any, b: any) => a===b)
 export const weakEq = curry2((a: any, b: any) => a==b)
-export const equals = curry2((a: any, b: any) => {
-  const typea = type(a)
-  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array'))) {
-    if(isNull(a) || isNull(b)) return eq(a, b)
-    if(eq(a, b)) return true
-    for(const v of [a, b])
-      for(const k in v)
-        if(
-          !((eq(v, b)) && (k in a)) &&
-          !((eq(v, a)) && (k in b) && equals(a[k], b[k]))
-        ) return false
-    return true
-  }
-  return eq(a, b)
-})
 export const ifElse = curry(
   (
     cond: (s: any) => boolean,
@@ -58,15 +42,6 @@ export const bind = curry2<AnyFunc>(
   (fn: AnyFunc, context: any) => fn.bind(context)
 )
 export const nth = curry2(<T=any>(i: number, data: T[] | string) => data[i])
-export const includes = curry2(
-  <T>(s: T, ss: T[]) => {
-    if(isStr(ss)) return ss.includes(s)
-    else {
-      for(const a of ss) if(equals(a, s)) return true
-      return false
-    }
-  }
-)
 export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
@@ -74,26 +49,35 @@ export const slice = curry3(
 export const flip = <T extends AnyFunc>(fn: T) => curry2(
   (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
 )
+/** @returns first element of an array. */
 export const head = nth(0) as <T = any>(xs: T[] | string) => T
+/** @returns last element of an array. */
 export const tail = slice(1, inf)
-export const add = curry2((n: number, m: number) => n+m)
-export const subtract = curry2((n: number, m: number) => m-n)
-export const multiply = curry2((n: number, m: number) => n*m)
-export const gt = curry2( (a: number, b: number) => a>b )
-export const lt = curry2( (a: number, b: number) => a<b )
-export const gte = curry2( (a: number, b: number) => b>=a )
-export const lte = curry2( (a: number, b: number) => b<=a )
+/** @param a @param b @returns a+b  */
+export const add = curry2((a: number, b: number) => a+b)
+/** @param a @param b @returns b-a  */
+export const subtract = curry2((a: number, b: number) => b-a)
+/**@param a @param b @returns a*b  */
+export const multiply = curry2((a: number, b: number) => a*b)
+/** @param a @param b @returns a<b  */
+export const gt = curry2( (a: number, b: number) => a<b )
+/** @param a @param b @returns a>b  */
+export const lt = curry2( (a: number, b: number) => a>b )
+/** @param a @param b @returns a<=b  */
+export const gte = curry2( (a: number, b: number) => a<=b )
+/** @param a @param b @returns a>=b  */
+export const lte = curry2( (a: number, b: number) => a>=b )
 export const sort = curry2((sortFn: any, xs: any[]) => xs.sort(sortFn))
 export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
 export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
 export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
 export const divide = curry2((n: number, m: number) => n/m)
-export const isNil = (s: any) => isNull(s) || isUndef(s)
-export const length = (s: any[] | string) => s.length
 export const always = <T=any>(s: T) => () => s
 export const identity = (s: any) => s
 export const trim = (s: string) => s.trim()
 export const last = (s: any[] | string) => s[length(s)-1]
+/** @param start string | any[] @param s string | any[] */
+export const startsWith = qstartsWithWith((x: any, y: any) => equals(x, y))
 type NotOverload = {
   (x: true): false
   (x: false): true
@@ -139,13 +123,11 @@ export const sizeof = (s: any[] | string | AnyObject) => {
     return len
   } else return length(s as any[])
 }
-export const range = curry2((from: number, to: number) =>
-  genBy(add(from), to-from)
-)
-// TODO: make it using equals for deep stuff !
+export const range = curry2((from: number, to: number) => genBy(add(from), to-from))
+/** @param xs any[] @returns xs without duplicates.  */
 export const uniq = (xs: any[]) => qreduce(
   <T>(accum: any, x: T) =>
-    includes(x, accum) ? accum : qappend(x, accum),
+    find(equals(x), accum) ? accum : qappend(x, accum),
 [], xs)
 export const intersection = curry2(
   (xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2))
@@ -177,11 +159,7 @@ export const explore = (caption: string, level = 'log') => tap(
 )
 export const cond = curry2(
   (pairs: [Cond, Function][], s: any) => {
-    for(const [cond, fn] of pairs) {
-      if(cond(s)) {
-        return fn(s)
-      }
-    }
+    for(const [cond, fn] of pairs) if(cond(s)) return fn(s)
   }
 )
 /** Assigns a prop to an object.
@@ -190,10 +168,7 @@ export const cond = curry2(
  * @param object AnyObject
  */
 export const assoc = curry3(
-  (prop: string, v: any, obj: AnyObject) => ({
-    ...obj,
-    [prop]: v
-  })
+  (prop: string, v: any, obj: AnyObject) => ({...obj, [prop]: v})
 )
 export const assocPath = curry3(
   (_path: string[], v: any, o: AnyObject) => compose(
@@ -209,16 +184,15 @@ export const assocPath = curry3(
 )
 export const all = curry2((pred: Cond, xs: any[]) => xs.every(pred))
 export const any = curry2((pred: Cond, xs: any[]) => xs.some(pred))
-export const allPass = curry2(
-  (preds: Cond[], x: any) => preds.every((pred) => pred(x))
-)
-export const anyPass = curry2(
-  (preds: Cond[], x: any) => preds.some((pred) => pred(x))
-)
-export const prop = curry2( (key: string, o: AnyObject) => o[key] )
+export const allPass = curry2((preds: Cond[], x: any) => preds.every((pred) => pred(x)))
+export const anyPass = curry2((preds: Cond[], x: any) => preds.some((pred) => pred(x)))
+/** @param key string @param o AnyObject @returns o[key] */
+export const prop = curry2((key: string, o: AnyObject) => o[key])
+/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
 export const propEq = curry3(
   (key: string, value: any, o: AnyObject) => equals(o[key], value)
 )
+/** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 export const propsEq = curry3(
   (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 )
@@ -295,21 +269,15 @@ type Concat = ((a: string, b: string) => string)
 export const concat = curry2(
   ((a: any, b: string | any[]) => b.concat(a)) as Concat
 )
-export const join = curry2(
-  (delimeter: string, arr: string[]) => arr.join(delimeter)
-)
 export const map = curry2(
   (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => arr.map(pipe)
 )
 export const mapObj = curry2(
   (pipe: (s: any, i?: string, list?: any[]) => any, o: AnyObject) => qmapObj(pipe, cloneShallow(o))
 )
-export const forEach = curry2(
-  (pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe)
-)
-export const both = curry3(
-  (cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s)
-)
+export const join = curry2((delimeter: string, arr: string[]) => arr.join(delimeter))
+export const forEach = curry2((pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe))
+export const both = curry3((cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s))
 export const isEmpty = (s: any) => {
   switch(type(s)) {
     case 'String': case 'Array': return length(s)==0
@@ -392,40 +360,8 @@ export const zipWith = curry3(
     map((s: T1, i: number) => pipe(s, b[i]), a)
 )
 
-// ASYNCS
-
-/** One promise waits for another. */
-export const forEachSerial = (() => {
-  const pipe = async (fn: AnyFunc, items: any[], i: number) => {
-    if(i<items.length) {
-      await fn(items[i])
-      await pipe(fn, items, ++i)
-    }
-  }
-  return curry2(
-    (fn: AnyFunc, items: any[]) => pipe(fn, items, 0)
-  )
-})()
-/** Promise.all wrapper for functional pipelining. */
-export const waitAll = (promises: Promise<any>[]) => Promise.all(promises)
-/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
- * @param {AnyFunc<Promise>} fn - function to wait.
- * @param {T} s - any value to tap and return back
- * @returns {T}
- */
-export const waitTap = curry2(async (fn: AnyFunc, s: any) => { await fn(s); return s })
-/** Waits for all promises mapped by the fn. */
-export const forEachAsync = curry2(
-  (fn: (item: any) => Promise<any>, items: any[]) =>
-    Promise.all(items.map(fn))
-)
-/** The same as compose, but waits for promises in chains and returns a Promise.  */
-export const composeAsync = (() => {
-  const pipe = async (fns: AnyFunc[], input: any[], i: number): Promise<any> =>
-    ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input)
-  return <T = any>(...fns: AnyFunc[]) =>
-    (...input: any[]) => pipe(fns, input, fns.length-1) as Promise<T>
-})()
+// Reexport safe stuff that is ready to use externally. 
+export { toLower, toUpper, type, typeIs, length, isNil, eq, equals, includes } from './common'
 
 // ALIASES
 export const mirror = identity
