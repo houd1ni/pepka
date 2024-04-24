@@ -136,7 +136,7 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
-// TODO: qflat, qoverProp, qover array ?
+// TODO: qflat, qpick, qoverProp, qover array ?
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
@@ -339,6 +339,7 @@ const range = curry2((from, to) => genBy(add(from), to - from));
 /** @param xs any[] @returns xs without duplicates.  */
 const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
+const diff = curry2((xs1, xs2) => xs1.filter(complement(flip(includes)(xs2))));
 const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;
@@ -592,6 +593,7 @@ exports.cond = cond;
 exports.curry = curry;
 exports.curry2 = curry2;
 exports.curry3 = curry3;
+exports.diff = diff;
 exports.divide = divide;
 exports.echo = echo;
 exports.empty = empty;

@@ -271,6 +271,12 @@ export declare const intersection: {
 	(a: any[]): (b: any[]) => any[];
 	(a: any[], b: any[]): any[];
 };
+export declare const diff: {
+	(a: symbol, b: any[]): (a: any[]) => any[];
+	(a: any[], b: symbol): (b: any[]) => any[];
+	(a: any[]): (b: any[]) => any[];
+	(a: any[], b: any[]): any[];
+};
 export declare const genBy: {
 	(a: symbol, b: number): (a: (i: number) => any) => any[];
 	(a: (i: number) => any, b: symbol): (b: number) => any[];

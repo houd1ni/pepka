@@ -134,7 +134,7 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
-// TODO: qflat, qoverProp, qover array ?
+// TODO: qflat, qpick, qoverProp, qover array ?
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
@@ -337,6 +337,7 @@ const range = curry2((from, to) => genBy(add(from), to - from));
 /** @param xs any[] @returns xs without duplicates.  */
 const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
+const diff = curry2((xs1, xs2) => xs1.filter(complement(flip(includes)(xs2))));
 const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;
@@ -564,4 +565,4 @@ const composeAsync = (() => {
     return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
 })();
 
-export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, values, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };
+export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, values, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };

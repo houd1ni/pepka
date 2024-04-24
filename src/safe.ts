@@ -129,9 +129,8 @@ export const uniq = (xs: any[]) => qreduce(
   <T>(accum: any, x: T) =>
     find(equals(x), accum) ? accum : qappend(x, accum),
 [], xs)
-export const intersection = curry2(
-  (xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2))
-)
+export const intersection = curry2((xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2)))
+export const diff = curry2( (xs1: any[], xs2: any[]) => xs1.filter(complement(flip(includes)(xs2))) )
 export const genBy = curry2(
   (
     generator: (i: number) => any,
