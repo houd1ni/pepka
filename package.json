@@ -35,7 +35,6 @@
     "test": "npm run gentypes && npm run prod:es && ava",
     "test:report": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "test:lazy": "ava",
-    "dts-fix": "node dts-fix.js",
     "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
@@ -43,7 +42,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.4.2",
+  "version": "1.4.3",
   "ava": {
     "files": [
       "./test/specs/*.ts"

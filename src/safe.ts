@@ -131,11 +131,13 @@ export const uniq = (xs: any[]) => qreduce(
 [], xs)
 export const intersection = curry2((xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2)))
 export const diff = curry2((_xs1: any[], _xs2: any[]) => {
-  const len1 = length(_xs1)
-  const len2 = length(_xs2) // xs2 should be shorter 4 Set mem consumption.
-  const xs1 = len1>len2 ? _xs1 : _xs2
-  const xs2 = len1>len2 ? _xs2 : _xs1
-  const xset2 = new Set(xs2)
+  // BUG: if _xs1 is empty, results in [undefined, ...]
+  let len1 = length(_xs1)
+  let len2 = length(_xs2) // xs2 should be shorter 4 Set mem consumption.
+  const xs1 = len1>len2 ? _xs1 : _xs2 // ['qwe', 'qwe2'].
+  const xs2 = len1>len2 ? _xs2 : _xs1 // [].
+  if(len1<=len2) [len1, len2] = [len2, len1]
+  const xset2 = new Set(xs2) // empty set.
   const common = new Set()
   const out: any[] = []
   let i: number

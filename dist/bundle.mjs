@@ -341,11 +341,14 @@ const range = curry2((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
 const diff = curry2((_xs1, _xs2) => {
-    const len1 = length(_xs1);
-    const len2 = length(_xs2); // xs2 should be shorter 4 Set mem consumption.
-    const xs1 = len1 > len2 ? _xs1 : _xs2;
-    const xs2 = len1 > len2 ? _xs2 : _xs1;
-    const xset2 = new Set(xs2);
+    // BUG: if _xs1 is empty, results in [undefined, ...]
+    let len1 = length(_xs1);
+    let len2 = length(_xs2); // xs2 should be shorter 4 Set mem consumption.
+    const xs1 = len1 > len2 ? _xs1 : _xs2; // ['qwe', 'qwe2'].
+    const xs2 = len1 > len2 ? _xs2 : _xs1; // [].
+    if (len1 <= len2)
+        [len1, len2] = [len2, len1];
+    const xset2 = new Set(xs2); // empty set.
     const common = new Set();
     const out = [];
     let i;
