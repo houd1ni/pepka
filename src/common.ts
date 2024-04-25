@@ -1,5 +1,4 @@
 import { curry2 } from "./curry"
-import { BasicType } from "./types"
 import { to, isNull, isStr, isUndef } from "./utils"
 
 // It's faster that toUpperCase() !

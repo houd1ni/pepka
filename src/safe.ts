@@ -57,15 +57,15 @@ export const tail = slice(1, inf)
 export const add = curry2((a: number, b: number) => a+b)
 /** @param a @param b @returns b-a  */
 export const subtract = curry2((a: number, b: number) => b-a)
-/**@param a @param b @returns a*b  */
+/**@param a @param b @returns a×b  */
 export const multiply = curry2((a: number, b: number) => a*b)
 /** @param a @param b @returns a<b  */
 export const gt = curry2( (a: number, b: number) => a<b )
 /** @param a @param b @returns a>b  */
 export const lt = curry2( (a: number, b: number) => a>b )
-/** @param a @param b @returns a<=b  */
+/** @param a @param b @returns a≤b  */
 export const gte = curry2( (a: number, b: number) => a<=b )
-/** @param a @param b @returns a>=b  */
+/** @param a @param b @returns a≥b  */
 export const lte = curry2( (a: number, b: number) => a>=b )
 export const sort = curry2((sortFn: any, xs: any[]) => xs.sort(sortFn))
 export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
@@ -107,9 +107,9 @@ export const F = always<false>(false) as (...args: any[]) => false
 export const callWith = curry2((args: any[], fn: AnyFunc) => fn(...args))
 export const noop = (()=>{}) as (...args: any[]) => any
 /** Calls a func from object.
- * @param {any[]} [args] - arguments for the function.
- * @param {string} [fnName] - property name of the function.
- * @param {AnyObject} [o] - the object with the function. */
+ * @param {any[]} args - arguments for the function.
+ * @param {string} fnName - property name of the function.
+ * @param {AnyObject} o - the object with the function. */
 export const callFrom = curry((args: any[], fn: string, o: AnyObject) => o[fn](...args))
 export const complement = (fn: AnyFunc) => (...args: any) => {
   const out = fn(...args)
@@ -130,7 +130,26 @@ export const uniq = (xs: any[]) => qreduce(
     find(equals(x), accum) ? accum : qappend(x, accum),
 [], xs)
 export const intersection = curry2((xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2)))
-export const diff = curry2( (xs1: any[], xs2: any[]) => xs1.filter(complement(flip(includes)(xs2))) )
+export const diff = curry2((_xs1: any[], _xs2: any[]) => {
+  const len1 = length(_xs1)
+  const len2 = length(_xs2) // xs2 should be shorter 4 Set mem consumption.
+  const xs1 = len1>len2 ? _xs1 : _xs2
+  const xs2 = len1>len2 ? _xs2 : _xs1
+  const xset2 = new Set(xs2)
+  const common = new Set()
+  const out: any[] = []
+  let i: number
+  for(i=0; i<len1; i++) {
+    const el = xs1[i]
+    if(xset2.has(el)) common.add(el)
+    else out.push(el)
+  }
+  for(i=0; i<len2; i++) {
+    const el = xs2[i]
+    if(!common.has(el)) out.push(el)
+  }
+  return out
+})
 export const genBy = curry2(
   (
     generator: (i: number) => any,

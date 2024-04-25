@@ -136,7 +136,10 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
-// TODO: qflat, qpick, qoverProp, qover array ?
+// TODO: qoverProp, qover array ?
+/** Then next fns seem to be excess due to their safe ver performance should be the same or better:
+ * qflat, qpick
+ */
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
@@ -278,15 +281,15 @@ const tail = slice(1, inf);
 const add = curry2((a, b) => a + b);
 /** @param a @param b @returns b-a  */
 const subtract = curry2((a, b) => b - a);
-/**@param a @param b @returns a*b  */
+/**@param a @param b @returns a×b  */
 const multiply = curry2((a, b) => a * b);
 /** @param a @param b @returns a<b  */
 const gt = curry2((a, b) => a < b);
 /** @param a @param b @returns a>b  */
 const lt = curry2((a, b) => a > b);
-/** @param a @param b @returns a<=b  */
+/** @param a @param b @returns a≤b  */
 const gte = curry2((a, b) => a <= b);
-/** @param a @param b @returns a>=b  */
+/** @param a @param b @returns a≥b  */
 const lte = curry2((a, b) => a >= b);
 const sort = curry2((sortFn, xs) => xs.sort(sortFn));
 const find = curry2((fn, s) => s.find(fn));
@@ -316,9 +319,9 @@ const F = always(false);
 const callWith = curry2((args, fn) => fn(...args));
 const noop = (() => { });
 /** Calls a func from object.
- * @param {any[]} [args] - arguments for the function.
- * @param {string} [fnName] - property name of the function.
- * @param {AnyObject} [o] - the object with the function. */
+ * @param {any[]} args - arguments for the function.
+ * @param {string} fnName - property name of the function.
+ * @param {AnyObject} o - the object with the function. */
 const callFrom = curry((args, fn, o) => o[fn](...args));
 const complement = (fn) => (...args) => {
     const out = fn(...args);
@@ -339,7 +342,29 @@ const range = curry2((from, to) => genBy(add(from), to - from));
 /** @param xs any[] @returns xs without duplicates.  */
 const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
-const diff = curry2((xs1, xs2) => xs1.filter(complement(flip(includes)(xs2))));
+const diff = curry2((_xs1, _xs2) => {
+    const len1 = length(_xs1);
+    const len2 = length(_xs2); // xs2 should be shorter 4 Set mem consumption.
+    const xs1 = len1 > len2 ? _xs1 : _xs2;
+    const xs2 = len1 > len2 ? _xs2 : _xs1;
+    const xset2 = new Set(xs2);
+    const common = new Set();
+    const out = [];
+    let i;
+    for (i = 0; i < len1; i++) {
+        const el = xs1[i];
+        if (xset2.has(el))
+            common.add(el);
+        else
+            out.push(el);
+    }
+    for (i = 0; i < len2; i++) {
+        const el = xs2[i];
+        if (!common.has(el))
+            out.push(el);
+    }
+    return out;
+});
 const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;

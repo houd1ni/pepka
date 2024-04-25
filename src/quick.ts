@@ -2,7 +2,11 @@ import { curry2, curry3 } from "./curry"
 import { includes, isNil, type, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj } from "./utils"
-// TODO: qflat, qpick, qoverProp, qover array ?
+// TODO: qoverProp, qover array ?
+
+/** Then next fns seem to be excess due to their safe ver performance should be the same or better:
+ * qflat, qpick
+ */
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
