@@ -332,11 +332,23 @@ export const filter = curry2(
     ? data.filter(cond)
     : qfilter(cond, {...data})
 )
-export const memoize = (fn: Function) => {
-  let cache: any
-  let cached = false
-  return () => cached ? cache : (cached = true, cache = fn())
-}
+/** Saves result of a function with given key and avoids calling it again.
+ * @param {(...args: Args) string} keyGen that takes the same args and returns a key for the cache.
+ * @param {(...args: Args) any} fn to be cached.
+*/
+export const memoize = curry2(<Args extends any[]>(
+  keyGen: (...args: Args) => string,
+  fn: AnyFunc<any, Args>
+) => {
+  const cache: {[key in string]: ReturnType<typeof fn>} = {}
+  return (...args: Args): ReturnType<typeof fn> => {
+    const key = keyGen(...args)
+    if(key in cache) return cache[key]
+    const res = fn(...args)
+    cache[key] = res
+    return res
+  }
+})
 export const mergeShallow = curry2(
   (o1: AnyObject, o2: AnyObject): AnyObject =>
     Object.assign({}, o1, o2)

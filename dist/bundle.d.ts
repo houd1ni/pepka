@@ -425,7 +425,16 @@ export declare const filter: {
 	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any;
 	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any;
 };
-export declare const memoize: (fn: Function) => () => any;
+/** Saves result of a function with given key and avoids calling it again.
+ * @param {(...args: Args) string} keyGen that takes the same args and returns a key for the cache.
+ * @param {(...args: Args) any} fn to be cached.
+*/
+export declare const memoize: {
+	(a: symbol, b: AnyFunc<any, any[]>): (a: (...args: any[]) => string) => (...args: any[]) => any;
+	(a: (...args: any[]) => string, b: symbol): (b: AnyFunc<any, any[]>) => (...args: any[]) => any;
+	(a: (...args: any[]) => string): (b: AnyFunc<any, any[]>) => (...args: any[]) => any;
+	(a: (...args: any[]) => string, b: AnyFunc<any, any[]>): (...args: any[]) => any;
+};
 export declare const mergeShallow: {
 	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
 	(a: AnyObject, b: symbol): (b: AnyObject) => AnyObject;

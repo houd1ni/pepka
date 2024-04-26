@@ -484,11 +484,21 @@ const replace = curry3((a, b, where
 const filter = curry2((cond, data) => isArray(data)
     ? data.filter(cond)
     : qfilter(cond, { ...data }));
-const memoize = (fn) => {
-    let cache;
-    let cached = false;
-    return () => cached ? cache : (cached = true, cache = fn());
-};
+/** Saves result of a function with given key and avoids calling it again.
+ * @param {(...args: Args) string} keyGen that takes the same args and returns a key for the cache.
+ * @param {(...args: Args) any} fn to be cached.
+*/
+const memoize = curry2((keyGen, fn) => {
+    const cache = {};
+    return (...args) => {
+        const key = keyGen(...args);
+        if (key in cache)
+            return cache[key];
+        const res = fn(...args);
+        cache[key] = res;
+        return res;
+    };
+});
 const mergeShallow = curry2((o1, o2) => Object.assign({}, o1, o2));
 const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), clone(b)));
 const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), clone(b)));
