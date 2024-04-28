@@ -2,8 +2,6 @@ import { curry2, curry3 } from "./curry"
 import { includes, isNil, type, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj } from "./utils"
-// TODO: qoverProp, qover array ?
-
 /** Then next fns seem to be excess due to their safe ver performance should be the same or better:
  * qflat, qpick
  */
@@ -12,7 +10,7 @@ export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
 export const qreduce = curry3(<T>(fn: Reducer, accum: any, arr: T[]) => arr.reduce(fn, accum))
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObject => {
+const mergeDeep = (strategy: 1|2|3) => curry2((o1: AnyObject, o2: AnyObject): AnyObject => {
   for(let k in o2) {
     switch(type(o2[k])) {
       case 'Array':
@@ -21,7 +19,7 @@ const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObj
             case 2:
               const o1k = o1[k], o2k = o2[k]
               for(const i in o2k)
-                if(o1k[i]) mergeDeep(strategy, o1k[i], o2k[i])
+                if(o1k[i]) mergeDeep(strategy)(o1k[i], o2k[i])
                 else o1k[i] = o2k[i]
               break
             case 3: o1[k].push(...o2[k])
@@ -31,7 +29,7 @@ const mergeDeep = curry3((strategy: 1|2|3, o1: AnyObject, o2: AnyObject): AnyObj
         break
       case 'Object':
         if(type(o1[k])==='Object') {
-          mergeDeep(strategy, o1[k], o2[k])
+          mergeDeep(strategy)(o1[k], o2[k])
           break
         }
       default:
@@ -65,7 +63,7 @@ export const qmapKeys = curry2(
 )
 export const qmap = curry2(
   (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => {
-    for(let i in arr) arr[i] = pipe(arr[i], +i, arr)
+    for(const i in arr) arr[i] = pipe(arr[i], +i, arr)
     return arr
   }
 )
@@ -93,10 +91,10 @@ export const qfilter = curry2(
     return data
   }
 )
-export const qempty = (o: AnyObject|any[]) => {
+export const qempty = <T extends AnyObject|any[]>(o: T): T extends any[] ? [] : {} => {
   if(isArray(o)) o.splice(0)
   else for(const i in o) delete o[i]
-  return o
+  return o as any
 }
 export const qfreeze = <T extends AnyObject>(o: T): Readonly<T> => {
   let v: any
@@ -125,3 +123,8 @@ export const qomit = curry2(
 )
 /** @param start string | any[] @param s string | any[] */
 export const qstartsWith = qstartsWithWith(eq)
+/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+export const qoverProp = curry3(
+  (prop: string, pipe: AnyFunc, data: any) =>
+    qassoc(prop, pipe(data[prop]), data)
+)

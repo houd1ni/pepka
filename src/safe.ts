@@ -1,8 +1,9 @@
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, undef, isNull, isArray, isFunc, isObj, inf } from './utils'
+import { isNum, undef, isArray, isFunc, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { symbol, type, length, equals, includes, isNil, qstartsWithWith } from './common'
+import { Split, AnyArray, IndexesOfArray } from './internal_types'
 // over, lensProp
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
@@ -38,10 +39,8 @@ export const compose = (
       return s as any as TOut
     }
 )
-export const bind = curry2<AnyFunc>(
-  (fn: AnyFunc, context: any) => fn.bind(context)
-)
-export const nth = curry2(<T=any>(i: number, data: T[] | string) => data[i])
+export const bind = curry2<AnyFunc>((fn: AnyFunc, context: any) => fn.bind(context))
+export const nth = curry2((i: number, data: any[] | string) => data[i])
 export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
@@ -49,10 +48,42 @@ export const slice = curry3(
 export const flip = <T extends AnyFunc>(fn: T) => curry2(
   (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
 )
-/** @returns first element of an array. */
-export const head = nth(0) as <T = any>(xs: T[] | string) => T
-/** @returns last element of an array. */
-export const tail = slice(1, inf)
+type FirstChar<T extends string> = T extends `${infer First}${string}`
+  ? Split<T>['length'] extends 1 ? T : FirstChar<First>
+  : T
+type HeadOverload = {
+  <T extends string>(s: T): FirstChar<T>
+  <T extends readonly any[]>(s: T): T extends Array<0> ? undefined
+    : T extends readonly [infer U, ...any[]] ? U
+      : T extends (infer Y)[] ? Y : any
+  <T extends any>(s: T[]): null
+}
+/** @returns first element of an array or a string. */
+export const head = nth(0) as HeadOverload
+type Tail<T extends string> = T extends `${string}${infer Tail}`
+  ? Tail : T extends '' ? '' : string
+type TailOverload = {
+  <T extends string>(s: T): Tail<T>
+  <T extends readonly any[]>(s: T): T extends Array<0> ? []
+    : T extends readonly [any, ...infer U] ? U : T
+  <T extends any>(s: T[]): null
+}
+/** @returns last element of an array or a string. */
+export const tail = slice(1, inf) as TailOverload
+type LastChar<T extends string> = T extends `${string}${infer Rest}`
+  ? (Split<T>['length'] extends 1 ? T : LastChar<Rest>) : T
+type LastOverload = {
+  <T extends string>(s: T): LastChar<T>
+  <T extends readonly any[]>(s: T): T extends Array<0>
+    ? undefined
+    : T extends readonly [...any[], infer U] ? U
+      : T extends (infer Y)[] ? Y : any
+  <T extends any>(s: T[]): null
+}
+/** Returns last element of an array, readonly array or a string.
+ * @param s Array to extract that element.
+ * @returns undefined if s is empty or last element. */
+export const last: LastOverload = (s: string | AnyArray) => s[length(s)-1]
 /** @param a @param b @returns a+b  */
 export const add = curry2((a: number, b: number) => a+b)
 /** @param a @param b @returns b-a  */
@@ -67,15 +98,15 @@ export const lt = curry2( (a: number, b: number) => a>b )
 export const gte = curry2( (a: number, b: number) => a<=b )
 /** @param a @param b @returns a≥b  */
 export const lte = curry2( (a: number, b: number) => a>=b )
-export const sort = curry2((sortFn: any, xs: any[]) => xs.sort(sortFn))
+export const sort = curry2((sortFn: (a: any, b: any) => number , xs: any[]) => xs.sort(sortFn))
 export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
 export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
 export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
-export const divide = curry2((n: number, m: number) => n/m)
+export const divide = curry2((a: number, b: number) => b/a)
 export const always = <T=any>(s: T) => () => s
-export const identity = (s: any) => s
+export const identity = <T=any>(s: T) => s
 export const trim = (s: string) => s.trim()
-export const last = (s: any[] | string) => s[length(s)-1]
+
 /** @param start string | any[] @param s string | any[] */
 export const startsWith = qstartsWithWith((x: any, y: any) => equals(x, y))
 type NotOverload = {
@@ -84,14 +115,12 @@ type NotOverload = {
   (x: any): boolean
 }
 export const not: NotOverload = (x: any) => !x as any
-type IndexesOfArray<A> = Exclude<keyof A, keyof []>
 type KeysOverload = {
-  <T extends any[]>(o: T): string[]
   <T extends readonly any[]>(o: T): IndexesOfArray<T>[]
+  <T extends any[]>(o: T): string[]
   <T extends AnyObject>(o: T): (keyof T)[]
 }
-export const keys: KeysOverload = (o: number[]) => Object.keys(o)
-
+export const keys: KeysOverload = (o: any) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
@@ -131,13 +160,12 @@ export const uniq = (xs: any[]) => qreduce(
 [], xs)
 export const intersection = curry2((xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2)))
 export const diff = curry2((_xs1: any[], _xs2: any[]) => {
-  // BUG: if _xs1 is empty, results in [undefined, ...]
   let len1 = length(_xs1)
-  let len2 = length(_xs2) // xs2 should be shorter 4 Set mem consumption.
-  const xs1 = len1>len2 ? _xs1 : _xs2 // ['qwe', 'qwe2'].
-  const xs2 = len1>len2 ? _xs2 : _xs1 // [].
-  if(len1<=len2) [len1, len2] = [len2, len1]
-  const xset2 = new Set(xs2) // empty set.
+  let len2 = length(_xs2)
+  const xs1 = len1>len2 ? _xs1 : _xs2
+  const xs2 = len1>len2 ? _xs2 : _xs1
+  if(len1<len2) [len1, len2] = [len2, len1]
+  const xset2 = new Set(xs2)
   const common = new Set()
   const out: any[] = []
   let i: number
@@ -166,14 +194,10 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
     return cache = fn(...args)
   }
 }
-export const reverse = (xs: any[]) => compose(
-  <T>(ln: number) => reduce(
-    (nxs: T[], _: any, i: number) => qappend(xs[ln-i], nxs),
-    [], xs
-  ),
-  add(-1),
-  length
-)(xs)
+export const reverse = <T extends any>(xs: T[]): T[] => {
+  const ln = length(xs)-1
+  return map((_: any, i: number) => xs[ln-i], xs)
+}
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
 )
@@ -266,16 +290,15 @@ export const reduce = curry3(
   <T = any>(reducer: Reducer<T>, accum: T, arr: any[]) =>
     qreduce(reducer, clone(accum), arr)
 )
-export const pickBy = curry2(
-  (cond: Cond, o: AnyObject) => filter(cond, o)
-)
 export const pick = curry2(
   (props: string[], o: AnyObject) => {
     const out = {}
-    for(const p of props)
-      if(p in o) out[p] = o[p]
+    for(const p of props) if(p in o) out[p] = o[p]
     return out
   }
+)
+export const pickBy = curry2(
+  (cond: Cond, o: AnyObject) => compose(flip(pick)(o), qfilter(cond), keys)(o)
 )
 export const omit = curry2(
   (props: string[], o: AnyObject) => filter(
@@ -354,14 +377,15 @@ export const mergeShallow = curry2(
     Object.assign({}, o1, o2)
 )
 export const mergeDeep = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), clone(b)) as AnyObject
+  (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), b) as AnyObject
 )
 export const mergeDeepX = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeepX(clone(a), clone(b)) as AnyObject
+  (a: AnyObject, b: AnyObject) => qmergeDeepX(clone(a), b) as AnyObject
 )
 export const mergeDeepAdd = curry2(
-  (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), clone(b)) as AnyObject
+  (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), b) as AnyObject
 )
+/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
 export const overProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) =>
     assoc(prop, pipe(data[prop]), data)

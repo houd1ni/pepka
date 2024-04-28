@@ -134,7 +134,6 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
-// TODO: qoverProp, qover array ?
 /** Then next fns seem to be excess due to their safe ver performance should be the same or better:
  * qflat, qpick
  */
@@ -142,7 +141,7 @@ const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
 // strategy is for arrays: 1->clean, 2->merge, 3->push.
-const mergeDeep$1 = curry3((strategy, o1, o2) => {
+const mergeDeep$1 = (strategy) => curry2((o1, o2) => {
     for (let k in o2) {
         switch (type(o2[k])) {
             case 'Array':
@@ -152,7 +151,7 @@ const mergeDeep$1 = curry3((strategy, o1, o2) => {
                             const o1k = o1[k], o2k = o2[k];
                             for (const i in o2k)
                                 if (o1k[i])
-                                    mergeDeep$1(strategy, o1k[i], o2k[i]);
+                                    mergeDeep$1(strategy)(o1k[i], o2k[i]);
                                 else
                                     o1k[i] = o2k[i];
                             break;
@@ -163,7 +162,7 @@ const mergeDeep$1 = curry3((strategy, o1, o2) => {
                 break;
             case 'Object':
                 if (type(o1[k]) === 'Object') {
-                    mergeDeep$1(strategy, o1[k], o2[k]);
+                    mergeDeep$1(strategy)(o1[k], o2[k]);
                     break;
                 }
             default:
@@ -193,7 +192,7 @@ const qmapKeys = curry2((keyMap, o) => {
     return o;
 });
 const qmap = curry2((pipe, arr) => {
-    for (let i in arr)
+    for (const i in arr)
         arr[i] = pipe(arr[i], +i, arr);
     return arr;
 });
@@ -245,6 +244,8 @@ const qreverse = (arr) => arr.reverse();
 const qomit = curry2((props, o) => qfilter((_, k) => !includes(k, props), o));
 /** @param start string | any[] @param s string | any[] */
 const qstartsWith = qstartsWithWith(eq);
+/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+const qoverProp = curry3((prop, pipe, data) => qassoc(prop, pipe(data[prop]), data));
 
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
@@ -271,10 +272,14 @@ const bind = curry2((fn, context) => fn.bind(context));
 const nth = curry2((i, data) => data[i]);
 const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
 const flip = (fn) => curry2((b, a) => fn(a, b));
-/** @returns first element of an array. */
+/** @returns first element of an array or a string. */
 const head = nth(0);
-/** @returns last element of an array. */
+/** @returns last element of an array or a string. */
 const tail = slice(1, inf);
+/** Returns last element of an array, readonly array or a string.
+ * @param s Array to extract that element.
+ * @returns undefined if s is empty or last element. */
+const last = (s) => s[length(s) - 1];
 /** @param a @param b @returns a+b  */
 const add = curry2((a, b) => a + b);
 /** @param a @param b @returns b-a  */
@@ -293,11 +298,10 @@ const sort = curry2((sortFn, xs) => xs.sort(sortFn));
 const find = curry2((fn, s) => s.find(fn));
 const findIndex = curry2((fn, s) => s.findIndex(fn));
 const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
-const divide = curry2((n, m) => n / m);
+const divide = curry2((a, b) => b / a);
 const always = (s) => () => s;
 const identity = (s) => s;
 const trim = (s) => s.trim();
-const last = (s) => s[length(s) - 1];
 /** @param start string | any[] @param s string | any[] */
 const startsWith = qstartsWithWith((x, y) => equals(x, y));
 const not = (x) => !x;
@@ -341,14 +345,13 @@ const range = curry2((from, to) => genBy(add(from), to - from));
 const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
 const diff = curry2((_xs1, _xs2) => {
-    // BUG: if _xs1 is empty, results in [undefined, ...]
     let len1 = length(_xs1);
-    let len2 = length(_xs2); // xs2 should be shorter 4 Set mem consumption.
-    const xs1 = len1 > len2 ? _xs1 : _xs2; // ['qwe', 'qwe2'].
-    const xs2 = len1 > len2 ? _xs2 : _xs1; // [].
-    if (len1 <= len2)
+    let len2 = length(_xs2);
+    const xs1 = len1 > len2 ? _xs1 : _xs2;
+    const xs2 = len1 > len2 ? _xs2 : _xs1;
+    if (len1 < len2)
         [len1, len2] = [len2, len1];
-    const xset2 = new Set(xs2); // empty set.
+    const xset2 = new Set(xs2);
     const common = new Set();
     const out = [];
     let i;
@@ -376,7 +379,10 @@ const once = (fn) => {
         return cache = fn(...args);
     };
 };
-const reverse = (xs) => compose((ln) => reduce((nxs, _, i) => qappend(xs[ln - i], nxs), [], xs), add(-1), length)(xs);
+const reverse = (xs) => {
+    const ln = length(xs) - 1;
+    return map((_, i) => xs[ln - i], xs);
+};
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 const cond = curry2((pairs, s) => {
     for (const [cond, fn] of pairs)
@@ -442,7 +448,6 @@ const freezeShallow = (o) => qfreezeShallow(clone(o));
  *  @param array T2[]
 */
 const reduce = curry3((reducer, accum, arr) => qreduce(reducer, clone(accum), arr));
-const pickBy = curry2((cond, o) => filter(cond, o));
 const pick = curry2((props, o) => {
     const out = {};
     for (const p of props)
@@ -450,6 +455,7 @@ const pick = curry2((props, o) => {
             out[p] = o[p];
     return out;
 });
+const pickBy = curry2((cond, o) => compose(flip(pick)(o), qfilter(cond), keys)(o));
 const omit = curry2((props, o) => filter((_, k) => !includes(k, props), o));
 const fromPairs = (pairs) => Object.fromEntries(pairs);
 const concat = curry2(((a, b) => b.concat(a)));
@@ -500,9 +506,10 @@ const memoize = curry2((keyGen, fn) => {
     };
 });
 const mergeShallow = curry2((o1, o2) => Object.assign({}, o1, o2));
-const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), clone(b)));
-const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), clone(b)));
-const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), clone(b)));
+const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), b));
+const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), b));
+const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), b));
+/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
 const overProp = curry3((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
@@ -527,12 +534,12 @@ const some = any;
 const ecran = '\\';
 // TODO: make it splicy, not accumulatie by symbols.
 /** Supports ecrans: '\\{"json": {yes} \\}'
-  @returns get_tmpl(one{meme}two)({meme: 42}) -> one42two */
+  @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */
 const getTmpl = (tmpl) => {
     const parts = [];
     const keymap = [];
     const len = tmpl.length;
-    let i = 0, s, ln, start = 0, open = false, hasEcran = head(tmpl), hasEcranNext = false, nextChar;
+    let i = 0, s, ln, start = 0, open = false, hasEcran = false, hasEcranNext = false, nextChar;
     for (i = 0; i < len; i++) {
         s = tmpl[i];
         switch (s) {
@@ -603,4 +610,4 @@ const composeAsync = (() => {
     return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
 })();
 
-export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, values, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };
+export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, values, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };

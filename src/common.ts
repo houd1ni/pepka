@@ -1,4 +1,5 @@
 import { curry2 } from "./curry"
+import { AnyArray } from "./internal_types"
 import { to, isNull, isStr, isUndef } from "./utils"
 
 // It's faster that toUpperCase() !
@@ -14,7 +15,7 @@ export const type = (s: any): string => {
     : caseMap[t[0]] + t.slice(1)
 }
 export const typeIs = curry2((t: string, s: any) => type(s)===t)
-export const length = (s: any[] | string) => s.length
+export const length = (s: AnyArray | string) => s.length
 export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const eq = curry2((a: any, b: any) => a===b)
 export const equals = curry2((a: any, b: any) => {

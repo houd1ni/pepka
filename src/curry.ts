@@ -1,4 +1,5 @@
-import { AnyFunc, AnyArgs } from "./types"
+import { AnyArgs } from "./internal_types"
+import { AnyFunc } from "./types"
 
 type Placeholder = symbol
 export const __: Placeholder = Symbol('Placeholder')

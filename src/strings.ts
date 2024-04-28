@@ -6,13 +6,13 @@ const ecran = '\\'
 
 // TODO: make it splicy, not accumulatie by symbols.
 /** Supports ecrans: '\\{"json": {yes} \\}'
-  @returns get_tmpl(one{meme}two)({meme: 42}) -> one42two */
+  @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */
 export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
   const keymap: string[] = []
   const len = tmpl.length
   let i = 0, s: string, ln: number, start = 0, open = false,
-      hasEcran = head(tmpl), hasEcranNext = false, nextChar: string
+      hasEcran = false, hasEcranNext = false, nextChar: string
   for(i=0; i<len; i++) {
     s = tmpl[i]
     switch(s) {
