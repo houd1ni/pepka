@@ -2,12 +2,11 @@ import { __, curry, curry2, curry3 } from './curry'
 import { isNum, undef, isArray, isFunc, isObj, inf } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
-import { symbol, type, length, equals, includes, isNil, qstartsWithWith } from './common'
+import { symbol, type, length, equals, includes, isNil, qstartsWithWith, eq } from './common'
 import { Split, AnyArray, IndexesOfArray } from './internal_types'
-// over, lensProp
+// TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
-export const weakEq = curry2((a: any, b: any) => a==b)
 export const ifElse = curry(
   (
     cond: (s: any) => boolean,
@@ -103,8 +102,8 @@ export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
 export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
 export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
 export const divide = curry2((a: number, b: number) => b/a)
-export const always = <T=any>(s: T) => () => s
-export const identity = <T=any>(s: T) => s
+export const always = <T extends any>(s: T) => () => s
+export const identity = <T extends any>(s: T) => s
 export const trim = (s: string) => s.trim()
 
 /** @param start string | any[] @param s string | any[] */
@@ -153,11 +152,13 @@ export const sizeof = (s: any[] | string | AnyObject) => {
   } else return length(s as any[])
 }
 export const range = curry2((from: number, to: number) => genBy(add(from), to-from))
-/** @param xs any[] @returns xs without duplicates.  */
-export const uniq = (xs: any[]) => qreduce(
+/** @param cond (x, y): bool @param xs any[] @returns xs without duplicates, using cond as a comparator.  */
+export const uniqWith = curry2((cond: (x: any, y: any) => boolean, xs: any[]) => qreduce(
   <T>(accum: any, x: T) =>
-    find(equals(x), accum) ? accum : qappend(x, accum),
-[], xs)
+    find((y) => cond(x as any, y), accum) ? accum : qappend(x, accum),
+[], xs))
+/** @param xs any[] @returns xs without duplicates.  */
+export const uniq = uniqWith(equals)
 export const intersection = curry2((xs1: any[], xs2: any[]) => xs1.filter(flip(includes)(xs2)))
 export const diff = curry2((_xs1: any[], _xs2: any[]) => {
   let len1 = length(_xs1)
@@ -426,3 +427,4 @@ export const echo = identity
 export const notf = complement
 export const push = append
 export const some = any
+export const weakEq = eq

@@ -136,9 +136,9 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
-/** Then next fns seem to be excess due to their safe ver performance should be the same or better:
- * qflat, qpick
- */
+/* Then next fns seem to be excess due to their safe ver performance should be the same or better:
+* qflat, qpick
+*/
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
@@ -193,6 +193,7 @@ const qmapKeys = curry2((keyMap, o) => {
         }
     return o;
 });
+// FIXME: qmap(any, tags) -> some function!!!
 const qmap = curry2((pipe, arr) => {
     for (const i in arr)
         arr[i] = pipe(arr[i], +i, arr);
@@ -246,15 +247,15 @@ const qreverse = (arr) => arr.reverse();
 const qomit = curry2((props, o) => qfilter((_, k) => !includes(k, props), o));
 /** @param start string | any[] @param s string | any[] */
 const qstartsWith = qstartsWithWith(eq);
-/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+/** @param prop string @param pipe (data[prop]): prop_value @param data any
+ * @returns data with prop over pipe. */
 const qoverProp = curry3((prop, pipe, data) => qassoc(prop, pipe(data[prop]), data));
 
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
-// over, lensProp
+// TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
 const take = (argN) => (...args) => args[argN];
-const weakEq = curry2((a, b) => a == b);
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));
 const compose = ((...fns) => (...args) => {
@@ -343,8 +344,10 @@ const sizeof = (s) => {
         return length(s);
 };
 const range = curry2((from, to) => genBy(add(from), to - from));
+/** @param cond (x, y): bool @param xs any[] @returns xs without duplicates, using cond as a comparator.  */
+const uniqWith = curry2((cond, xs) => qreduce((accum, x) => find((y) => cond(x, y), accum) ? accum : qappend(x, accum), [], xs));
 /** @param xs any[] @returns xs without duplicates.  */
-const uniq = (xs) => qreduce((accum, x) => find(equals(x), accum) ? accum : qappend(x, accum), [], xs);
+const uniq = uniqWith(equals);
 const intersection = curry2((xs1, xs2) => xs1.filter(flip(includes)(xs2)));
 const diff = curry2((_xs1, _xs2) => {
     let len1 = length(_xs1);
@@ -532,6 +535,7 @@ const echo = identity;
 const notf = complement;
 const push = append;
 const some = any;
+const weakEq = eq;
 
 const ecran = '\\';
 // TODO: make it splicy, not accumulatie by symbols.
@@ -751,6 +755,7 @@ exports.type = type;
 exports.typeIs = typeIs;
 exports.uncurry = uncurry;
 exports.uniq = uniq;
+exports.uniqWith = uniqWith;
 exports.values = values;
 exports.waitAll = waitAll;
 exports.waitTap = waitTap;

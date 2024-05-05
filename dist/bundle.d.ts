@@ -9,6 +9,11 @@ type Split<S extends string> = S extends `${infer U}${infer V}` ? [
 ];
 type IndexesOfArray<A> = Exclude<keyof A, keyof [
 ]>;
+type StrLen<S extends string, Acc extends 0[] = [
+]> = S extends `${string}${infer Rest}` ? StrLen<Rest, [
+	...Acc,
+	0
+]> : Acc["length"];
 export type Cond = (x1?: any, x2?: any, x3?: any) => boolean;
 export interface AnyObject {
 	[k: string]: any;
@@ -39,7 +44,7 @@ export declare const typeIs: {
 	(a: string): (b: any) => boolean;
 	(a: string, b: any): boolean;
 };
-declare const length$1: (s: AnyArray | string) => number;
+declare const length$1: <T extends string | AnyArray>(s: T) => T extends string ? StrLen<T> : T["length"];
 export declare const isNil: (s: any) => boolean;
 export declare const eq: {
 	(a: symbol, b: any): (a: any) => boolean;
@@ -67,12 +72,6 @@ export declare const qstartsWithWith: (comparator: (x: any, y: any) => boolean) 
 	(a: string | any[], b: string | any[]): boolean;
 };
 export declare const take: (argN: number) => (...args: any[]) => any;
-export declare const weakEq: {
-	(a: symbol, b: any): (a: any) => boolean;
-	(a: any, b: symbol): (b: any) => boolean;
-	(a: any): (b: any) => boolean;
-	(a: any, b: any): boolean;
-};
 export declare const ifElse: (...args: AnyArgs) => any;
 export declare const when: (...args: AnyArgs) => any;
 type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut;
@@ -211,8 +210,8 @@ export declare const divide: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const always: <T = any>(s: T) => () => T;
-export declare const identity: <T = any>(s: T) => T;
+export declare const always: <T extends unknown>(s: T) => () => T;
+export declare const identity: <T extends unknown>(s: T) => T;
 export declare const trim: (s: string) => string;
 /** @param start string | any[] @param s string | any[] */
 export declare const startsWith: {
@@ -298,8 +297,15 @@ export declare const range: {
 	(a: number): (b: number) => any[];
 	(a: number, b: number): any[];
 };
+/** @param cond (x, y): bool @param xs any[] @returns xs without duplicates, using cond as a comparator.  */
+export declare const uniqWith: {
+	(a: symbol, b: any[]): (a: (x: any, y: any) => boolean) => any;
+	(a: (x: any, y: any) => boolean, b: symbol): (b: any[]) => any;
+	(a: (x: any, y: any) => boolean): (b: any[]) => any;
+	(a: (x: any, y: any) => boolean, b: any[]): any;
+};
 /** @param xs any[] @returns xs without duplicates.  */
-export declare const uniq: (xs: any[]) => any;
+export declare const uniq: (b: any[]) => any;
 export declare const intersection: {
 	(a: symbol, b: any[]): (a: any[]) => any[];
 	(a: any[], b: symbol): (b: any[]) => any[];
@@ -530,9 +536,9 @@ export declare const zipObj: {
  * @param b T2[]
  */
 export declare const zipWith: (...args: AnyArgs) => any;
-export declare const mirror: <T = any>(s: T) => T;
-export declare const reflect: <T = any>(s: T) => T;
-export declare const echo: <T = any>(s: T) => T;
+export declare const mirror: <T extends unknown>(s: T) => T;
+export declare const reflect: <T extends unknown>(s: T) => T;
+export declare const echo: <T extends unknown>(s: T) => T;
 export declare const notf: (fn: AnyFunc) => (...args: any) => boolean | any;
 export declare const push: {
 	(a: symbol, b: any[]): (a: any) => any[];
@@ -546,9 +552,12 @@ export declare const some: {
 	(a: Cond): (b: any[]) => boolean;
 	(a: Cond, b: any[]): boolean;
 };
-/** Then next fns seem to be excess due to their safe ver performance should be the same or better:
- * qflat, qpick
- */
+export declare const weakEq: {
+	(a: symbol, b: any): (a: any) => boolean;
+	(a: any, b: symbol): (b: any) => boolean;
+	(a: any): (b: any) => boolean;
+	(a: any, b: any): boolean;
+};
 export declare const qappend: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];
@@ -639,7 +648,8 @@ export declare const qstartsWith: {
 	(a: string | any[]): (b: string | any[]) => boolean;
 	(a: string | any[], b: string | any[]): boolean;
 };
-/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+/** @param prop string @param pipe (data[prop]): prop_value @param data any
+ * @returns data with prop over pipe. */
 export declare const qoverProp: (...args: AnyArgs) => any;
 type StrTmpl = ((data: AnyObject) => string);
 /** Supports ecrans: '\\{"json": {yes} \\}'

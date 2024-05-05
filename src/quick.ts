@@ -2,9 +2,9 @@ import { curry2, curry3 } from "./curry"
 import { includes, isNil, type, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj } from "./utils"
-/** Then next fns seem to be excess due to their safe ver performance should be the same or better:
- * qflat, qpick
- */
+/* Then next fns seem to be excess due to their safe ver performance should be the same or better:
+* qflat, qpick
+*/
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
@@ -61,6 +61,7 @@ export const qmapKeys = curry2(
     return o
   }
 )
+// FIXME: qmap(any, tags) -> some function!!!
 export const qmap = curry2(
   (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => {
     for(const i in arr) arr[i] = pipe(arr[i], +i, arr)
@@ -123,8 +124,8 @@ export const qomit = curry2(
 )
 /** @param start string | any[] @param s string | any[] */
 export const qstartsWith = qstartsWithWith(eq)
-/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+/** @param prop string @param pipe (data[prop]): prop_value @param data any
+ * @returns data with prop over pipe. */
 export const qoverProp = curry3(
-  (prop: string, pipe: AnyFunc, data: any) =>
-    qassoc(prop, pipe(data[prop]), data)
+  (prop: string, pipe: AnyFunc, data: any) => qassoc(prop, pipe(data[prop]), data)
 )
