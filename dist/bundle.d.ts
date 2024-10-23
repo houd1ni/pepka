@@ -15,8 +15,7 @@ type StrLen<S extends string, Acc extends 0[] = [
 	0
 ]> : Acc["length"];
 export type Cond = (x1?: any, x2?: any, x3?: any) => boolean;
-export interface AnyObject {
-	[k: string]: any;
+export interface AnyObject extends Record<any, any> {
 }
 export type Reducer<T = any> = (accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
@@ -439,10 +438,10 @@ export declare const map: {
 	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
 };
 export declare const mapObj: {
-	(a: symbol, b: AnyObject): (a: (s: any, i?: string, list?: any[]) => any) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
-	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
-	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
-	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): (b: AnyObject) => (a: (s: any, i?: number | undefined, list?: any[] | undefined) => any) => any[];
+	(a: symbol, b: AnyObject): (a: (s: any, i?: string, list?: any[]) => any) => (b: AnyObject) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (b: AnyObject) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => (b: AnyObject) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): (b: AnyObject) => AnyObject;
 };
 export declare const join: {
 	(a: symbol, b: string[]): (a: string) => string;
@@ -612,10 +611,10 @@ export declare const qmap: {
 	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
 };
 export declare const qmapObj: {
-	(a: symbol, b: AnyObject): (a: (s: any, k?: string, list?: any[]) => any) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
-	(a: (s: any, k?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
-	(a: (s: any, k?: string, list?: any[]) => any): (b: AnyObject) => (a: (s: any, i?: number, list?: any[]) => any) => any[];
-	(a: (s: any, k?: string, list?: any[]) => any, b: AnyObject): (a: (s: any, i?: number, list?: any[]) => any) => any[];
+	(a: symbol, b: AnyObject): (a: (s: any, k?: string, o?: AnyObject) => any) => AnyObject;
+	(a: (s: any, k?: string, o?: AnyObject) => any, b: symbol): (b: AnyObject) => AnyObject;
+	(a: (s: any, k?: string, o?: AnyObject) => any): (b: AnyObject) => AnyObject;
+	(a: (s: any, k?: string, o?: AnyObject) => any, b: AnyObject): AnyObject;
 };
 export declare const qfilter: {
 	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any[] | AnyObject;

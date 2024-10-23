@@ -69,7 +69,10 @@ export const qmap = curry2(
   }
 )
 export const qmapObj = curry2(
-  (pipe: (s: any, k?: string, list?: any[]) => any, o: AnyObject) => qmap(pipe as any, o as any[])
+  (pipe: (s: any, k?: string, o?: AnyObject) => any, o: AnyObject) => {
+    for(const k in o) o[k] = pipe(o[k], k, o)
+    return o
+  }
 )
 export const qfilter = curry2(
   <T extends any[] | AnyObject>(

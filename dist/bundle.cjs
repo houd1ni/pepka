@@ -199,7 +199,11 @@ const qmap = curry2((pipe, arr) => {
         arr[i] = pipe(arr[i], +i, arr);
     return arr;
 });
-const qmapObj = curry2((pipe, o) => qmap(pipe, o));
+const qmapObj = curry2((pipe, o) => {
+    for (const k in o)
+        o[k] = pipe(o[k], k, o);
+    return o;
+});
 const qfilter = curry2((cond, data) => {
     const isArr = isArray(data);
     let indicies_offset, indicies2rm;
