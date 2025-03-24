@@ -299,7 +299,7 @@ const lt = curry2((a, b) => a > b);
 const gte = curry2((a, b) => a <= b);
 /** @param a @param b @returns a≥b  */
 const lte = curry2((a, b) => a >= b);
-const sort = curry2((sortFn, xs) => xs.sort(sortFn));
+const sort = curry2((sortFn, xs) => xs.sort(sortFn)); // TODO: make it shallow cloning.
 const find = curry2((fn, s) => s.find(fn));
 const findIndex = curry2((fn, s) => s.findIndex(fn));
 const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
@@ -336,7 +336,7 @@ const complement = (fn) => (...args) => {
     return !f || f && out.$args_left <= 0 ? not(out) : complement(out);
 };
 const sizeof = (s) => {
-    if (type(s) === 'Object') {
+    if (isObj(s)) {
         let len = 0;
         for (let _k in s)
             len++;
@@ -592,6 +592,33 @@ const getTmpl = (tmpl) => {
     };
 };
 
+const debounce = (time, fn) => {
+    let queue = [];
+    let to;
+    return ((...args) => new Promise((ff) => {
+        clearTimeout(to);
+        to = setTimeout(async () => {
+            const res = await fn(...args);
+            for (ff of queue)
+                ff(res);
+            queue.splice(0);
+        }, time);
+        queue.push(ff);
+    }));
+};
+// export const debouncePrepared = 
+const throttle = (time, fn) => {
+    let on = true;
+    return (...args) => {
+        if (on) {
+            on = false;
+            setTimeout(() => on = true, time);
+            return fn(...args);
+        }
+    };
+};
+const wait = (time) => new Promise((ff) => setTimeout(ff, time));
+
 /** One promise waits for another. */
 const forEachSerial = (() => {
     const pipe = async (fn, items, i) => {
@@ -618,4 +645,4 @@ const composeAsync = (() => {
     return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
 })();
 
-export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqWith, values, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };
+export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, debounce, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qprepend, qreduce, qreverse, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, throttle, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqWith, values, wait, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };

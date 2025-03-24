@@ -301,7 +301,7 @@ const lt = curry2((a, b) => a > b);
 const gte = curry2((a, b) => a <= b);
 /** @param a @param b @returns a≥b  */
 const lte = curry2((a, b) => a >= b);
-const sort = curry2((sortFn, xs) => xs.sort(sortFn));
+const sort = curry2((sortFn, xs) => xs.sort(sortFn)); // TODO: make it shallow cloning.
 const find = curry2((fn, s) => s.find(fn));
 const findIndex = curry2((fn, s) => s.findIndex(fn));
 const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
@@ -338,7 +338,7 @@ const complement = (fn) => (...args) => {
     return !f || f && out.$args_left <= 0 ? not(out) : complement(out);
 };
 const sizeof = (s) => {
-    if (type(s) === 'Object') {
+    if (isObj(s)) {
         let len = 0;
         for (let _k in s)
             len++;
@@ -594,6 +594,33 @@ const getTmpl = (tmpl) => {
     };
 };
 
+const debounce = (time, fn) => {
+    let queue = [];
+    let to;
+    return ((...args) => new Promise((ff) => {
+        clearTimeout(to);
+        to = setTimeout(async () => {
+            const res = await fn(...args);
+            for (ff of queue)
+                ff(res);
+            queue.splice(0);
+        }, time);
+        queue.push(ff);
+    }));
+};
+// export const debouncePrepared = 
+const throttle = (time, fn) => {
+    let on = true;
+    return (...args) => {
+        if (on) {
+            on = false;
+            setTimeout(() => on = true, time);
+            return fn(...args);
+        }
+    };
+};
+const wait = (time) => new Promise((ff) => setTimeout(ff, time));
+
 /** One promise waits for another. */
 const forEachSerial = (() => {
     const pipe = async (fn, items, i) => {
@@ -646,6 +673,7 @@ exports.cond = cond;
 exports.curry = curry;
 exports.curry2 = curry2;
 exports.curry3 = curry3;
+exports.debounce = debounce;
 exports.diff = diff;
 exports.divide = divide;
 exports.echo = echo;
@@ -751,6 +779,7 @@ exports.tail = tail;
 exports.take = take;
 exports.tap = tap;
 exports.test = test;
+exports.throttle = throttle;
 exports.toLower = toLower;
 exports.toPairs = toPairs;
 exports.toUpper = toUpper;
@@ -761,6 +790,7 @@ exports.uncurry = uncurry;
 exports.uniq = uniq;
 exports.uniqWith = uniqWith;
 exports.values = values;
+exports.wait = wait;
 exports.waitAll = waitAll;
 exports.waitTap = waitTap;
 exports.weakEq = weakEq;

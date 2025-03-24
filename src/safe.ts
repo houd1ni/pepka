@@ -1,6 +1,6 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, undef, isArray, isFunc, isObj, inf } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj, qsort } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { symbol, type, length, equals, includes, isNil, qstartsWithWith, eq } from './common'
 import { Split, AnyArray, IndexesOfArray } from './internal_types'
@@ -97,7 +97,7 @@ export const lt = curry2( (a: number, b: number) => a>b )
 export const gte = curry2( (a: number, b: number) => a<=b )
 /** @param a @param b @returns a≥b  */
 export const lte = curry2( (a: number, b: number) => a>=b )
-export const sort = curry2((sortFn: (a: any, b: any) => number , xs: any[]) => xs.sort(sortFn))
+export const sort = curry2(<T extends any>(sortFn: (a: T, b: T) => number , xs: T[]) => [...xs].sort(sortFn))
 export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
 export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
 export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
@@ -145,7 +145,7 @@ export const complement = (fn: AnyFunc) => (...args: any) => {
   return !f || f&&out.$args_left<=0 ? not(out) : complement(out)
 }
 export const sizeof = (s: any[] | string | AnyObject) => {
-  if(type(s) === 'Object') {
+  if(isObj(s)) {
     let len = 0
     for(let _k in s as AnyObject) len++
     return len
@@ -317,7 +317,7 @@ export const map = curry2(
   (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => arr.map(pipe)
 )
 export const mapObj = curry2(
-  (pipe: (s: any, i?: string, list?: any[]) => any, o: AnyObject) => qmapObj(pipe, cloneShallow(o))
+  (pipe: (s: any, i?: string, list?: any[]) => any, o: AnyObject) => qmapObj(pipe, {...o})
 )
 export const join = curry2((delimeter: string, arr: string[]) => arr.join(delimeter))
 export const forEach = curry2((pipe: (s: any) => any, arr: any[]) => arr.forEach(pipe))

@@ -43,7 +43,7 @@ export declare const typeIs: {
 	(a: string): (b: any) => boolean;
 	(a: string, b: any): boolean;
 };
-declare const length$1: <T extends string | AnyArray>(s: T) => T extends string ? StrLen<T> : T["length"];
+declare const length$1: <T extends AnyArray | string>(s: T) => T extends string ? StrLen<T> : T["length"];
 export declare const isNil: (s: any) => boolean;
 export declare const eq: {
 	(a: symbol, b: any): (a: any) => boolean;
@@ -209,8 +209,8 @@ export declare const divide: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const always: <T extends unknown>(s: T) => () => T;
-export declare const identity: <T extends unknown>(s: T) => T;
+export declare const always: <T extends any>(s: T) => () => T;
+export declare const identity: <T extends any>(s: T) => T;
 export declare const trim: (s: string) => string;
 /** @param start string | any[] @param s string | any[] */
 export declare const startsWith: {
@@ -288,7 +288,7 @@ export declare const noop: (...args: any[]) => any;
  * @param {string} fnName - property name of the function.
  * @param {AnyObject} o - the object with the function. */
 export declare const callFrom: (...args: AnyArgs) => any;
-export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | any;
+export declare const complement: (fn: AnyFunc) => (...args: any) => boolean | ((...args: any) => boolean | /*elided*/ any);
 export declare const sizeof: (s: any[] | string | AnyObject) => number;
 export declare const range: {
 	(a: symbol, b: number): (a: number) => any[];
@@ -324,7 +324,7 @@ export declare const genBy: {
 	(a: (i: number) => any, b: number): any[];
 };
 export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => any;
-export declare const reverse: <T extends unknown>(xs: T[]) => T[];
+export declare const reverse: <T extends any>(xs: T[]) => T[];
 export declare const explore: (caption: string, level?: string) => (b: any) => any;
 export declare const cond: {
 	(a: symbol, b: any): (a: [
@@ -350,7 +350,7 @@ export declare const cond: {
  * @param object AnyObject
  */
 export declare const assoc: (...args: AnyArgs) => any;
-export declare const assocPath: any;
+export declare const assocPath: (...args: AnyArgs) => any;
 export declare const all: {
 	(a: symbol, b: any[]): (a: Cond) => boolean;
 	(a: Cond, b: symbol): (b: any[]) => boolean;
@@ -386,7 +386,7 @@ export declare const prop: {
 export declare const propEq: (...args: AnyArgs) => any;
 /** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 export declare const propsEq: (...args: AnyArgs) => any;
-export declare const pathOr: any;
+export declare const pathOr: (...args: AnyArgs) => any;
 export declare const path: any;
 export declare const pathEq: (...args: AnyArgs) => any;
 export declare const pathsEq: (...args: AnyArgs) => any;
@@ -414,10 +414,10 @@ export declare const pickBy: {
 	(a: Cond, b: AnyObject): any;
 };
 export declare const omit: {
-	(a: symbol, b: AnyObject): (a: string[]) => any;
-	(a: string[], b: symbol): (b: AnyObject) => any;
-	(a: string[]): (b: AnyObject) => any;
-	(a: string[], b: AnyObject): any;
+	(a: symbol, b: AnyObject): (a: string[]) => any[] | AnyObject;
+	(a: string[], b: symbol): (b: AnyObject) => any[] | AnyObject;
+	(a: string[]): (b: AnyObject) => any[] | AnyObject;
+	(a: string[], b: AnyObject): any[] | AnyObject;
 };
 export declare const fromPairs: (pairs: [
 	string,
@@ -460,20 +460,20 @@ export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
 export declare const replace: (...args: AnyArgs) => any;
 export declare const filter: {
-	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any;
-	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any;
-	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any;
-	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any;
+	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any[] | AnyObject;
+	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any[] | AnyObject;
+	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any[] | AnyObject;
+	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any[] | AnyObject;
 };
 /** Saves result of a function with given key and avoids calling it again.
  * @param {(...args: Args) string} keyGen that takes the same args and returns a key for the cache.
  * @param {(...args: Args) any} fn to be cached.
 */
 export declare const memoize: {
-	(a: symbol, b: AnyFunc<any, any[]>): (a: (...args: any[]) => string) => (...args: any[]) => any;
-	(a: (...args: any[]) => string, b: symbol): (b: AnyFunc<any, any[]>) => (...args: any[]) => any;
-	(a: (...args: any[]) => string): (b: AnyFunc<any, any[]>) => (...args: any[]) => any;
-	(a: (...args: any[]) => string, b: AnyFunc<any, any[]>): (...args: any[]) => any;
+	(a: symbol, b: AnyFunc<any, any[]>): (a: (...args: any[]) => string) => (...args: any[]) => ReturnType<AnyFunc<any, any[]>>;
+	(a: (...args: any[]) => string, b: symbol): (b: AnyFunc<any, any[]>) => (...args: any[]) => ReturnType<AnyFunc<any, any[]>>;
+	(a: (...args: any[]) => string): (b: AnyFunc<any, any[]>) => (...args: any[]) => ReturnType<AnyFunc<any, any[]>>;
+	(a: (...args: any[]) => string, b: AnyFunc<any, any[]>): (...args: any[]) => ReturnType<AnyFunc<any, any[]>>;
 };
 export declare const mergeShallow: {
 	(a: symbol, b: AnyObject): (a: AnyObject) => AnyObject;
@@ -538,7 +538,7 @@ export declare const zipWith: (...args: AnyArgs) => any;
 export declare const mirror: <T extends unknown>(s: T) => T;
 export declare const reflect: <T extends unknown>(s: T) => T;
 export declare const echo: <T extends unknown>(s: T) => T;
-export declare const notf: (fn: AnyFunc) => (...args: any) => boolean | any;
+export declare const notf: (fn: AnyFunc) => (...args: any) => boolean | ((...args: any) => boolean | /*elided*/ any);
 export declare const push: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];
@@ -622,7 +622,7 @@ export declare const qfilter: {
 	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any[] | AnyObject;
 	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any[] | AnyObject;
 };
-export declare const qempty: <T extends any[] | AnyObject>(o: T) => T extends any[] ? [
+export declare const qempty: <T extends AnyObject | any[]>(o: T) => T extends any[] ? [
 ] : {};
 export declare const qfreeze: <T extends AnyObject>(o: T) => Readonly<T>;
 export declare const qfreezeShallow: <T extends AnyObject>(o: T) => Readonly<T>;
@@ -632,7 +632,7 @@ export declare const qprepend: {
 	(a: any): (b: any[]) => number;
 	(a: any, b: any[]): number;
 };
-export declare const qassocPath: any;
+export declare const qassocPath: (...args: AnyArgs) => any;
 export declare const qreverse: (arr: any[]) => any[];
 export declare const qomit: {
 	(a: symbol, b: AnyObject): (a: string[]) => any[] | AnyObject;
@@ -654,6 +654,9 @@ type StrTmpl = ((data: AnyObject) => string);
 /** Supports ecrans: '\\{"json": {yes} \\}'
   @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */
 export declare const getTmpl: (tmpl: string) => StrTmpl;
+export declare const debounce: <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => Promise<ReturnType<T>>;
+export declare const throttle: <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => any;
+export declare const wait: (time: number) => Promise<unknown>;
 /** One promise waits for another. */
 export declare const forEachSerial: {
 	(a: symbol, b: any[]): (a: AnyFunc) => Promise<void>;

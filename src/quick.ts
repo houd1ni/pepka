@@ -110,6 +110,7 @@ export const qfreeze = <T extends AnyObject>(o: T): Readonly<T> => {
 }
 export const qfreezeShallow = <T extends AnyObject>(o: T): Readonly<T> => Object.freeze(o)
 export const qprepend = curry2((x: any, xs: any[]) => xs.unshift(x))
+export const qsort = curry2((sortFn: (a: any, b: any) => number , xs: any[]) => xs.sort(sortFn))
 export const qassocPath = curry3((_path: string[], v: any, o: AnyObject) => {
   const first = _path[0]
   return qassoc(first, _path.length<2
