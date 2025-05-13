@@ -71,6 +71,9 @@ function curry3(fn) {
     return curry(fn);
 }
 
+const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
+const is_typed_arr = (t) => typed_arr_re.test(t);
+
 const undef = undefined;
 const nul = null;
 const inf = Infinity;
@@ -100,7 +103,7 @@ const isNil = (s) => isNull(s) || isUndef(s);
 const eq = curry2((a, b) => a === b);
 const equals = curry2((a, b) => {
     const typea = type(a);
-    if (eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array'))) {
+    if (eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || is_typed_arr(typea))) {
         if (isNull(a) || isNull(b))
             return eq(a, b);
         if (eq(a, b))
@@ -241,6 +244,7 @@ const qfreeze = (o) => {
 };
 const qfreezeShallow = (o) => Object.freeze(o);
 const qprepend = curry2((x, xs) => xs.unshift(x));
+const qsort = curry2((sortFn, xs) => xs.sort(sortFn));
 const qassocPath = curry3((_path, v, o) => {
     const first = _path[0];
     return qassoc(first, _path.length < 2
@@ -301,7 +305,7 @@ const lt = curry2((a, b) => a > b);
 const gte = curry2((a, b) => a <= b);
 /** @param a @param b @returns a≥b  */
 const lte = curry2((a, b) => a >= b);
-const sort = curry2((sortFn, xs) => xs.sort(sortFn)); // TODO: make it shallow cloning.
+const sort = curry2((sortFn, xs) => [...xs].sort(sortFn));
 const find = curry2((fn, s) => s.find(fn));
 const findIndex = curry2((fn, s) => s.findIndex(fn));
 const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
@@ -426,7 +430,6 @@ const path = pathOr(undef);
 const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
 const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
 const pathExists = compose(ifElse(equals(symbol), F, T), pathOr(symbol));
-const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 const clone = (s, shallow = false) => {
     const t = type(s);
     switch (t) {
@@ -445,7 +448,7 @@ const clone = (s, shallow = false) => {
         case 'Symbol':
             return s;
         default:
-            return typed_arr_re.test(t) ? s.constructor.from(s) : s;
+            return is_typed_arr(t) ? s.constructor.from(s) : s;
     }
 };
 const cloneShallow = (s) => clone(s, true);
@@ -469,7 +472,7 @@ const omit = curry2((props, o) => filter((_, k) => !includes(k, props), o));
 const fromPairs = (pairs) => Object.fromEntries(pairs);
 const concat = curry2(((a, b) => b.concat(a)));
 const map = curry2((pipe, arr) => arr.map(pipe));
-const mapObj = curry2((pipe, o) => qmapObj(pipe, cloneShallow(o)));
+const mapObj = curry2((pipe, o) => qmapObj(pipe, { ...o }));
 const join = curry2((delimeter, arr) => arr.join(delimeter));
 const forEach = curry2((pipe, arr) => arr.forEach(pipe));
 const both = curry3((cond1, cond2, s) => cond2(s) && cond1(s));
@@ -760,6 +763,7 @@ exports.qoverProp = qoverProp;
 exports.qprepend = qprepend;
 exports.qreduce = qreduce;
 exports.qreverse = qreverse;
+exports.qsort = qsort;
 exports.qstartsWith = qstartsWith;
 exports.qstartsWithWith = qstartsWithWith;
 exports.range = range;

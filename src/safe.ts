@@ -4,6 +4,7 @@ import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfi
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
 import { symbol, type, length, equals, includes, isNil, qstartsWithWith, eq } from './common'
 import { Split, AnyArray, IndexesOfArray } from './internal_types'
+import { is_typed_arr } from './internal'
 // TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
@@ -260,7 +261,6 @@ export const pathsEq = curry3(
     equals(path(_path, o1), path(_path, o2))
 )
 export const pathExists = compose(ifElse(equals(symbol), F, T), pathOr(symbol))
-const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/
 export const clone = (s: any, shallow = false) => {
   const t = type(s)
   switch(t) {
@@ -275,7 +275,7 @@ export const clone = (s: any, shallow = false) => {
     case 'Boolean': case 'Symbol':
       return s
     default:
-      return typed_arr_re.test(t) ? s.constructor.from(s) : s
+      return is_typed_arr(t) ? s.constructor.from(s) : s
   }
 }
 export const cloneShallow = (s: any) => clone(s, true)

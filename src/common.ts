@@ -1,4 +1,5 @@
 import { curry2 } from "./curry"
+import { is_typed_arr } from "./internal"
 import { AnyArray, StrLen } from "./internal_types"
 import { to, isNull, isStr, isUndef } from "./utils"
 
@@ -21,7 +22,7 @@ export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const eq = curry2((a: any, b: any) => a===b)
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)
-  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array'))) {
+  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || is_typed_arr(typea))) {
     if(isNull(a) || isNull(b)) return eq(a, b)
     if(eq(a, b)) return true
     for(const v of [a, b])

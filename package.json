@@ -12,6 +12,7 @@
     "ramda",
     "functional",
     "fp",
+    "toolkit",
     "pure",
     "strongly-typed",
     "typescript",
@@ -40,7 +41,7 @@
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.6.3",
+  "version": "1.6.4",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.0",

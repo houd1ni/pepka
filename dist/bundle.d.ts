@@ -180,10 +180,10 @@ export declare const lte: {
 	(a: number, b: number): boolean;
 };
 export declare const sort: {
-	(a: symbol, b: any[]): (a: (a: any, b: any) => number) => any[];
-	(a: (a: any, b: any) => number, b: symbol): (b: any[]) => any[];
-	(a: (a: any, b: any) => number): (b: any[]) => any[];
-	(a: (a: any, b: any) => number, b: any[]): any[];
+	(a: symbol, b: unknown[]): (a: (a: unknown, b: unknown) => number) => unknown[];
+	(a: (a: unknown, b: unknown) => number, b: symbol): (b: unknown[]) => unknown[];
+	(a: (a: unknown, b: unknown) => number): (b: unknown[]) => unknown[];
+	(a: (a: unknown, b: unknown) => number, b: unknown[]): unknown[];
 };
 export declare const find: {
 	(a: symbol, b: any[]): (a: Cond) => any;
@@ -438,10 +438,10 @@ export declare const map: {
 	(a: (s: any, i?: number, list?: any[]) => any, b: any[]): any[];
 };
 export declare const mapObj: {
-	(a: symbol, b: AnyObject): (a: (s: any, i?: string, list?: any[]) => any) => (b: AnyObject) => AnyObject;
-	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => (b: AnyObject) => AnyObject;
-	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => (b: AnyObject) => AnyObject;
-	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): (b: AnyObject) => AnyObject;
+	(a: symbol, b: AnyObject): (a: (s: any, i?: string, list?: any[]) => any) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any, b: symbol): (b: AnyObject) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any): (b: AnyObject) => AnyObject;
+	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): AnyObject;
 };
 export declare const join: {
 	(a: symbol, b: string[]): (a: string) => string;
@@ -631,6 +631,12 @@ export declare const qprepend: {
 	(a: any, b: symbol): (b: any[]) => number;
 	(a: any): (b: any[]) => number;
 	(a: any, b: any[]): number;
+};
+export declare const qsort: {
+	(a: symbol, b: any[]): (a: (a: any, b: any) => number) => any[];
+	(a: (a: any, b: any) => number, b: symbol): (b: any[]) => any[];
+	(a: (a: any, b: any) => number): (b: any[]) => any[];
+	(a: (a: any, b: any) => number, b: any[]): any[];
 };
 export declare const qassocPath: (...args: AnyArgs) => any;
 export declare const qreverse: (arr: any[]) => any[];
