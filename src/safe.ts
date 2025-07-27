@@ -1,8 +1,8 @@
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, undef, isArray, isFunc, isObj, inf } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj, qsort } from './quick'
+import { isNum, undef, isArray, isFunc, isObj, inf, isNil } from './utils'
+import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
 import { AnyFunc, Cond, AnyObject, Reducer } from './types'
-import { symbol, type, length, equals, includes, isNil, qstartsWithWith, eq } from './common'
+import { symbol, type, length, equals, includes, qstartsWithWith, eq } from './common'
 import { Split, AnyArray, IndexesOfArray } from './internal_types'
 import { is_typed_arr } from './internal'
 // TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
@@ -40,7 +40,11 @@ export const compose = (
     }
 )
 export const bind = curry2<AnyFunc>((fn: AnyFunc, context: any) => fn.bind(context))
-export const nth = curry2((i: number, data: any[] | string) => data[i])
+export const nth = curry2(<T extends any>(i: number, data: string | ArrayLike<T>) => data[i])
+// FIXME: these types. Somewhere in curry2.
+// const x = nth(0)([1,2,3])
+// const y = nth(0)('123')
+// const z = nth(0)(new Uint8Array([0,2,3]))
 export const slice = curry3(
   (from: number, to: number, o: any[] | string) =>
     o.slice(from, (isNum(to)?to:inf) as number)
@@ -234,7 +238,7 @@ export const allPass = curry2((preds: Cond[], x: any) => preds.every((pred) => p
 export const anyPass = curry2((preds: Cond[], x: any) => preds.some((pred) => pred(x)))
 /** @param key string @param o AnyObject @returns o[key] */
 export const prop = curry2((key: string, o: AnyObject) => o[key])
-/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
+/** @param key string @param value any @param o AnyObject @returns boolean o[key] equals value */
 export const propEq = curry3(
   (key: string, value: any, o: AnyObject) => equals(o[key], value)
 )
@@ -418,7 +422,8 @@ export const zipWith = curry3(
 )
 
 // Reexport safe stuff that is ready to use externally. 
-export { toLower, toUpper, type, typeIs, length, isNil, eq, equals, includes } from './common'
+export { toLower, toUpper, type, typeIs, length, eq, equals, includes } from './common'
+export { isNil } from './utils'
 
 // ALIASES
 export const mirror = identity

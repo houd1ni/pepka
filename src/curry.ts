@@ -65,11 +65,11 @@ export function curry2<Func extends Func2>(fn: Func) {
   type p0 = Parameters<Func>[0]
   type p1 = Parameters<Func>[1]
   type ReturnT = ReturnType<Func>
-  function curried2( a: Placeholder, b: p1 ): (a: p0) => ReturnT
-  function curried2( a: p0, b: Placeholder ): (b: p1) => ReturnT
-  function curried2( a: p0 ): (b: p1) => ReturnT
-  function curried2( a: p0, b: p1 ): ReturnT
-  function curried2( a: p0 | Placeholder, b?: p1 ) {
+  function curried2(a: Placeholder, b: p1): (a: p0) => ReturnT
+  function curried2(a: p0, b: Placeholder): (b: p1) => ReturnT
+  function curried2(a: p0 ): (b: p1) => ReturnT
+  function curried2(a: p0, b: p1): ReturnT
+  function curried2(a: p0 | Placeholder, b?: p1) {
     const withPlaceholder1 = a===__
     const aln = arguments.length
     if(aln === 1 && withPlaceholder1)

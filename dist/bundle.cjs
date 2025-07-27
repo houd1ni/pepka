@@ -78,13 +78,14 @@ const undef = undefined;
 const nul = null;
 const inf = Infinity;
 const to = (s) => typeof s;
-const isNull = (s) => s === nul;
-const isUndef = (s) => s === undef;
-const isNum = (s) => to(s) == 'number';
-const isArray = (s) => Array.isArray(s);
-const isFunc = (s) => to(s) === 'function';
-const isStr = (s) => to(s) === 'string';
-const isObj = (s) => !isNull(s) && to(s) === 'object';
+const isNull = (s) => (s === nul);
+const isUndef = (s) => (s === undef);
+const isNum = (s) => (to(s) == 'number');
+const isArray = (s) => (Array.isArray(s));
+function isFunc(s) { return to(s) === 'function'; }
+const isStr = (s) => (to(s) === 'string');
+const isObj = (s) => (!isNull(s) && to(s) === 'object');
+const isNil = (s) => (isNull(s) || isUndef(s));
 
 // It's faster that toUpperCase() !
 const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F' };
@@ -99,7 +100,6 @@ const type = (s) => {
 };
 const typeIs = curry2((t, s) => type(s) === t);
 const length = (s) => s.length;
-const isNil = (s) => isNull(s) || isUndef(s);
 const eq = curry2((a, b) => a === b);
 const equals = curry2((a, b) => {
     const typea = type(a);
@@ -281,6 +281,10 @@ const compose = ((...fns) => (...args) => {
 });
 const bind = curry2((fn, context) => fn.bind(context));
 const nth = curry2((i, data) => data[i]);
+// FIXME: these types. Somewhere in curry2.
+// const x = nth(0)([1,2,3])
+// const y = nth(0)('123')
+// const z = nth(0)(new Uint8Array([0,2,3]))
 const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
 const flip = (fn) => curry2((b, a) => fn(a, b));
 /** @returns first element of an array or a string. */
@@ -417,7 +421,7 @@ const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
 const anyPass = curry2((preds, x) => preds.some((pred) => pred(x)));
 /** @param key string @param o AnyObject @returns o[key] */
 const prop = curry2((key, o) => o[key]);
-/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
+/** @param key string @param value any @param o AnyObject @returns boolean o[key] equals value */
 const propEq = curry3((key, value, o) => equals(o[key], value));
 /** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));

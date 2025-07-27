@@ -1,7 +1,7 @@
 import { curry2, curry3 } from "./curry"
-import { includes, isNil, type, eq, qstartsWithWith } from "./common"
+import { includes, type, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
-import { isFunc, isArray, isObj } from "./utils"
+import { isFunc, isArray, isObj, isNil } from "./utils"
 /* Then next fns seem to be excess due to their safe ver performance should be the same or better:
 * qflat, qpick
 */

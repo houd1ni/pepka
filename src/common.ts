@@ -18,7 +18,6 @@ export const type = (s: any): string => {
 export const typeIs = curry2((t: string, s: any) => type(s)===t)
 
 export const length = <T extends AnyArray | string>(s: T): T extends string ? StrLen<T> : T["length"] => s.length as any
-export const isNil = (s: any) => isNull(s) || isUndef(s)
 export const eq = curry2((a: any, b: any) => a===b)
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)

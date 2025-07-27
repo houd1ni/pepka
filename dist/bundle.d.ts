@@ -44,7 +44,6 @@ export declare const typeIs: {
 	(a: string, b: any): boolean;
 };
 declare const length$1: <T extends AnyArray | string>(s: T) => T extends string ? StrLen<T> : T["length"];
-export declare const isNil: (s: any) => boolean;
 export declare const eq: {
 	(a: symbol, b: any): (a: any) => boolean;
 	(a: any, b: symbol): (b: any) => boolean;
@@ -70,6 +69,7 @@ export declare const qstartsWithWith: (comparator: (x: any, y: any) => boolean) 
 	(a: string | any[]): (b: string | any[]) => boolean;
 	(a: string | any[], b: string | any[]): boolean;
 };
+export declare const isNil: <T extends any>(s: T) => T extends (null | undefined) ? true : false;
 export declare const take: (argN: number) => (...args: any[]) => any;
 export declare const ifElse: (...args: AnyArgs) => any;
 export declare const when: (...args: AnyArgs) => any;
@@ -82,10 +82,10 @@ export declare const bind: {
 	(a: any, b: any): any;
 };
 export declare const nth: {
-	(a: symbol, b: string | any[]): (a: number) => any;
-	(a: number, b: symbol): (b: string | any[]) => any;
-	(a: number): (b: string | any[]) => any;
-	(a: number, b: string | any[]): any;
+	(a: symbol, b: string | ArrayLike<unknown>): (a: number) => unknown;
+	(a: number, b: symbol): (b: string | ArrayLike<unknown>) => unknown;
+	(a: number): (b: string | ArrayLike<unknown>) => unknown;
+	(a: number, b: string | ArrayLike<unknown>): unknown;
 };
 export declare const slice: (...args: AnyArgs) => any;
 export declare const flip: <T extends AnyFunc>(fn: T) => {
@@ -382,7 +382,7 @@ export declare const prop: {
 	(a: string): (b: AnyObject) => any;
 	(a: string, b: AnyObject): any;
 };
-/** @param key string @param value any @param o AnyObject @returns o[key] equals value */
+/** @param key string @param value any @param o AnyObject @returns boolean o[key] equals value */
 export declare const propEq: (...args: AnyArgs) => any;
 /** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 export declare const propsEq: (...args: AnyArgs) => any;
@@ -414,10 +414,10 @@ export declare const pickBy: {
 	(a: Cond, b: AnyObject): any;
 };
 export declare const omit: {
-	(a: symbol, b: AnyObject): (a: string[]) => any[] | AnyObject;
-	(a: string[], b: symbol): (b: AnyObject) => any[] | AnyObject;
-	(a: string[]): (b: AnyObject) => any[] | AnyObject;
-	(a: string[], b: AnyObject): any[] | AnyObject;
+	(a: symbol, b: AnyObject): (a: string[]) => any;
+	(a: string[], b: symbol): (b: AnyObject) => any;
+	(a: string[]): (b: AnyObject) => any;
+	(a: string[], b: AnyObject): any;
 };
 export declare const fromPairs: (pairs: [
 	string,
@@ -460,10 +460,10 @@ export declare const isEmpty: (s: any) => boolean | null;
 export declare const empty: (s: any) => {} | undefined;
 export declare const replace: (...args: AnyArgs) => any;
 export declare const filter: {
-	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any[] | AnyObject;
-	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any[] | AnyObject;
-	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any[] | AnyObject;
-	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any[] | AnyObject;
+	(a: symbol, b: any[] | AnyObject): (a: (v: any, k: string | number) => boolean) => any;
+	(a: (v: any, k: string | number) => boolean, b: symbol): (b: any[] | AnyObject) => any;
+	(a: (v: any, k: string | number) => boolean): (b: any[] | AnyObject) => any;
+	(a: (v: any, k: string | number) => boolean, b: any[] | AnyObject): any;
 };
 /** Saves result of a function with given key and avoids calling it again.
  * @param {(...args: Args) string} keyGen that takes the same args and returns a key for the cache.
