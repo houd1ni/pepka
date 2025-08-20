@@ -444,10 +444,10 @@ export declare const mapObj: {
 	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): AnyObject;
 };
 export declare const join: {
-	(a: symbol, b: string[]): (a: string) => string;
-	(a: string, b: symbol): (b: string[]) => string;
-	(a: string): (b: string[]) => string;
-	(a: string, b: string[]): string;
+	(a: symbol, b: any[]): (a: string) => string;
+	(a: string, b: symbol): (b: any[]) => string;
+	(a: string): (b: any[]) => string;
+	(a: string, b: any[]): string;
 };
 export declare const forEach: {
 	(a: symbol, b: any[]): (a: (s: unknown, i: number, arr: unknown[]) => any) => void;

@@ -323,7 +323,7 @@ export const map = curry2(
 export const mapObj = curry2(
   (pipe: (s: any, i?: string, list?: any[]) => any, o: AnyObject) => qmapObj(pipe, {...o})
 )
-export const join = curry2((delimeter: string, arr: string[]) => arr.join(delimeter))
+export const join = curry2((delimeter: string, arr: any[]) => arr.join(delimeter))
 export const forEach = curry2(<T extends any>(pipe: (s: T, i: number, arr: T[]) => any, arr: any[]) => arr.forEach(pipe))
 export const both = curry3((cond1: Cond, cond2: Cond, s: any) => cond2(s) && cond1(s))
 export const isEmpty = (s: any) => {
