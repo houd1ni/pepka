@@ -258,6 +258,8 @@ const qstartsWith = qstartsWithWith(eq);
 /** @param prop string @param pipe (data[prop]): prop_value @param data any
  * @returns data with prop over pipe. */
 const qoverProp = curry3((prop, pipe, data) => qassoc(prop, pipe(data[prop]), data));
+// Aliases.
+const qpush = qappend;
 
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
@@ -765,6 +767,7 @@ exports.qmergeShallow = qmergeShallow;
 exports.qomit = qomit;
 exports.qoverProp = qoverProp;
 exports.qprepend = qprepend;
+exports.qpush = qpush;
 exports.qreduce = qreduce;
 exports.qreverse = qreverse;
 exports.qsort = qsort;

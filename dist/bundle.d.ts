@@ -450,10 +450,10 @@ export declare const join: {
 	(a: string, b: string[]): string;
 };
 export declare const forEach: {
-	(a: symbol, b: any[]): (a: (s: any) => any) => void;
-	(a: (s: any) => any, b: symbol): (b: any[]) => void;
-	(a: (s: any) => any): (b: any[]) => void;
-	(a: (s: any) => any, b: any[]): void;
+	(a: symbol, b: any[]): (a: (s: unknown, i: number, arr: unknown[]) => any) => void;
+	(a: (s: unknown, i: number, arr: unknown[]) => any, b: symbol): (b: any[]) => void;
+	(a: (s: unknown, i: number, arr: unknown[]) => any): (b: any[]) => void;
+	(a: (s: unknown, i: number, arr: unknown[]) => any, b: any[]): void;
 };
 export declare const both: (...args: AnyArgs) => any;
 export declare const isEmpty: (s: any) => boolean | null;
@@ -656,6 +656,12 @@ export declare const qstartsWith: {
 /** @param prop string @param pipe (data[prop]): prop_value @param data any
  * @returns data with prop over pipe. */
 export declare const qoverProp: (...args: AnyArgs) => any;
+export declare const qpush: {
+	(a: symbol, b: any[]): (a: any) => any[];
+	(a: any, b: symbol): (b: any[]) => any[];
+	(a: any): (b: any[]) => any[];
+	(a: any, b: any[]): any[];
+};
 type StrTmpl = ((data: AnyObject) => string);
 /** Supports ecrans: '\\{"json": {yes} \\}'
   @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */

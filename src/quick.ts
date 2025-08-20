@@ -133,3 +133,6 @@ export const qstartsWith = qstartsWithWith(eq)
 export const qoverProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) => qassoc(prop, pipe(data[prop]), data)
 )
+
+// Aliases.
+export const qpush = qappend
