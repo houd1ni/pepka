@@ -444,10 +444,26 @@ export declare const mapObj: {
 	(a: (s: any, i?: string, list?: any[]) => any, b: AnyObject): AnyObject;
 };
 export declare const join: {
-	(a: symbol, b: any[]): (a: string) => string;
-	(a: string, b: symbol): (b: any[]) => string;
-	(a: string): (b: any[]) => string;
-	(a: string, b: any[]): string;
+	(a: symbol, b: ArrayLike<any> & {
+		join: AnyFunc<string, [
+			delim: string
+		]>;
+	}): (a: string) => string;
+	(a: string, b: symbol): (b: ArrayLike<any> & {
+		join: AnyFunc<string, [
+			delim: string
+		]>;
+	}) => string;
+	(a: string): (b: ArrayLike<any> & {
+		join: AnyFunc<string, [
+			delim: string
+		]>;
+	}) => string;
+	(a: string, b: ArrayLike<any> & {
+		join: AnyFunc<string, [
+			delim: string
+		]>;
+	}): string;
 };
 export declare const forEach: {
 	(a: symbol, b: any[]): (a: (s: unknown, i: number, arr: unknown[]) => any) => void;
