@@ -391,7 +391,7 @@ export declare const path: any;
 export declare const pathEq: (...args: AnyArgs) => any;
 export declare const pathsEq: (...args: AnyArgs) => any;
 export declare const pathExists: Composed<any[], any>;
-export declare const clone: (s: any, shallow?: boolean) => any;
+export declare const clone: <T extends any>(s: T, shallow?: boolean) => T;
 export declare const cloneShallow: (s: any) => any;
 export declare const freeze: <T extends AnyObject>(o: T) => Readonly<T>;
 export declare const freezeShallow: <T extends AnyObject>(o: T) => Readonly<T>;

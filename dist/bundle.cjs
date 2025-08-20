@@ -440,7 +440,7 @@ const clone = (s, shallow = false) => {
     const t = type(s);
     switch (t) {
         case 'Null': return s;
-        case 'Array': return shallow ? [...s] : map(compose(clone, take(0)), s);
+        case 'Array': return (shallow ? [...s] : map(compose(clone, take(0)), s));
         case 'Object':
             if (shallow)
                 return { ...s };

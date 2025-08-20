@@ -265,21 +265,21 @@ export const pathsEq = curry3(
     equals(path(_path, o1), path(_path, o2))
 )
 export const pathExists = compose(ifElse(equals(symbol), F, T), pathOr(symbol))
-export const clone = (s: any, shallow = false) => {
+export const clone = <T extends any>(s: T, shallow = false): T => {
   const t = type(s)
   switch(t) {
     case 'Null': return s
-    case 'Array': return shallow ? [...s] : map(compose(clone, take(0)), s)
+    case 'Array': return (shallow ? [...(s as any[])] : map(compose(clone, take(0)), s as any[])) as T
     case 'Object':
-      if(shallow) return {...s}
-      const out = {}
+      if(shallow) return {...s as AnyObject} as T
+      const out: AnyObject = {}
       for(let k in s) out[k] = clone(s[k])
-      return out
+      return out as T
     case 'String': case 'Number':
     case 'Boolean': case 'Symbol':
       return s
     default:
-      return is_typed_arr(t) ? s.constructor.from(s) : s
+      return is_typed_arr(t) ? (s as any).constructor.from(s) : s
   }
 }
 export const cloneShallow = (s: any) => clone(s, true)
