@@ -72,7 +72,7 @@ type TailOverload = {
     : T extends readonly [any, ...infer U] ? U : T
   <T extends any>(s: T[]): null
 }
-/** @returns last element of an array or a string. */
+/** @returns all elements of an array or a string after first one. */
 export const tail = slice(1, inf) as TailOverload
 type LastChar<T extends string> = T extends `${string}${infer Rest}`
   ? (Split<T>['length'] extends 1 ? T : LastChar<Rest>) : T
@@ -194,7 +194,7 @@ export const genBy = curry2(
 )
 export const once = <Func extends AnyFunc>(fn: Func) => {
   let done = false, cache: any
-  return (...args: Parameters<Func>) => {
+  return function(...args: Parameters<Func>) {
     if(done) return cache
     done = true
     return cache = fn(...args)

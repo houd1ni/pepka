@@ -291,7 +291,7 @@ const slice = curry3((from, to, o) => o.slice(from, (isNum(to) ? to : inf)));
 const flip = (fn) => curry2((b, a) => fn(a, b));
 /** @returns first element of an array or a string. */
 const head = nth(0);
-/** @returns last element of an array or a string. */
+/** @returns all elements of an array or a string after first one. */
 const tail = slice(1, inf);
 /** Returns last element of an array, readonly array or a string.
  * @param s Array to extract that element.
@@ -391,7 +391,7 @@ const diff = curry2((_xs1, _xs2) => {
 const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
 const once = (fn) => {
     let done = false, cache;
-    return (...args) => {
+    return function (...args) {
         if (done)
             return cache;
         done = true;
