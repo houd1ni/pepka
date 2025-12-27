@@ -76,9 +76,9 @@ export function curry2<Func extends Func2>(fn: Func) {
       throw new Error('Senseless placeholder usage.')
     return aln>1
       ? withPlaceholder1
-        ? endlessph((a: p0) => fn(a, b))
+        ? endlessph((a: p0) => fn(a, b) as ReturnType<Func>)
         : fn(a, b) as ReturnType<Func>
-      : (b: p1) => fn(a, b)
+      : (b: p1) => fn(a, b) as ReturnType<Func>
   }
   return curried2
 }

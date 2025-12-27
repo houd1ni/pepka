@@ -128,7 +128,11 @@ export const keys: KeysOverload = (o: any) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
-export const tap = curry2((fn: Function, x: any) => { fn(x); return x })
+type T_tap = {
+  <T>(fn: (x: T) => any, x: T): T
+  (fn: AnyFunc): <T>(x: T) => T
+}
+export const tap = curry2(<T>(fn: AnyFunc, x: T): T => { fn(x); return x }) as T_tap
 export const append = curry2((x: any, xs: any[]) => [...xs, x])
 export const prepend = curry2((x: any, xs: any[]) => [...xs, x])
 export const flat = (xs: any[]) => xs.flat(inf)

@@ -242,12 +242,11 @@ export declare const test: {
 	(a: RegExp): (b: string) => boolean;
 	(a: RegExp, b: string): boolean;
 };
-export declare const tap: {
-	(a: symbol, b: any): (a: Function) => any;
-	(a: Function, b: symbol): (b: any) => any;
-	(a: Function): (b: any) => any;
-	(a: Function, b: any): any;
+type T_tap = {
+	<T>(fn: (x: T) => any, x: T): T;
+	(fn: AnyFunc): <T>(x: T) => T;
 };
+export declare const tap: T_tap;
 export declare const append: {
 	(a: symbol, b: any[]): (a: any) => any[];
 	(a: any, b: symbol): (b: any[]) => any[];
@@ -325,7 +324,7 @@ export declare const genBy: {
 };
 export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => any;
 export declare const reverse: <T extends any>(xs: T[]) => T[];
-export declare const explore: (caption: string, level?: string) => (b: any) => any;
+export declare const explore: (caption: string, level?: string) => <T>(x: T) => T;
 export declare const cond: {
 	(a: symbol, b: any): (a: [
 		Cond,
