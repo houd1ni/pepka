@@ -130,9 +130,12 @@ export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
 type T_tap = {
   <T>(fn: (x: T) => any, x: T): T
-  (fn: AnyFunc): <T>(x: T) => T
+  (fn: AnyFunc): {
+    <T>(x: T): T
+    (): undefined
+  }
 }
-export const tap = curry2(<T>(fn: AnyFunc, x: T): T => { fn(x); return x }) as T_tap
+export const tap = curry2(<T>(fn: AnyFunc, x: T): T => { fn(x); return x }) as any as T_tap
 export const append = curry2((x: any, xs: any[]) => [...xs, x])
 export const prepend = curry2((x: any, xs: any[]) => [...xs, x])
 export const flat = (xs: any[]) => xs.flat(inf)

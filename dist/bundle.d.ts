@@ -244,7 +244,10 @@ export declare const test: {
 };
 type T_tap = {
 	<T>(fn: (x: T) => any, x: T): T;
-	(fn: AnyFunc): <T>(x: T) => T;
+	(fn: AnyFunc): {
+		<T>(x: T): T;
+		(): undefined;
+	};
 };
 export declare const tap: T_tap;
 export declare const append: {
@@ -324,7 +327,10 @@ export declare const genBy: {
 };
 export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => any;
 export declare const reverse: <T extends any>(xs: T[]) => T[];
-export declare const explore: (caption: string, level?: string) => <T>(x: T) => T;
+export declare const explore: (caption: string, level?: string) => {
+	<T>(x: T): T;
+	(): undefined;
+};
 export declare const cond: {
 	(a: symbol, b: any): (a: [
 		Cond,
