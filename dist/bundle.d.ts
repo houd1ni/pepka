@@ -325,7 +325,7 @@ export declare const genBy: {
 	(a: (i: number) => any): (b: number) => any[];
 	(a: (i: number) => any, b: number): any[];
 };
-export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => any;
+export declare const once: <Func extends AnyFunc>(fn: Func) => (...args: Parameters<Func>) => ReturnType<Func>;
 export declare const reverse: <T extends any>(xs: T[]) => T[];
 export declare const explore: (caption: string, level?: string) => {
 	<T>(x: T): T;

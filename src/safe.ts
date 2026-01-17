@@ -200,11 +200,11 @@ export const genBy = curry2(
   ) => [...Array(length)].map((_, i) => generator(i))
 )
 export const once = <Func extends AnyFunc>(fn: Func) => {
-  let done = false, cache: any
+  let done = false, cache: ReturnType<Func>
   return function(...args: Parameters<Func>) {
     if(done) return cache
     done = true
-    return cache = fn(...args)
+    return cache = fn(...args) as ReturnType<Func>
   }
 }
 export const reverse = <T extends any>(xs: T[]): T[] => {

@@ -138,7 +138,7 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
 });
 
 /* Then next fns seem to be excess due to their safe ver performance should be the same or better:
-* qflat, qpick
+* qflat, qpick, qslice, quniq
 */
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
