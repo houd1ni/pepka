@@ -3,7 +3,7 @@ import { includes, type, eq, qstartsWithWith } from "./common"
 import { AnyObject, Reducer, AnyFunc } from "./types"
 import { isFunc, isArray, isObj, isNil } from "./utils"
 /* Then next fns seem to be excess due to their safe ver performance should be the same or better:
-* qflat, qpick, qslice, quniq
+* qflat, qpick, qslice, quniq, qflat, qflatShallow, qreduceAsync
 */
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})

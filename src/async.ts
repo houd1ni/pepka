@@ -1,6 +1,6 @@
 import { curry2 } from "./curry"
 import { head } from "./safe"
-import { AnyFunc } from "./types"
+import { AnyFunc, Composed } from "./types"
 
 /** One promise waits for another. */
 export const forEachSerial = (() => {
@@ -30,6 +30,6 @@ export const forEachAsync = curry2(
 export const composeAsync = (() => {
   const pipe = async (fns: AnyFunc[], input: any[], i: number): Promise<any> =>
     ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input)
-  return <T = any>(...fns: AnyFunc[]) =>
-    (...input: any[]) => pipe(fns, input, fns.length-1) as Promise<T>
+  return <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]): Composed<TIn, Promise<TOut>> =>
+    (...input: any[]) => pipe(fns, input, fns.length-1)
 })()

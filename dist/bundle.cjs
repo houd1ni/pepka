@@ -140,7 +140,7 @@ const qstartsWithWith = (comparator) => curry2((start, s) => {
 });
 
 /* Then next fns seem to be excess due to their safe ver performance should be the same or better:
-* qflat, qpick, qslice, quniq
+* qflat, qpick, qslice, quniq, qflat, qflatShallow, qreduceAsync
 */
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
@@ -264,7 +264,7 @@ const qpush = qappend;
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
-// TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
+// TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 const take = (argN) => (...args) => args[argN];
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
 const when = curry3((cond, pipe, s) => ifElse(cond, pipe, identity, s));

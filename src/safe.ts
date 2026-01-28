@@ -1,11 +1,11 @@
 import { __, curry, curry2, curry3 } from './curry'
 import { isNum, undef, isArray, isFunc, isObj, inf, isNil } from './utils'
 import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
-import { AnyFunc, Cond, AnyObject, Reducer } from './types'
+import { AnyFunc, Composed, Cond, AnyObject, Reducer } from './types'
 import { symbol, type, length, equals, includes, qstartsWithWith, eq } from './common'
 import { Split, AnyArray, IndexesOfArray } from './internal_types'
 import { is_typed_arr } from './internal'
-// TODO: over, lensProp. propsEq is up to 20x slow due to deep equals.
+// TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
 export const ifElse = curry(
@@ -23,7 +23,6 @@ export const when = curry3(
     s: any
   ) => ifElse(cond, pipe, identity, s)
 )
-type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut
 export const compose = (
   <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]): Composed<TIn, TOut> =>
     (...args: TIn) => {

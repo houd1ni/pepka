@@ -20,6 +20,7 @@ export interface AnyObject extends Record<any, any> {
 export type Reducer<T = any> = (accum: T, cur: any, index: number) => T;
 export type AnyFunc<ReturnT = any, Args extends AnyArgs = AnyArgs> = (...args: Args) => ReturnT;
 export type Curried<Args extends AnyArgs = AnyArgs, ReturnT = any> = (arg: Args[number]) => Curried<Args> | ReturnT;
+export type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut;
 type Placeholder = symbol;
 export declare const __: Placeholder;
 export declare const curry: (fn: AnyFunc) => (...args: AnyArgs) => any;
@@ -73,7 +74,6 @@ export declare const isNil: <T extends any>(s: T) => T extends (null | undefined
 export declare const take: (argN: number) => (...args: any[]) => any;
 export declare const ifElse: (...args: AnyArgs) => any;
 export declare const when: (...args: AnyArgs) => any;
-type Composed<TIn extends any[], TOut> = (...xs: TIn) => TOut;
 export declare const compose: <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, TOut>;
 export declare const bind: {
 	(a: symbol, b: any): (a: any) => any;
@@ -718,7 +718,7 @@ export declare const forEachAsync: {
 	(a: (item: any) => Promise<any>, b: any[]): Promise<any[]>;
 };
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
-export declare const composeAsync: <T = any>(...fns: AnyFunc[]) => (...input: any[]) => Promise<T>;
+export declare const composeAsync: <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, Promise<TOut>>;
 
 export {
 	length$1 as length,
