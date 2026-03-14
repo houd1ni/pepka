@@ -13,15 +13,16 @@ export const debounce = <T extends AnyFunc>(time: number, fn: T) => {
     queue.push(ff)
   }))
 }
-// export const debouncePrepared = 
 export const throttle = <T extends AnyFunc>(time: number, fn: T) => {
   let on = true
+  let res: any
   return (...args: Parameters<T>) => {
     if(on) {
       on = false
       setTimeout(() => on = true, time)
-      return fn(...args)
+      res = fn(...args)
     }
+    return res
   }
 }
 export const wait = (time: number) => new Promise((ff) => setTimeout(ff, time))

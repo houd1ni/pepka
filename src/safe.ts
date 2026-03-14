@@ -1,10 +1,10 @@
+import { eq, equals, includes, length, symbol, type } from './common'
 import { __, curry, curry2, curry3 } from './curry'
-import { isNum, undef, isArray, isFunc, isObj, inf, isNil } from './utils'
-import { qmergeDeep, qreduce, qappend, qmapKeys, qmergeDeepX, qmergeDeepAdd, qfilter, qfreeze, qfreezeShallow, qmapObj } from './quick'
-import { AnyFunc, Composed, Cond, AnyObject, Reducer } from './types'
-import { symbol, type, length, equals, includes, qstartsWithWith, eq } from './common'
-import { Split, AnyArray, IndexesOfArray } from './internal_types'
-import { is_typed_arr } from './internal'
+import { is_typed_arr, startsWithWith } from './internal'
+import { AnyArray, IndexesOfArray, Split } from './internal_types'
+import { qappend, qfilter, qfreeze, qfreezeShallow, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qreduce } from './quick'
+import { AnyFunc, AnyObject, Composed, Cond, Reducer } from './types'
+import { inf, isArray, isFunc, isNil, isNum, isObj, undef } from './utils'
 // TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
@@ -38,6 +38,7 @@ export const compose = (
       return s as any as TOut
     }
 )
+/** @param fn AnyFunc @param context any */
 export const bind = curry2<AnyFunc>((fn: AnyFunc, context: any) => fn.bind(context))
 export const nth = curry2(<T extends any>(i: number, data: string | ArrayLike<T>) => data[i])
 // FIXME: these types. Somewhere in curry2.
@@ -110,20 +111,18 @@ export const always = <T extends any>(s: T) => () => s
 export const identity = <T extends any>(s: T) => s
 export const trim = (s: string) => s.trim()
 
-/** @param start string | any[] @param s string | any[] */
-export const startsWith = qstartsWithWith((x: any, y: any) => equals(x, y))
-type NotOverload = {
+type T_not = {
   (x: true): false
   (x: false): true
   (x: any): boolean
 }
-export const not: NotOverload = (x: any) => !x as any
-type KeysOverload = {
+export const not: T_not = (x: any) => !x as any
+type T_keys = {
   <T extends readonly any[]>(o: T): IndexesOfArray<T>[]
   <T extends any[]>(o: T): string[]
   <T extends AnyObject>(o: T): (keyof T)[]
 }
-export const keys: KeysOverload = (o: any) => Object.keys(o)
+export const keys: T_keys = (o: any) => Object.keys(o)
 export const values = (o: AnyObject | any[]) => Object.values(o)
 export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
 export const test = curry2((re: RegExp, s: string) => re.test(s))
@@ -150,10 +149,13 @@ export const noop = (()=>{}) as (...args: any[]) => any
  * @param {string} fnName - property name of the function.
  * @param {AnyObject} o - the object with the function. */
 export const callFrom = curry((args: any[], fn: string, o: AnyObject) => o[fn](...args))
-export const complement = (fn: AnyFunc) => (...args: any) => {
+type T_complement<F extends AnyFunc> = {
+  (...args: Parameters<F>): ReturnType<F> extends AnyFunc ? T_complement<ReturnType<F>> : boolean
+}
+export const complement = <F extends AnyFunc>(fn: F): T_complement<F> => (...args: any[]): any => {
   const out = fn(...args)
   const f = isFunc(out)
-  return !f || f&&out.$args_left<=0 ? not(out) : complement(out)
+  return (!f || !out.$args_left) ? not(out) : complement(out)
 }
 export const sizeof = (s: any[] | string | AnyObject) => {
   if(isObj(s)) {
@@ -196,7 +198,11 @@ export const genBy = curry2(
   (
     generator: (i: number) => any,
     length: number
-  ) => [...Array(length)].map((_, i) => generator(i))
+  ) => {
+    const a = new Array(length)
+    for(let i=0; i<length; i++) a[i] = generator(i)
+    return a
+  }
 )
 export const once = <Func extends AnyFunc>(fn: Func) => {
   let done = false, cache: ReturnType<Func>
@@ -206,10 +212,7 @@ export const once = <Func extends AnyFunc>(fn: Func) => {
     return cache = fn(...args) as ReturnType<Func>
   }
 }
-export const reverse = <T extends any>(xs: T[]): T[] => {
-  const ln = length(xs)-1
-  return map((_: any, i: number) => xs[ln-i], xs)
-}
+export const reverse = <T extends any>(xs: T[]): T[] => xs.toReversed()
 export const explore = (caption: string, level = 'log') => tap(
   (v: any) => console[level](caption, v)
 )
@@ -242,8 +245,23 @@ export const all = curry2((pred: Cond, xs: any[]) => xs.every(pred))
 export const any = curry2((pred: Cond, xs: any[]) => xs.some(pred))
 export const allPass = curry2((preds: Cond[], x: any) => preds.every((pred) => pred(x)))
 export const anyPass = curry2((preds: Cond[], x: any) => preds.some((pred) => pred(x)))
+/** @param start string | any[] @param s string | any[] @description detects if `s` starts with `start` */
+export const startsWith = startsWithWith(equals)
+/** @param start string | any[] @param s string | any[] @description detects if `s` starts with `start` */
+export const startsWithShallow = startsWithWith(eq)
+// type PropGetter = <O extends AnyObject, k extends keyof O>(key: k, o: O) => O[k]
+// type T_prop = <O extends AnyObject, k extends keyof O>{
+//   (key: k, o: O): O[k]
+//   (fn: AnyFunc): {
+//     <T>(x: T): T
+//     (): undefined
+//   }
+// }
+//type PropGetterCurried = Curried<PropGetter>
 /** @param key string @param o AnyObject @returns o[key] */
-export const prop = curry2((key: string, o: AnyObject) => o[key])
+export const prop = curry2(((key: string, o: AnyObject) => o[key])) // as PropGetter
+// const x = prop('q')
+// const y = x({q: 9})
 /** @param key string @param value any @param o AnyObject @returns boolean o[key] equals value */
 export const propEq = curry3(
   (key: string, value: any, o: AnyObject) => equals(o[key], value)
@@ -252,16 +270,15 @@ export const propEq = curry3(
 export const propsEq = curry3(
   (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 )
-export const pathOr = curry3(
-  (_default: any, path: (string | number)[], o: any) => length(path)
-    ? isNil(o)
-      ? _default
-      : compose(
-          (k) => k in o ? pathOr(_default, slice(1, inf, path), o[k]) : _default,
-          head
-        )(path)
-    : o
-)
+const _pathOr = (_default: any, path: (string | number)[], o: AnyObject) => length(path)
+  ? isNil(o)
+    ? _default
+    : compose(
+        (k) => k in o ? _pathOr(_default, slice(1, inf, path) as typeof path, o[k] as typeof o) : _default,
+        head
+      )(path)
+  : o
+export const pathOr = curry3(_pathOr) // it's more performant due to recursion there.
 export const path = pathOr(undef)
 export const pathEq = curry3(
   (_path: string[], value: any, o: AnyObject) => equals(path(_path, o), value)
@@ -301,8 +318,13 @@ export const reduce = curry3(
   <T = any>(reducer: Reducer<T>, accum: T, arr: any[]) =>
     qreduce(reducer, clone(accum), arr)
 )
+/**
+ *  @param props (string|number)[]
+ *  @param o AnyObject
+ *  @returns AnyObject
+*/
 export const pick = curry2(
-  (props: string[], o: AnyObject) => {
+  (props: (string|number)[], o: AnyObject) => {
     const out = {}
     for(const p of props) if(p in o) out[p] = o[p]
     return out
@@ -430,7 +452,7 @@ export const zipWith = curry3(
 )
 
 // Reexport safe stuff that is ready to use externally. 
-export { toLower, toUpper, type, typeIs, length, eq, equals, includes } from './common'
+export { eq, equals, includes, length, toLower, toUpper, type, typeIs } from './common'
 export { isNil } from './utils'
 
 // ALIASES
@@ -441,3 +463,4 @@ export const notf = complement
 export const push = append
 export const some = any
 export const weakEq = eq
+export const uniqBy = uniqWith

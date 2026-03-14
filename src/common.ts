@@ -1,7 +1,6 @@
 import { curry2 } from "./curry"
 import { is_typed_arr } from "./internal"
-import { AnyArray, StrLen } from "./internal_types"
-import { to, isNull, isStr, isUndef } from "./utils"
+import { to, isNull, isStr } from "./utils"
 
 // It's faster that toUpperCase() !
 const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F' }
@@ -17,7 +16,6 @@ export const type = (s: any): string => {
 }
 export const typeIs = curry2((t: string, s: any) => type(s)===t)
 
-export const length = <T extends AnyArray | string>(s: T): T extends string ? StrLen<T> : T["length"] => s.length as any
 export const eq = curry2((a: any, b: any) => a===b)
 export const equals = curry2((a: any, b: any) => {
   const typea = type(a)
@@ -43,13 +41,4 @@ export const includes = curry2(
     }
   }
 )
-/** @param start string | any[] @param s string | any[] */
-export const qstartsWithWith = (comparator: (x: any, y: any)=>boolean) => curry2(
-  (start: any[] | string, s: any[] | string) => {
-    const len_start = length(start)
-    const len_s = length(s)
-    if(len_start>len_s) return false
-    for(let i=0; i<len_start; i++) if(!comparator(s[i], start[i])) return false
-    return true
-  }
-)
+export {length} from './internal'

@@ -1,7 +1,7 @@
 import { AnyArgs } from "./internal_types"
 import { AnyFunc } from "./types"
 
-type Placeholder = symbol
+export type Placeholder = symbol
 export const __: Placeholder = Symbol('Placeholder')
 
 const countArgs = (s: AnyArgs) => {
@@ -60,7 +60,15 @@ const endlessph = <Func extends AnyFunc>(fn: Func) => {
   return _endlessph
 }
 
+export type Curried2<p0, p1, ReturnT> = {
+  (a: Placeholder, b: p1): (a: p0) => ReturnT
+  (a: p0, b: Placeholder): (b: p1) => ReturnT
+  (a: p0): (b: p1) => ReturnT
+  (a: p0, b: p1): ReturnT
+}
+
 type Func2 = (a: any, b: any) => any
+const zero = 0, one = 1
 export function curry2<Func extends Func2>(fn: Func) {
   type p0 = Parameters<Func>[0]
   type p1 = Parameters<Func>[1]
@@ -69,16 +77,12 @@ export function curry2<Func extends Func2>(fn: Func) {
   function curried2(a: p0, b: Placeholder): (b: p1) => ReturnT
   function curried2(a: p0 ): (b: p1) => ReturnT
   function curried2(a: p0, b: p1): ReturnT
-  function curried2(a: p0 | Placeholder, b?: p1) {
-    const withPlaceholder1 = a===__
-    const aln = arguments.length
-    if(aln === 1 && withPlaceholder1)
-      throw new Error('Senseless placeholder usage.')
-    return aln>1
-      ? withPlaceholder1
-        ? endlessph((a: p0) => fn(a, b) as ReturnType<Func>)
-        : fn(a, b) as ReturnType<Func>
-      : (b: p1) => fn(a, b) as ReturnType<Func>
+  function curried2(a: p0 | Placeholder, ...args: [b?: p1]) {
+    return args.length>zero
+      ? a===__
+        ? endlessph((a: p0) => fn(a, args[zero]) as ReturnType<Func>)
+        : fn(a, args[zero]) as ReturnType<Func>
+      : (b: p1) => fn(a, b) as Curried2<p0, p1, ReturnT>
   }
   return curried2
 }

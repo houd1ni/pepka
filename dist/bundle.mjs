@@ -44,16 +44,13 @@ const endlessph = (fn) => {
     }
     return _endlessph;
 };
+const zero = 0;
 function curry2(fn) {
-    function curried2(a, b) {
-        const withPlaceholder1 = a === __;
-        const aln = arguments.length;
-        if (aln === 1 && withPlaceholder1)
-            throw new Error('Senseless placeholder usage.');
-        return aln > 1
-            ? withPlaceholder1
-                ? endlessph((a) => fn(a, b))
-                : fn(a, b)
+    function curried2(a, ...args) {
+        return args.length > zero
+            ? a === __
+                ? endlessph((a) => fn(a, args[zero]))
+                : fn(a, args[zero])
             : (b) => fn(a, b);
     }
     return curried2;
@@ -69,8 +66,20 @@ function curry3(fn) {
     return curry(fn);
 }
 
+const length = (s) => s.length;
 const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
 const is_typed_arr = (t) => typed_arr_re.test(t);
+/** @param start string | any[] @param s string | any[] */
+const startsWithWith = (comparator) => curry2((start, s) => {
+    const len_start = length(start);
+    const len_s = length(s);
+    if (len_start > len_s)
+        return false;
+    for (let i = 0; i < len_start; i++)
+        if (!comparator(s[i], start[i]))
+            return false;
+    return true;
+});
 
 const undef = undefined;
 const nul = null;
@@ -97,7 +106,6 @@ const type = (s) => {
         : caseMap[t[0]] + t.slice(1);
 };
 const typeIs = curry2((t, s) => type(s) === t);
-const length = (s) => s.length;
 const eq = curry2((a, b) => a === b);
 const equals = curry2((a, b) => {
     const typea = type(a);
@@ -125,21 +133,10 @@ const includes = curry2((s, ss) => {
         return false;
     }
 });
-/** @param start string | any[] @param s string | any[] */
-const qstartsWithWith = (comparator) => curry2((start, s) => {
-    const len_start = length(start);
-    const len_s = length(s);
-    if (len_start > len_s)
-        return false;
-    for (let i = 0; i < len_start; i++)
-        if (!comparator(s[i], start[i]))
-            return false;
-    return true;
-});
 
-/* Then next fns seem to be excess due to their safe ver performance should be the same or better:
-* qflat, qpick, qslice, quniq, qflat, qflatShallow, qreduceAsync
-*/
+const { min } = Math;
+const z = 0;
+/* qflat, qflatShallow, qreduceAsync */
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
@@ -178,6 +175,7 @@ const mergeDeep$1 = (strategy) => curry2((o1, o2) => {
 const qmergeDeep = mergeDeep$1(1);
 const qmergeDeepX = mergeDeep$1(2);
 const qmergeDeepAdd = mergeDeep$1(3);
+/** @param o1 <- o2 */
 const qmergeShallow = curry2((o1, o2) => Object.assign(o1, o2));
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const qmapKeys = curry2((keyMap, o) => {
@@ -251,16 +249,60 @@ const qassocPath = curry3((_path, v, o) => {
 });
 const qreverse = (arr) => arr.reverse();
 const qomit = curry2((props, o) => qfilter((_, k) => !includes(k, props), o));
-/** @param start string | any[] @param s string | any[] */
-const qstartsWith = qstartsWithWith(eq);
 /** @param prop string @param pipe (data[prop]): prop_value @param data any
  * @returns data with prop over pipe. */
 const qoverProp = curry3((prop, pipe, data) => qassoc(prop, pipe(data[prop]), data));
+/** Slower than pick() (dictionary mode) !
+ *  @param props (string|number)[]
+ *  @param o AnyObject
+ *  @returns AnyObject
+*/
+const qpick = curry2((props, o) => {
+    for (const p in o)
+        if (!props.includes(p))
+            delete o[p];
+    return o;
+});
+const qslice = curry3((from, to, xs) => {
+    const right = (isNum(to) ? to : inf);
+    const window_width = min(right, length(xs)) - from;
+    if (isArray(xs)) {
+        xs = xs;
+        if (from > z)
+            for (let i = z; i < window_width; i++)
+                xs[i] = xs[from + i];
+        xs.length = window_width;
+        return xs;
+    }
+    else
+        return xs.slice(from, right); // strings are immutable.
+});
+/** Should be faster than .splice() 'cause does not make a new array. */
+const rmel = (index, xs) => {
+    const len = length(xs);
+    for (let i = index; i < len; i++)
+        xs[i] = xs[i + 1];
+    xs.length = len - 1;
+    return xs;
+};
+const seen = new Set();
+const quniq = (xs) => {
+    seen.clear();
+    let size = length(xs);
+    for (let i = z; i < size; i++) {
+        const x = xs[i];
+        if (seen.has(x)) {
+            rmel(i, xs);
+            size--;
+            i--;
+        }
+        else
+            seen.add(x);
+    }
+    return xs;
+};
 // Aliases.
 const qpush = qappend;
-
-// TODO: possibly introduce a second argument limiting unfolding.
-const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
 // TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 const take = (argN) => (...args) => args[argN];
@@ -279,6 +321,7 @@ const compose = ((...fns) => (...args) => {
     }
     return s;
 });
+/** @param fn AnyFunc @param context any */
 const bind = curry2((fn, context) => fn.bind(context));
 const nth = curry2((i, data) => data[i]);
 // FIXME: these types. Somewhere in curry2.
@@ -317,8 +360,6 @@ const divide = curry2((a, b) => b / a);
 const always = (s) => () => s;
 const identity = (s) => s;
 const trim = (s) => s.trim();
-/** @param start string | any[] @param s string | any[] */
-const startsWith = qstartsWithWith((x, y) => equals(x, y));
 const not = (x) => !x;
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
@@ -343,7 +384,7 @@ const callFrom = curry((args, fn, o) => o[fn](...args));
 const complement = (fn) => (...args) => {
     const out = fn(...args);
     const f = isFunc(out);
-    return !f || f && out.$args_left <= 0 ? not(out) : complement(out);
+    return (!f || !out.$args_left) ? not(out) : complement(out);
 };
 const sizeof = (s) => {
     if (isObj(s)) {
@@ -386,7 +427,12 @@ const diff = curry2((_xs1, _xs2) => {
     }
     return out;
 });
-const genBy = curry2((generator, length) => [...Array(length)].map((_, i) => generator(i)));
+const genBy = curry2((generator, length) => {
+    const a = new Array(length);
+    for (let i = 0; i < length; i++)
+        a[i] = generator(i);
+    return a;
+});
 const once = (fn) => {
     let done = false, cache;
     return function (...args) {
@@ -396,10 +442,7 @@ const once = (fn) => {
         return cache = fn(...args);
     };
 };
-const reverse = (xs) => {
-    const ln = length(xs) - 1;
-    return map((_, i) => xs[ln - i], xs);
-};
+const reverse = (xs) => xs.toReversed();
 const explore = (caption, level = 'log') => tap((v) => console[level](caption, v));
 const cond = curry2((pairs, s) => {
     for (const [cond, fn] of pairs)
@@ -419,17 +462,33 @@ const all = curry2((pred, xs) => xs.every(pred));
 const any = curry2((pred, xs) => xs.some(pred));
 const allPass = curry2((preds, x) => preds.every((pred) => pred(x)));
 const anyPass = curry2((preds, x) => preds.some((pred) => pred(x)));
+/** @param start string | any[] @param s string | any[] @description detects if `s` starts with `start` */
+const startsWith = startsWithWith(equals);
+/** @param start string | any[] @param s string | any[] @description detects if `s` starts with `start` */
+const startsWithShallow = startsWithWith(eq);
+// type PropGetter = <O extends AnyObject, k extends keyof O>(key: k, o: O) => O[k]
+// type T_prop = <O extends AnyObject, k extends keyof O>{
+//   (key: k, o: O): O[k]
+//   (fn: AnyFunc): {
+//     <T>(x: T): T
+//     (): undefined
+//   }
+// }
+//type PropGetterCurried = Curried<PropGetter>
 /** @param key string @param o AnyObject @returns o[key] */
-const prop = curry2((key, o) => o[key]);
+const prop = curry2(((key, o) => o[key])); // as PropGetter
+// const x = prop('q')
+// const y = x({q: 9})
 /** @param key string @param value any @param o AnyObject @returns boolean o[key] equals value */
 const propEq = curry3((key, value, o) => equals(o[key], value));
 /** @param key string @param o1 AnyObject @param o2 AnyObject @returns o₁[key] equals o₂[key] */
 const propsEq = curry3((key, o1, o2) => equals(o1[key], o2[key]));
-const pathOr = curry3((_default, path, o) => length(path)
+const _pathOr = (_default, path, o) => length(path)
     ? isNil(o)
         ? _default
-        : compose((k) => k in o ? pathOr(_default, slice(1, inf, path), o[k]) : _default, head)(path)
-    : o);
+        : compose((k) => k in o ? _pathOr(_default, slice(1, inf, path), o[k]) : _default, head)(path)
+    : o;
+const pathOr = curry3(_pathOr); // it's more performant due to recursion there.
 const path = pathOr(undef);
 const pathEq = curry3((_path, value, o) => equals(path(_path, o), value));
 const pathsEq = curry3((_path, o1, o2) => equals(path(_path, o1), path(_path, o2)));
@@ -464,6 +523,11 @@ const freezeShallow = (o) => qfreezeShallow(clone(o));
  *  @param array T2[]
 */
 const reduce = curry3((reducer, accum, arr) => qreduce(reducer, clone(accum), arr));
+/**
+ *  @param props (string|number)[]
+ *  @param o AnyObject
+ *  @returns AnyObject
+*/
 const pick = curry2((props, o) => {
     const out = {};
     for (const p of props)
@@ -547,6 +611,33 @@ const notf = complement;
 const push = append;
 const some = any;
 const weakEq = eq;
+const uniqBy = uniqWith;
+
+/** One promise waits for another. */
+const forEachSerial = (() => {
+    const pipe = async (fn, items, i) => {
+        if (i < items.length) {
+            await fn(items[i]);
+            await pipe(fn, items, ++i);
+        }
+    };
+    return curry2((fn, items) => pipe(fn, items, 0));
+})();
+/** Promise.all wrapper for functional pipelining. */
+const waitAll = (promises) => Promise.all(promises);
+/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
+ * @param {AnyFunc<Promise>} fn - function to wait.
+ * @param {T} s - any value to tap and return back
+ * @returns {T}
+ */
+const waitTap = curry2(async (fn, s) => { await fn(s); return s; });
+/** Waits for all promises mapped by the fn. */
+const forEachAsync = curry2((fn, items) => Promise.all(items.map(fn)));
+/** The same as compose, but waits for promises in chains and returns a Promise.  */
+const composeAsync = (() => {
+    const pipe = async (fns, input, i) => ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input);
+    return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
+})();
 
 const ecran = '\\';
 // TODO: make it splicy, not accumulatie by symbols.
@@ -615,43 +706,21 @@ const debounce = (time, fn) => {
         queue.push(ff);
     }));
 };
-// export const debouncePrepared = 
 const throttle = (time, fn) => {
     let on = true;
+    let res;
     return (...args) => {
         if (on) {
             on = false;
             setTimeout(() => on = true, time);
-            return fn(...args);
+            res = fn(...args);
         }
+        return res;
     };
 };
 const wait = (time) => new Promise((ff) => setTimeout(ff, time));
 
-/** One promise waits for another. */
-const forEachSerial = (() => {
-    const pipe = async (fn, items, i) => {
-        if (i < items.length) {
-            await fn(items[i]);
-            await pipe(fn, items, ++i);
-        }
-    };
-    return curry2((fn, items) => pipe(fn, items, 0));
-})();
-/** Promise.all wrapper for functional pipelining. */
-const waitAll = (promises) => Promise.all(promises);
-/** Waits for a Promise that been generated by the first arg, then returns an untoched value. Types T.
- * @param {AnyFunc<Promise>} fn - function to wait.
- * @param {T} s - any value to tap and return back
- * @returns {T}
- */
-const waitTap = curry2(async (fn, s) => { await fn(s); return s; });
-/** Waits for all promises mapped by the fn. */
-const forEachAsync = curry2((fn, items) => Promise.all(items.map(fn)));
-/** The same as compose, but waits for promises in chains and returns a Promise.  */
-const composeAsync = (() => {
-    const pipe = async (fns, input, i) => ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input);
-    return (...fns) => (...input) => pipe(fns, input, fns.length - 1);
-})();
+// TODO: possibly introduce a second argument limiting unfolding.
+const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
-export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, debounce, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qprepend, qpush, qreduce, qreverse, qsort, qstartsWith, qstartsWithWith, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, subtract, symbol, tail, take, tap, test, throttle, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqWith, values, wait, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };
+export { F, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, debounce, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachAsync, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qpick, qprepend, qpush, qreduce, qreverse, qslice, qsort, quniq, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, startsWithShallow, subtract, symbol, tail, take, tap, test, throttle, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqBy, uniqWith, values, wait, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };

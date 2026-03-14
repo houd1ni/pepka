@@ -1,10 +1,10 @@
+import { includes, length, type } from "./common"
 import { curry2, curry3 } from "./curry"
-import { includes, type, eq, qstartsWithWith } from "./common"
-import { AnyObject, Reducer, AnyFunc } from "./types"
-import { isFunc, isArray, isObj, isNil } from "./utils"
-/* Then next fns seem to be excess due to their safe ver performance should be the same or better:
-* qflat, qpick, qslice, quniq, qflat, qflatShallow, qreduceAsync
-*/
+import { AnyFunc, AnyObject, Reducer } from "./types"
+import { inf, isArray, isFunc, isNil, isNum, isObj } from "./utils"
+const {min} = Math
+const z = 0
+/* qflat, qflatShallow, qreduceAsync */
 
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
@@ -42,6 +42,7 @@ const mergeDeep = (strategy: 1|2|3) => curry2((o1: AnyObject, o2: AnyObject): An
 export const qmergeDeep = mergeDeep(1)
 export const qmergeDeepX = mergeDeep(2)
 export const qmergeDeepAdd = mergeDeep(3)
+/** @param o1 <- o2 */
 export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => Object.assign(o1, o2))
 /** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const qmapKeys = curry2(
@@ -126,13 +127,50 @@ export const qomit = curry2(
     o
   )
 )
-/** @param start string | any[] @param s string | any[] */
-export const qstartsWith = qstartsWithWith(eq)
 /** @param prop string @param pipe (data[prop]): prop_value @param data any
  * @returns data with prop over pipe. */
 export const qoverProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) => qassoc(prop, pipe(data[prop]), data)
 )
+/** Slower than pick() (dictionary mode) !
+ *  @param props (string|number)[]
+ *  @param o AnyObject
+ *  @returns AnyObject
+*/
+export const qpick = curry2((props: string[], o: AnyObject) => {
+  for(const p in o) if(!props.includes(p)) delete o[p]
+  return o
+})
+export const qslice = curry3(
+  (from: number, to: number, xs: any[] | string) => {
+    const right = (isNum(to)?to:inf) as number
+    const window_width = min(right, length(xs))-from
+    if(isArray(xs)) {
+      xs = xs as any[]
+      if(from>z) for(let i=z; i<window_width; i++) xs[i] = xs[from+i]
+      xs.length = window_width
+      return xs
+    } else return xs.slice(from, right) // strings are immutable.
+  }
+)
+/** Should be faster than .splice() 'cause does not make a new array. */
+const rmel = (index: number, xs: any[]) => {
+  const len = length(xs)
+  for(let i=index; i<len; i++) xs[i]=xs[i+1]
+  xs.length = len-1
+  return xs
+}
+const seen = new Set()
+export const quniq = (xs: any[]) => {
+  seen.clear()
+  let size = length(xs)
+  for(let i=z; i<size; i++) {
+    const x = xs[i]
+    if(seen.has(x)) {rmel(i, xs); size--; i--}
+    else seen.add(x)
+  }
+  return xs
+}
 
 // Aliases.
 export const qpush = qappend
