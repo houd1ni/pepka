@@ -1,3 +1,4 @@
+import { noop } from "./safe"
 import { AnyFunc, AnyObject } from "./types"
 
 export const undef = undefined
@@ -14,3 +15,21 @@ export function isFunc(s: any) { return to(s)==='function' }
 export const isStr = <T extends any>(s: T) => (to(s)==='string') as T extends string ? true : false
 export const isObj = <T extends any>(s: T) => (!isNull(s) && to(s)==='object') as T extends AnyObject ? true : false
 export const isNil = <T extends any>(s: T) => (isNull(s) || isUndef(s)) as T extends (null|undefined) ? true : false
+
+export class QPromise<T> extends Promise<T> {
+  private ff: AnyFunc
+  private rj: AnyFunc
+  public cancel(resolve = false) {
+    if(resolve) this.ff()
+    else {
+      this.catch(noop)
+      this.rj('canceled')
+    }
+  }
+  constructor(fn: AnyFunc<any, [AnyFunc, AnyFunc]>) {
+    super((ff, rj) => {
+      this.ff=ff; this.rj = rj
+      return fn(ff, rj)
+    })
+  }
+}

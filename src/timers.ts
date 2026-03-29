@@ -1,4 +1,5 @@
 import { AnyFunc } from "./types"
+import { QPromise } from "./utils"
 
 export const debounce = <T extends AnyFunc>(time: number, fn: T) => {
   let queue: AnyFunc[] = []
@@ -25,4 +26,4 @@ export const throttle = <T extends AnyFunc>(time: number, fn: T) => {
     return res
   }
 }
-export const wait = (time: number) => new Promise((ff) => setTimeout(ff, time))
+export const wait = (time: number) => new QPromise((ff) => setTimeout(ff, time))

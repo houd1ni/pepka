@@ -152,6 +152,7 @@ export const callFrom = curry((args: any[], fn: string, o: AnyObject) => o[fn](.
 type T_complement<F extends AnyFunc> = {
   (...args: Parameters<F>): ReturnType<F> extends AnyFunc ? T_complement<ReturnType<F>> : boolean
 }
+// FIXME: complement(flip(includes)) -> one arg fn!
 export const complement = <F extends AnyFunc>(fn: F): T_complement<F> => (...args: any[]): any => {
   const out = fn(...args)
   const f = isFunc(out)

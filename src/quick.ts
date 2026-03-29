@@ -63,39 +63,51 @@ export const qmapKeys = curry2(
   }
 )
 // FIXME: qmap(any, tags) -> some function!!!
+/**
+ * @param pipe (v, i, list: T[]) -> T.
+ * @param data T[].
+ * @returns T[].
+*/
 export const qmap = curry2(
-  (pipe: (s: any, i?: number, list?: any[]) => any, arr: any[]) => {
+  <T extends any[]|AnyObject>(pipe: (s: any, i?: number, list?: T) => T[Extract<keyof T, string>], arr: T) => {
     for(const i in arr) arr[i] = pipe(arr[i], +i, arr)
     return arr
   }
 )
+/**
+ * @param cond (v, k) -> boolean.
+ * @param data T extends AnyObject.
+ * @returns T
+*/
 export const qmapObj = curry2(
   (pipe: (s: any, k?: string, o?: AnyObject) => any, o: AnyObject) => {
     for(const k in o) o[k] = pipe(o[k], k, o)
     return o
   }
 )
+/**
+ * @param cond (v, k) -> boolean.
+ * @param data T extends any[] | AnyObject.
+ * @returns T
+*/
 export const qfilter = curry2(
-  <T extends any[] | AnyObject>(
-    cond: (v: any, k: string | number) => boolean,
-    data: T
-  ): T => {
-    const isArr = isArray(data)
-    let indicies_offset: number, indicies2rm: number[]
-    if(isArr) {
-      indicies_offset = 0
-      indicies2rm = []
-    }
-    for(let k in data)
-      if(!cond(data[k], k)) // @ts-ignore
-        if(isArr) indicies2rm.push(+k)
-        else delete data[k]
-    if(isArr)// @ts-ignore
-      for(const i of indicies2rm) // @ts-ignore
-        data.splice(i - indicies_offset++, 1)
-    return data
-  }
-)
+<T extends any[] | AnyObject>(
+  cond: (v: any, k: string | number) => boolean,
+  data: T
+): T => {
+  if(isArray(data)) {
+  let indicies_offset = 0
+  const indicies2rm: number[] = []
+  const len = length(data as any[])
+  for(let i = 0; i<len; i++)
+    if(!cond(data[i], i))
+      indicies2rm.push(i)
+  for(const i of indicies2rm)
+    data.splice(i - indicies_offset++, 1)
+} else for(const k in data)
+  if(!cond(data[k], k)) delete data[k]
+return data
+})
 export const qempty = <T extends AnyObject|any[]>(o: T): T extends any[] ? [] : {} => {
   if(isArray(o)) o.splice(0)
   else for(const i in o) delete o[i]
@@ -132,7 +144,7 @@ export const qomit = curry2(
 export const qoverProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) => qassoc(prop, pipe(data[prop]), data)
 )
-/** Slower than pick() (dictionary mode) !
+/** Slower than pick() (dictionary mode) ! it's okay when the object is already in the dic mode !
  *  @param props (string|number)[]
  *  @param o AnyObject
  *  @returns AnyObject

@@ -8,3 +8,5 @@ export * from './strings'
 export * from './timers'
 export * from './types'
 export * from './uncurry'
+export { QPromise } from './utils'
+

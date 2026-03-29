@@ -1,18 +1,19 @@
 import { curry2 } from "./curry"
 import { is_typed_arr } from "./internal"
-import { to, isNull, isStr } from "./utils"
+import { isNull, isStr, to } from "./utils"
 
 // It's faster that toUpperCase() !
-const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F' }
+const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F', o: 'O' }
 
 export const symbol = Symbol()
 export const toLower = (s: string) => s.toLowerCase()
 export const toUpper = (s: string) => s.toUpperCase()
+const cap_type = (t: string) => caseMap[t[0]] + t.slice(1)
 export const type = (s: any): string => {
   const t = to(s)
   return t==='object'
-    ? isNull(s) ? 'Null' : s.constructor.name
-    : caseMap[t[0]] + t.slice(1)
+    ? isNull(s) ? 'Null' : (s.constructor?.name||cap_type(t))
+    : cap_type(t)
 }
 export const typeIs = curry2((t: string, s: any) => type(s)===t)
 
@@ -41,4 +42,5 @@ export const includes = curry2(
     }
   }
 )
-export {length} from './internal'
+export { length } from './internal'
+
