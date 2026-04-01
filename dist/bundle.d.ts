@@ -240,13 +240,15 @@ export declare const qpush: {
 };
 export declare const isNil: <T extends any>(s: T) => T extends (null | undefined) ? true : false;
 export declare class QPromise<T> extends Promise<T> {
+	private oncancel;
 	private ff;
-	private rj;
+	private _cancel_data;
 	cancel(resolve?: boolean): void;
 	constructor(fn: AnyFunc<any, [
 		AnyFunc,
-		AnyFunc
-	]>);
+		AnyFunc,
+		AnyFunc?
+	]>, oncancel?: (...args: any[]) => any);
 }
 export declare const take: (argN: number) => (...args: any[]) => any;
 export declare const ifElse: (...args: AnyArgs) => any;
@@ -783,7 +785,7 @@ type StrTmpl = ((data: AnyObject) => string);
 export declare const getTmpl: (tmpl: string) => StrTmpl;
 export declare const debounce: <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => Promise<ReturnType<T>>;
 export declare const throttle: <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => any;
-export declare const wait: (time: number) => QPromise<unknown>;
+export declare const wait: (time: number) => QPromise<any>;
 export declare const uncurry: <Args extends any[] = any[], ReturnT = any>(fn: Curried<Args>) => AnyFunc;
 
 export {

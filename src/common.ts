@@ -1,6 +1,7 @@
 import { curry2 } from "./curry"
 import { is_typed_arr } from "./internal"
 import { isNull, isStr, to } from "./utils"
+const {isNaN} = Number
 
 // It's faster that toUpperCase() !
 const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F', o: 'O' }
@@ -13,6 +14,7 @@ export const type = (s: any): string => {
   const t = to(s)
   return t==='object'
     ? isNull(s) ? 'Null' : (s.constructor?.name||cap_type(t))
+    : t==='number'&&isNaN(s) ? 'NaN'
     : cap_type(t)
 }
 export const typeIs = curry2((t: string, s: any) => type(s)===t)

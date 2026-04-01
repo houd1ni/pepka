@@ -26,4 +26,7 @@ export const throttle = <T extends AnyFunc>(time: number, fn: T) => {
     return res
   }
 }
-export const wait = (time: number) => new QPromise((ff) => setTimeout(ff, time))
+export const wait = (time: number) => new QPromise<any>(
+  (ff) => setTimeout(ff, time),
+  (timeout: any) => clearTimeout(timeout)
+)

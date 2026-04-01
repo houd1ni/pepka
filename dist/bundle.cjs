@@ -86,6 +86,7 @@ const startsWithWith = (comparator) => curry2((start, s) => {
 const undef = undefined;
 const nul = null;
 const inf = Infinity;
+const not_assigned = Symbol();
 const to = (s) => typeof s;
 const isNull = (s) => (s === nul);
 const isUndef = (s) => (s === undef);
@@ -95,26 +96,30 @@ function isFunc(s) { return to(s) === 'function'; }
 const isStr = (s) => (to(s) === 'string');
 const isObj = (s) => (!isNull(s) && to(s) === 'object');
 const isNil = (s) => (isNull(s) || isUndef(s));
+// TODO: add .then(), .finally() and .catch() to return QPromise.
 class QPromise extends Promise {
+    oncancel;
     ff;
-    rj;
+    _cancel_data;
     cancel(resolve = false) {
         if (resolve)
             this.ff();
-        else {
-            this.catch(noop);
-            this.rj('canceled');
-        }
+        this.oncancel(this._cancel_data);
     }
-    constructor(fn) {
-        super((ff, rj) => {
-            this.ff = ff;
-            this.rj = rj;
-            return fn(ff, rj);
-        });
+    constructor(fn, oncancel = noop) {
+        let _cancel_data = not_assigned;
+        super((ff, rj) => _cancel_data = fn(ff, rj));
+        this.oncancel = oncancel;
+        const set_cb = () => this._cancel_data = _cancel_data;
+        // @ts-ignore-next
+        if (_cancel_data !== not_assigned)
+            set_cb();
+        else
+            setTimeout(set_cb);
     }
 }
 
+const { isNaN } = Number;
 // It's faster that toUpperCase() !
 const caseMap = { u: 'U', b: 'B', n: 'N', s: 'S', f: 'F', o: 'O' };
 const symbol = Symbol();
@@ -125,7 +130,8 @@ const type = (s) => {
     const t = to(s);
     return t === 'object'
         ? isNull(s) ? 'Null' : (s.constructor?.name || cap_type(t))
-        : cap_type(t);
+        : t === 'number' && isNaN(s) ? 'NaN'
+            : cap_type(t);
 };
 const typeIs = curry2((t, s) => type(s) === t);
 const eq = curry2((a, b) => a === b);
@@ -785,7 +791,7 @@ const throttle = (time, fn) => {
         return res;
     };
 };
-const wait = (time) => new QPromise((ff) => setTimeout(ff, time));
+const wait = (time) => new QPromise((ff) => setTimeout(ff, time), (timeout) => clearTimeout(timeout));
 
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
