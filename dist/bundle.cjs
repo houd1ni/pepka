@@ -83,6 +83,7 @@ const startsWithWith = (comparator) => curry2((start, s) => {
     return true;
 });
 
+const unsafe_props = { '__proto__': true, 'constructor': true, 'prototype': true };
 const undef = undefined;
 const nul = null;
 const inf = Infinity;
@@ -96,6 +97,7 @@ function isFunc(s) { return to(s) === 'function'; }
 const isStr = (s) => (to(s) === 'string');
 const isObj = (s) => (!isNull(s) && to(s) === 'object');
 const isNil = (s) => (isNull(s) || isUndef(s));
+const isSafe = (prop) => !(prop in unsafe_props);
 // TODO: add .then(), .finally() and .catch() to return QPromise.
 class QPromise extends Promise {
     oncancel;
@@ -168,35 +170,36 @@ const z = 0;
 const qappend = curry2((s, xs) => { xs.push(s); return xs; });
 const qassoc = curry3((prop, v, obj) => { obj[prop] = v; return obj; });
 const qreduce = curry3((fn, accum, arr) => arr.reduce(fn, accum));
-// strategy is for arrays: 1->clean, 2->merge, 3->push.
+// strategy is for arrays: 1->replace, 2->merge, 3->push.
 const mergeDeep$1 = (strategy) => curry2((o1, o2) => {
     for (let k in o2) {
-        switch (type(o2[k])) {
-            case 'Array':
-                if (strategy > 1 && type(o1[k]) === 'Array')
-                    switch (strategy) {
-                        case 2:
-                            const o1k = o1[k], o2k = o2[k];
-                            for (const i in o2k)
-                                if (o1k[i])
-                                    mergeDeep$1(strategy)(o1k[i], o2k[i]);
-                                else
-                                    o1k[i] = o2k[i];
-                            break;
-                        case 3: o1[k].push(...o2[k]);
-                    }
-                else
-                    o1[k] = o2[k];
-                break;
-            case 'Object':
-                if (type(o1[k]) === 'Object') {
-                    mergeDeep$1(strategy)(o1[k], o2[k]);
+        if (isSafe(k))
+            switch (type(o2[k])) {
+                case 'Array':
+                    if (strategy > 1 && type(o1[k]) === 'Array')
+                        switch (strategy) {
+                            case 2:
+                                const o1k = o1[k], o2k = o2[k];
+                                for (const i in o2k)
+                                    if (o1k[i])
+                                        mergeDeep$1(strategy)(o1k[i], o2k[i]);
+                                    else
+                                        o1k[i] = o2k[i];
+                                break;
+                            case 3: o1[k].push(...o2[k]);
+                        }
+                    else
+                        o1[k] = o2[k];
                     break;
-                }
-            default:
-                o1[k] = o2[k];
-                break;
-        }
+                case 'Object':
+                    if (type(o1[k]) === 'Object') {
+                        mergeDeep$1(strategy)(o1[k], o2[k]);
+                        break;
+                    }
+                default:
+                    o1[k] = o2[k];
+                    break;
+            }
     }
     return o1;
 });
@@ -346,6 +349,7 @@ const quniq = (xs) => {
 // Aliases.
 const qpush = qappend;
 
+const { assign } = Object;
 // TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 const take = (argN) => (...args) => args[argN];
 const ifElse = curry((cond, pipeYes, pipeNo, s) => cond(s) ? pipeYes(s) : pipeNo(s));
@@ -628,14 +632,14 @@ const memoize = curry2((keyGen, fn) => {
         return res;
     };
 });
-const mergeShallow = curry2((o1, o2) => Object.assign({}, o1, o2));
+const mergeShallow = curry2((o1, o2) => assign({}, o1, o2));
 const mergeDeep = curry2((a, b) => qmergeDeep(clone(a), b));
 const mergeDeepX = curry2((a, b) => qmergeDeepX(clone(a), b));
 const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), b));
 /** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
 const overProp = curry3((prop, pipe, data) => assoc(prop, pipe(data[prop]), data));
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
-const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, Object.assign({}, o)));
+const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, assign({}, o)));
 const zip = curry2((a, b) => map((s, i) => [s, b[i]], a));
 const zipObj = curry2((a, b) => reduce((ac, s, i) => assoc(s, b[i], ac), {}, a));
 // TODO: Tuple curried functions to replace these `AnyFuncs`.

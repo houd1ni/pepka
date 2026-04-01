@@ -1,6 +1,7 @@
 import { noop } from "./safe"
 import { AnyFunc, AnyObject } from "./types"
 
+const unsafe_props = {'__proto__': true, 'constructor': true, 'prototype': true}
 export const undef = undefined
 export const nul = null
 export const inf = Infinity
@@ -16,7 +17,7 @@ export function isFunc(s: any) { return to(s)==='function' }
 export const isStr = <T extends any>(s: T) => (to(s)==='string') as T extends string ? true : false
 export const isObj = <T extends any>(s: T) => (!isNull(s) && to(s)==='object') as T extends AnyObject ? true : false
 export const isNil = <T extends any>(s: T) => (isNull(s) || isUndef(s)) as T extends (null|undefined) ? true : false
-
+export const isSafe = (prop: string) => !(prop in unsafe_props)
 // TODO: add .then(), .finally() and .catch() to return QPromise.
 export class QPromise<T> extends Promise<T> {
   private ff: AnyFunc

@@ -68,7 +68,7 @@ export type Curried2<p0, p1, ReturnT> = {
 }
 
 type Func2 = (a: any, b: any) => any
-const zero = 0, one = 1
+const zero = 0
 export function curry2<Func extends Func2>(fn: Func) {
   type p0 = Parameters<Func>[0]
   type p1 = Parameters<Func>[1]

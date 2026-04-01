@@ -5,6 +5,7 @@ import { AnyArray, IndexesOfArray, Split } from './internal_types'
 import { qappend, qfilter, qfreeze, qfreezeShallow, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qreduce } from './quick'
 import { AnyFunc, AnyObject, Composed, Cond, Reducer } from './types'
 import { inf, isArray, isFunc, isNil, isNum, isObj, undef } from './utils'
+const {assign} = Object
 // TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
@@ -410,7 +411,7 @@ export const memoize = curry2(<Args extends any[]>(
 })
 export const mergeShallow = curry2(
   (o1: AnyObject, o2: AnyObject): AnyObject =>
-    Object.assign({}, o1, o2)
+    assign({}, o1, o2)
 )
 export const mergeDeep = curry2(
   (a: AnyObject, b: AnyObject) => qmergeDeep(clone(a), b) as AnyObject
@@ -431,7 +432,7 @@ export const mapKeys = curry2(
   (
     keyMap: {[oldKey: string]: string | AnyFunc},
     o: AnyObject
-  ) => qmapKeys(keyMap, Object.assign({}, o))
+  ) => qmapKeys(keyMap, assign({}, o))
 )
 export const zip = curry2(
   <T1 = any, T2 = any>(a: T1[], b: T2[]) => map((s: T1, i: number) => [s, b[i]], a)

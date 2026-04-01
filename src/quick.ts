@@ -1,7 +1,7 @@
 import { includes, length, type } from "./common"
 import { curry2, curry3 } from "./curry"
 import { AnyFunc, AnyObject, Reducer } from "./types"
-import { inf, isArray, isFunc, isNil, isNum, isObj } from "./utils"
+import { inf, isArray, isFunc, isNil, isNum, isObj, isSafe } from "./utils"
 const {min} = Math
 const z = 0
 /* qflat, qflatShallow, qreduceAsync */
@@ -9,10 +9,10 @@ const z = 0
 export const qappend = curry2((s: any, xs: any[]) => {xs.push(s); return xs})
 export const qassoc = curry3((prop: string, v: any, obj: AnyObject) => { obj[prop] = v; return obj })
 export const qreduce = curry3(<T>(fn: Reducer, accum: any, arr: T[]) => arr.reduce(fn, accum))
-// strategy is for arrays: 1->clean, 2->merge, 3->push.
+// strategy is for arrays: 1->replace, 2->merge, 3->push.
 const mergeDeep = (strategy: 1|2|3) => curry2((o1: AnyObject, o2: AnyObject): AnyObject => {
   for(let k in o2) {
-    switch(type(o2[k])) {
+    if(isSafe(k)) switch(type(o2[k])) {
       case 'Array':
         if(strategy>1 && type(o1[k])==='Array')
           switch(strategy) {
