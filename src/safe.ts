@@ -6,7 +6,7 @@ import { qappend, qfilter, qfreeze, qfreezeShallow, qmapKeys, qmapObj, qmergeDee
 import { AnyFunc, AnyObject, Composed, Cond, Reducer } from './types'
 import { inf, isArray, isFunc, isNil, isNum, isObj, undef } from './utils'
 const {assign} = Object
-// TODO: over, lensProp, reduceAsync, propsEq is up to 20x slow due to deep equals.
+// TODO: over, reduceAsync, propsEq is up to 20x slow due to deep equals.
 
 export const take = (argN: number) => (...args: any[]) => args[argN]
 export const ifElse = curry(
@@ -422,10 +422,15 @@ export const mergeDeepX = curry2(
 export const mergeDeepAdd = curry2(
   (a: AnyObject, b: AnyObject) => qmergeDeepAdd(clone(a), b) as AnyObject
 )
-/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+/**
+ * @param prop string
+ * @param pipe(data[prop])
+ * @param data any
+ * @returns data with prop over pipe.
+*/
 export const overProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) =>
-    assoc(prop, pipe(data[prop]), data)
+    (prop in data) && assoc(prop, pipe(data[prop]), data)
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry2(
@@ -466,3 +471,4 @@ export const push = append
 export const some = any
 export const weakEq = eq
 export const uniqBy = uniqWith
+export const propLens = overProp

@@ -36,12 +36,13 @@
     "lint": "tslint src/*.ts",
     "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
+    "watch": "nodemon --watch src 'npm run dev'",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.11.0",
+  "version": "1.12.0",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",

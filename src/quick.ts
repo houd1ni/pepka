@@ -50,14 +50,16 @@ export const qmapKeys = curry2(
     keyMap: {[oldKey: string]: string | AnyFunc},
     o: AnyObject
   ) => {
-    let k: string, mapped: string | AnyFunc, newKey: string, newValue: any
+    let k: string, mapped: string | AnyFunc, newKey: string, newValue: any, swap: AnyObject = {}, inswap: boolean
     for(k in keyMap) if(k in o) {
       mapped = keyMap[k]
       ;[newKey, newValue] = isFunc(mapped)
         ? (mapped as AnyFunc)(o[k], k, o)
         : [mapped, o[k]]
-      o[isNil(newKey) ? k : newKey] = newValue
-      if(k !== newKey) delete o[k]
+      if(newKey in keyMap) swap[newKey] = o[newKey]
+      inswap = k in swap
+      if(!isNil(newKey)) o[newKey] = inswap ? swap[k] : newValue
+      if(!inswap && k !== newKey) delete o[k]
     }
     return o
   }

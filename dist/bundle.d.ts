@@ -715,7 +715,12 @@ export declare const mergeDeepAdd: {
 	(a: AnyObject): (b: AnyObject) => AnyObject;
 	(a: AnyObject, b: AnyObject): AnyObject;
 };
-/** @param prop string @param pipe(data[prop]) @param data any @returns data with prop over pipe. */
+/**
+ * @param prop string
+ * @param pipe(data[prop])
+ * @param data any
+ * @returns data with prop over pipe.
+*/
 export declare const overProp: (...args: AnyArgs) => any;
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export declare const mapKeys: {
@@ -779,6 +784,7 @@ export declare const uniqBy: {
 	(a: (x: any, y: any) => boolean): (b: any[]) => any;
 	(a: (x: any, y: any) => boolean, b: any[]): any;
 };
+export declare const propLens: (...args: AnyArgs) => any;
 type StrTmpl = ((data: AnyObject) => string);
 /** Supports ecrans: '\\{"json": {yes} \\}'
   @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */
