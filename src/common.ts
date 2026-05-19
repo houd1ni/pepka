@@ -1,5 +1,5 @@
 import { curry2 } from "./curry"
-import { is_typed_arr } from "./internal"
+import { is_typed_arr, length } from "./internal"
 import { isNull, isStr, to } from "./utils"
 const {isNaN} = Number
 
@@ -21,19 +21,26 @@ export const typeIs = curry2((t: string, s: any) => type(s)===t)
 
 export const eq = curry2((a: any, b: any) => a===b)
 export const equals = curry2((a: any, b: any) => {
+  if(a===b) return true
   const typea = type(a)
-  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || is_typed_arr(typea))) {
+  const ta = is_typed_arr(a)
+  if(eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || ta)) {
+    if(ta) {
+      if(typea==='Buffer') return (a as Buffer).equals(b)
+      const len = length(a as any)
+      if(len!==length(b)) return false
+      for(let i=0; i<len; i++) if(a[i]!==b[i]) return false
+      return true
+    }
     if(isNull(a) || isNull(b)) return eq(a, b)
-    if(eq(a, b)) return true
-    for(const v of [a, b])
-      for(const k in v)
-        if(
-          !((eq(v, b)) && (k in a)) &&
-          !((eq(v, a)) && (k in b) && equals(a[k], b[k]))
-        ) return false
+    for(const v of [a, b]) for(const k in v)
+      if(
+        !(v===b && (k in a)) &&
+        !(v===a && (k in b) && equals(a[k], b[k]))
+      ) return false
     return true
   }
-  return eq(a, b)
+  return false
 })
 export const includes = curry2(
   <T>(s: T, ss: T[]) => {
@@ -44,5 +51,9 @@ export const includes = curry2(
     }
   }
 )
+export const always = <T extends any>(s: T) => () => s
+export const identity = <T extends any>(s: T) => s
+export const trim = (s: string) => s.trim()
+
 export { length } from './internal'
 

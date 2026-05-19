@@ -111,6 +111,9 @@ export declare const includes: {
 	(a: unknown): (b: unknown[]) => boolean;
 	(a: unknown, b: unknown[]): boolean;
 };
+export declare const always: <T extends any>(s: T) => () => T;
+export declare const identity: <T extends any>(s: T) => T;
+export declare const trim: (s: string) => string;
 export declare const qappend: {
 	(a: Placeholder, b: any[]): (a: any) => any[];
 	(a: any, b: Placeholder): (b: any[]) => any[];
@@ -144,7 +147,7 @@ export declare const qmergeShallow: {
 	(a: AnyObject): (b: AnyObject) => AnyObject;
 	(a: AnyObject, b: AnyObject): AnyObject;
 };
-/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } removes a key when null. */
 export declare const qmapKeys: {
 	(a: Placeholder, b: AnyObject): (a: {
 		[oldKey: string]: string | AnyFunc;
@@ -231,17 +234,30 @@ export declare const qpick: {
 	(a: string[], b: AnyObject): AnyObject;
 };
 export declare const qslice: (...args: AnyArgs) => any;
-export declare const quniq: (xs: any[]) => any[];
+export declare const quniqWith: {
+	(a: Placeholder, b: any[]): (a: AnyFunc) => any[];
+	(a: AnyFunc, b: Placeholder): (b: any[]) => any[];
+	(a: AnyFunc): (b: any[]) => any[];
+	(a: AnyFunc, b: any[]): any[];
+};
+export declare const quniq: (b: any[]) => any[];
 export declare const qpush: {
 	(a: Placeholder, b: any[]): (a: any) => any[];
 	(a: any, b: Placeholder): (b: any[]) => any[];
 	(a: any): (b: any[]) => any[];
 	(a: any, b: any[]): any[];
 };
+export declare const quniqBy: {
+	(a: Placeholder, b: any[]): (a: AnyFunc) => any[];
+	(a: AnyFunc, b: Placeholder): (b: any[]) => any[];
+	(a: AnyFunc): (b: any[]) => any[];
+	(a: AnyFunc, b: any[]): any[];
+};
 export declare const isNil: <T extends any>(s: T) => T extends (null | undefined) ? true : false;
 export declare class QPromise<T> extends Promise<T> {
 	private oncancel;
 	private ff;
+	private rj;
 	private _cancel_data;
 	cancel(resolve?: boolean): void;
 	constructor(fn: AnyFunc<any, [
@@ -389,9 +405,6 @@ export declare const divide: {
 	(a: number): (b: number) => number;
 	(a: number, b: number): number;
 };
-export declare const always: <T extends any>(s: T) => () => T;
-export declare const identity: <T extends any>(s: T) => T;
-export declare const trim: (s: string) => string;
 type T_not = {
 	(x: true): false;
 	(x: false): true;

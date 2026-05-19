@@ -1,4 +1,4 @@
-import { eq, equals, includes, length, symbol, type } from './common'
+import { always, eq, equals, identity, includes, length, symbol, type } from './common'
 import { __, curry, curry2, curry3 } from './curry'
 import { is_typed_arr, startsWithWith } from './internal'
 import { AnyArray, IndexesOfArray, Split } from './internal_types'
@@ -108,9 +108,6 @@ export const find = curry2((fn: Cond, s: any[]) => s.find(fn))
 export const findIndex = curry2((fn: Cond, s: any[]) => s.findIndex(fn))
 export const indexOf = curry2((x: any, xs: any[]) => findIndex(equals(x), xs))
 export const divide = curry2((a: number, b: number) => b/a)
-export const always = <T extends any>(s: T) => () => s
-export const identity = <T extends any>(s: T) => s
-export const trim = (s: string) => s.trim()
 
 type T_not = {
   (x: true): false
@@ -304,7 +301,7 @@ export const clone = <T extends any>(s: T, shallow = false): T => {
     case 'Boolean': case 'Symbol':
       return s
     default:
-      return is_typed_arr(t) ? (s as any).constructor.from(s) : s
+      return is_typed_arr(s) ? (s as any).constructor.from(s) : s
   }
 }
 export const cloneShallow = (s: any) => clone(s, true)
@@ -430,7 +427,7 @@ export const mergeDeepAdd = curry2(
 */
 export const overProp = curry3(
   (prop: string, pipe: AnyFunc, data: any) =>
-    (prop in data) && assoc(prop, pipe(data[prop]), data)
+    prop in data ? assoc(prop, pipe(data[prop]), data) : data
 )
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 export const mapKeys = curry2(

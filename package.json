@@ -36,13 +36,13 @@
     "lint": "tslint src/*.ts",
     "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts",
     "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
-    "watch": "nodemon --watch src 'npm run dev'",
+    "watch": "nodemon --watch src --ext ts,js --exec \"npm run dev\"",
     "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
     "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
     "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
     "all": "npm run dev && npm run prod"
   },
-  "version": "1.12.0",
+  "version": "1.13.0",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -50,6 +50,7 @@
     "@types/node": "^25.5.0",
     "cross-env": "^10.1.0",
     "dts-bundle-generator": "^9.5.1",
+    "nodemon": "^3.1.14",
     "rollup": "^4.59.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.2",

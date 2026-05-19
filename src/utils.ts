@@ -21,14 +21,18 @@ export const isSafe = (prop: string) => !(prop in unsafe_props)
 // TODO: add .then(), .finally() and .catch() to return QPromise.
 export class QPromise<T> extends Promise<T> {
   private ff: AnyFunc
+  private rj: AnyFunc
   private _cancel_data: any
   public cancel(resolve = false) {
-    if(resolve) this.ff()
+    if(resolve) this.ff?.(); else this.rj?.()
     this.oncancel(this._cancel_data)
   }
   constructor(fn: AnyFunc<any, [AnyFunc, AnyFunc, AnyFunc?]>, private oncancel = noop) {
     let _cancel_data: any = not_assigned
-    super((ff, rj) => _cancel_data = fn(ff, rj))
+    super((ff, rj) => {
+      _cancel_data = fn(ff, rj)
+      setTimeout(() => {this.ff = ff; this.rj = rj})
+    })
     const set_cb = () => this._cancel_data=_cancel_data
     // @ts-ignore-next
     if(_cancel_data!==not_assigned) set_cb()

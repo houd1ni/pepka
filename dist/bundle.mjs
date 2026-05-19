@@ -67,8 +67,7 @@ function curry3(fn) {
 }
 
 const length = (s) => s.length;
-const typed_arr_re = /^(.*?)(8|16|32|64)(Clamped)?Array$/;
-const is_typed_arr = (t) => typed_arr_re.test(t);
+const is_typed_arr = (x) => ArrayBuffer.isView(x);
 /** @param start string | any[] @param s string | any[] */
 const startsWithWith = (comparator) => curry2((start, s) => {
     const len_start = length(start);
@@ -100,15 +99,21 @@ const isSafe = (prop) => !(prop in unsafe_props);
 class QPromise extends Promise {
     oncancel;
     ff;
+    rj;
     _cancel_data;
     cancel(resolve = false) {
         if (resolve)
-            this.ff();
+            this.ff?.();
+        else
+            this.rj?.();
         this.oncancel(this._cancel_data);
     }
     constructor(fn, oncancel = noop) {
         let _cancel_data = not_assigned;
-        super((ff, rj) => _cancel_data = fn(ff, rj));
+        super((ff, rj) => {
+            _cancel_data = fn(ff, rj);
+            setTimeout(() => { this.ff = ff; this.rj = rj; });
+        });
         this.oncancel = oncancel;
         const set_cb = () => this._cancel_data = _cancel_data;
         // @ts-ignore-next
@@ -136,20 +141,32 @@ const type = (s) => {
 const typeIs = curry2((t, s) => type(s) === t);
 const eq = curry2((a, b) => a === b);
 const equals = curry2((a, b) => {
+    if (a === b)
+        return true;
     const typea = type(a);
-    if (eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || is_typed_arr(typea))) {
+    const ta = is_typed_arr(a);
+    if (eq(typea, type(b)) && (eq(typea, 'Object') || eq(typea, 'Array') || ta)) {
+        if (ta) {
+            if (typea === 'Buffer')
+                return a.equals(b);
+            const len = length(a);
+            if (len !== length(b))
+                return false;
+            for (let i = 0; i < len; i++)
+                if (a[i] !== b[i])
+                    return false;
+            return true;
+        }
         if (isNull(a) || isNull(b))
             return eq(a, b);
-        if (eq(a, b))
-            return true;
         for (const v of [a, b])
             for (const k in v)
-                if (!((eq(v, b)) && (k in a)) &&
-                    !((eq(v, a)) && (k in b) && equals(a[k], b[k])))
+                if (!(v === b && (k in a)) &&
+                    !(v === a && (k in b) && equals(a[k], b[k])))
                     return false;
         return true;
     }
-    return eq(a, b);
+    return false;
 });
 const includes = curry2((s, ss) => {
     if (isStr(ss))
@@ -161,6 +178,9 @@ const includes = curry2((s, ss) => {
         return false;
     }
 });
+const always = (s) => () => s;
+const identity = (s) => s;
+const trim = (s) => s.trim();
 
 const { min } = Math;
 const z = 0;
@@ -206,7 +226,7 @@ const qmergeDeepX = mergeDeep$1(2);
 const qmergeDeepAdd = mergeDeep$1(3);
 /** @param o1 <- o2 */
 const qmergeShallow = curry2((o1, o2) => Object.assign(o1, o2));
-/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } removes a key when null. */
 const qmapKeys = curry2((keyMap, o) => {
     let k, mapped, newKey, newValue, swap = {}, inswap;
     for (k in keyMap)
@@ -333,23 +353,26 @@ const rmel = (index, xs) => {
     return xs;
 };
 const seen = new Set();
-const quniq = (xs) => {
-    seen.clear();
-    let size = length(xs);
+const quniqWith = curry2((getter, xs) => {
+    let size = length(xs), cur;
     for (let i = z; i < size; i++) {
         const x = xs[i];
-        if (seen.has(x)) {
+        cur = getter(x);
+        if (seen.has(cur)) {
             rmel(i, xs);
             size--;
             i--;
         }
         else
-            seen.add(x);
+            seen.add(cur);
     }
+    seen.clear();
     return xs;
-};
+});
+const quniq = quniqWith(identity);
 // Aliases.
 const qpush = qappend;
+const quniqBy = quniqWith;
 
 const { assign } = Object;
 // TODO: over, reduceAsync, propsEq is up to 20x slow due to deep equals.
@@ -405,9 +428,6 @@ const find = curry2((fn, s) => s.find(fn));
 const findIndex = curry2((fn, s) => s.findIndex(fn));
 const indexOf = curry2((x, xs) => findIndex(equals(x), xs));
 const divide = curry2((a, b) => b / a);
-const always = (s) => () => s;
-const identity = (s) => s;
-const trim = (s) => s.trim();
 const not = (x) => !x;
 const keys = (o) => Object.keys(o);
 const values = (o) => Object.values(o);
@@ -560,7 +580,7 @@ const clone = (s, shallow = false) => {
         case 'Symbol':
             return s;
         default:
-            return is_typed_arr(t) ? s.constructor.from(s) : s;
+            return is_typed_arr(s) ? s.constructor.from(s) : s;
     }
 };
 const cloneShallow = (s) => clone(s, true);
@@ -644,7 +664,7 @@ const mergeDeepAdd = curry2((a, b) => qmergeDeepAdd(clone(a), b));
  * @param data any
  * @returns data with prop over pipe.
 */
-const overProp = curry3((prop, pipe, data) => (prop in data) && assoc(prop, pipe(data[prop]), data));
+const overProp = curry3((prop, pipe, data) => prop in data ? assoc(prop, pipe(data[prop]), data) : data);
 /** mapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
 const mapKeys = curry2((keyMap, o) => qmapKeys(keyMap, assign({}, o)));
 const zip = curry2((a, b) => map((s, i) => [s, b[i]], a));
@@ -808,4 +828,4 @@ const wait = (time) => new QPromise((ff) => setTimeout(ff, time), (timeout) => c
 // TODO: possibly introduce a second argument limiting unfolding.
 const uncurry = (fn) => (...args) => qreduce(((fn, arg) => fn ? fn(arg) : fn), fn, args);
 
-export { F, QPromise, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, debounce, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachParallel, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propLens, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfilterAsync, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qpick, qprepend, qpush, qreduce, qreverse, qslice, qsort, quniq, qwaitAll, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, startsWithShallow, subtract, symbol, tail, take, tap, test, throttle, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqBy, uniqWith, values, wait, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };
+export { F, QPromise, T, __, add, all, allPass, always, any, anyPass, append, assoc, assocPath, bind, both, callFrom, callWith, clone, cloneShallow, complement, compose, composeAsync, concat, cond, curry, curry2, curry3, debounce, diff, divide, echo, empty, eq, equals, explore, filter, find, findIndex, flat, flatShallow, flatTo, flip, forEach, forEachParallel, forEachSerial, freeze, freezeShallow, fromPairs, genBy, getTmpl, gt, gte, head, identity, ifElse, includes, indexOf, intersection, isEmpty, isNil, join, keys, last, length, lt, lte, map, mapKeys, mapObj, memoize, mergeDeep, mergeDeepAdd, mergeDeepX, mergeShallow, mirror, multiply, noop, not, notf, nth, omit, once, overProp, path, pathEq, pathExists, pathOr, pathsEq, pick, pickBy, prepend, prop, propEq, propLens, propsEq, push, qappend, qassoc, qassocPath, qempty, qfilter, qfilterAsync, qfreeze, qfreezeShallow, qmap, qmapKeys, qmapObj, qmergeDeep, qmergeDeepAdd, qmergeDeepX, qmergeShallow, qomit, qoverProp, qpick, qprepend, qpush, qreduce, qreverse, qslice, qsort, quniq, quniqBy, quniqWith, qwaitAll, range, reduce, reflect, replace, reverse, sizeof, slice, some, sort, split, startsWith, startsWithShallow, subtract, symbol, tail, take, tap, test, throttle, toLower, toPairs, toUpper, trim, type, typeIs, uncurry, uniq, uniqBy, uniqWith, values, wait, waitAll, waitTap, weakEq, when, zip, zipObj, zipWith };

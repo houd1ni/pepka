@@ -1,4 +1,4 @@
-import { includes, length, type } from "./common"
+import { identity, includes, length, type } from "./common"
 import { curry2, curry3 } from "./curry"
 import { AnyFunc, AnyObject, Reducer } from "./types"
 import { inf, isArray, isFunc, isNil, isNum, isObj, isSafe } from "./utils"
@@ -44,7 +44,7 @@ export const qmergeDeepX = mergeDeep(2)
 export const qmergeDeepAdd = mergeDeep(3)
 /** @param o1 <- o2 */
 export const qmergeShallow = curry2((o1: AnyObject, o2: AnyObject) => Object.assign(o1, o2))
-/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } */
+/** qmapKeys({ a: 'b' }, { a: 44 }) -> { b: 44 } removes a key when null. */
 export const qmapKeys = curry2(
   (
     keyMap: {[oldKey: string]: string | AnyFunc},
@@ -175,16 +175,19 @@ const rmel = (index: number, xs: any[]) => {
   return xs
 }
 const seen = new Set()
-export const quniq = (xs: any[]) => {
-  seen.clear()
-  let size = length(xs)
+export const quniqWith = curry2((getter: AnyFunc, xs: any[]) => {
+  let size = length(xs), cur: any
   for(let i=z; i<size; i++) {
     const x = xs[i]
-    if(seen.has(x)) {rmel(i, xs); size--; i--}
-    else seen.add(x)
+    cur = getter(x)
+    if(seen.has(cur)) {rmel(i, xs); size--; i--}
+    else seen.add(cur)
   }
+  seen.clear()
   return xs
-}
+})
+export const quniq = quniqWith(identity)
 
 // Aliases.
 export const qpush = qappend
+export const quniqBy = quniqWith
