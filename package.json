@@ -20,9 +20,10 @@
   ],
   "license": "MIT",
   "type": "module",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/bundle.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/bundle.mjs",
       "require": "./dist/bundle.cjs"
     }
@@ -33,29 +34,32 @@
     "url": "git+https://github.com/houd1ni/pepka.git"
   },
   "scripts": {
-    "lint": "tslint src/*.ts",
-    "gentypes": "dts-bundle-generator --no-check --export-referenced-types=false -o dist/bundle.d.ts src/index.ts",
-    "dev": "cross-env NODE_ENV=development BUILD=es rollup -c",
-    "watch": "nodemon --watch src --ext ts,js --exec \"npm run dev\"",
-    "prod:cjs": "cross-env NODE_ENV=production BUILD=cjs rollup -c",
-    "prod:es": "cross-env NODE_ENV=production BUILD=es rollup -c",
-    "prod": "npm run gentypes && npm run prod:es && npm run prod:cjs",
-    "all": "npm run dev && npm run prod"
+    "lint": "eslint src --ext ts",
+    "type-check": "tsgo --noEmit --noUnusedLocals --noUnusedParameters && tsgo --noEmit --strict --module esnext --moduleResolution bundler --types node --ignoreConfig tests/types/*.test.ts tests/pepka.spec.ts",
+    "test": "tsx node_modules/uvu/bin.js tests spec",
+    "gentypes": "tsx scripts/gentypes.ts",
+    "dev": "tsx scripts/build.ts dev",
+    "build": "tsx scripts/build.ts esm",
+    "build:cjs": "tsx scripts/build.ts cjs",
+    "prod": "pnpm build && pnpm build:cjs && pnpm gentypes",
+    "all": "pnpm dev && pnpm prod",
+    "watch": "nodemon --watch src --ext ts,js --exec \"pnpm run dev\""
   },
-  "version": "1.13.0",
+  "version": "1.14.0",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^29.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-replace": "^6.0.3",
-    "@types/node": "^25.5.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.3.0",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "cross-env": "^10.1.0",
-    "dts-bundle-generator": "^9.5.1",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.9.1",
+    "jiti": "^2.7.0",
     "nodemon": "^3.1.14",
-    "rollup": "^4.59.0",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "ts-node": "^10.9.2",
-    "tslint": "^6.1.3",
-    "typescript": "^5.9.3"
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0",
+    "uvu": "^0.5.6"
   },
+  "packageManager": "pnpm@11.17.0",
   "sideEffects": false
 }

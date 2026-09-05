@@ -1,0 +1,14 @@
+/src
+/types
+/tests
+/scripts
+/benchmarks
+/tmp
+/tsconfig.json
+/eslint.config.ts
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
+/.circleci
+/.github
+/CODE_OF_CONDUCT.md
+/CONTRIBUTING.md

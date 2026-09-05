@@ -1,12 +1,13 @@
-
+export type { AnyFunc, AnyObject, Composed, Cond, Inverse, PathValue, Reducer } from '../types/base'
+export type { Curried } from '../types/curry'
 export * from './async'
 export * from './common'
 export { __, curry, curry2, curry3 } from './curry'
+export { length } from './internal'
 export * from './quick'
 export * from './safe'
 export * from './strings'
 export * from './timers'
-export * from './types'
 export * from './uncurry'
-export { QPromise } from './utils'
+export * from './utils'
 
