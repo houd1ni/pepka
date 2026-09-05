@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "lib": [ "esnext", "DOM" ],
+    "types": [ "node" ],
     "strictNullChecks": true,
     "target": "esnext",
     "module": "esnext",
@@ -11,9 +12,8 @@
     "experimentalDecorators": true,
     "noUnusedParameters": true,
     "noUnusedLocals": false,
-    "rootDir": "src",
-    "baseUrl": ".",
+    "rootDir": ".",
     "outDir": "dist/ts"
   },
-  "include": [ "src/**/*" ]
+  "include": [ "scripts/**/*", "src/**/*", "types/**/*" ]
 }

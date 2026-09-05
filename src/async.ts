@@ -1,7 +1,9 @@
-import { curry2 } from "./curry"
-import { head, length } from "./safe"
-import { AnyFunc, AnyObject, Composed } from "./types"
-import { isArray } from "./utils"
+import type { T_forEachParallel, T_qfilterAsync, T_waitTap } from '../types/async'
+import { AnyFunc, Composed } from '../types/base'
+import { curry2 } from './curry'
+import { length, not_assigned } from './internal'
+import { head, noop } from './safe'
+import { isArray } from './utils'
 
 /** One promise waits for another. */
 export const forEachSerial = (() => {
@@ -17,6 +19,9 @@ export const forEachSerial = (() => {
 })()
 /** Promise.all wrapper for functional pipelining. */
 export const waitAll = <T>(promises: Promise<T>[]) => Promise.all<T>(promises)
+/** Like waitAll but resolves early when all promises settle, filling the array with results in-place.
+ * @param xs Array of promises.
+ */
 export const qwaitAll = async <T>(xs: Promise<T>[]) => new Promise<T[]>((ff, rj) => {
   const len = length(xs); let j = len
   for(let i=0; i<len; i++) xs[i].then((x: T) => {xs[i]=x as any; if(--j) ff(xs as any)}).catch(rj)
@@ -26,11 +31,13 @@ export const qwaitAll = async <T>(xs: Promise<T>[]) => new Promise<T[]>((ff, rj)
  * @param {T} s - any value to tap and return back
  * @returns {T}
  */
-export const waitTap = curry2(async (fn: AnyFunc<Promise<any>>, s: any) => { await fn(s); return s })
+export const waitTap = curry2(
+  async (fn: AnyFunc<Promise<any>>, s: any) => { await fn(s); return s }
+) as any as T_waitTap
 /** Waits for all promises mapped by the fn. */
 export const forEachParallel = curry2(
   (fn: (item: any) => Promise<any>, items: any[]) => Promise.all(items.map(fn))
-)
+) as any as T_forEachParallel
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
 export const composeAsync = (() => {
   const pipe = async (fns: AnyFunc[], input: any[], i: number): Promise<any> =>
@@ -43,20 +50,41 @@ export const composeAsync = (() => {
  * @param data T extends any[] | AnyObject.
  * @returns T
 */
-export const qfilterAsync = curry2(async <T extends any[] | AnyObject>(
+export const qfilterAsync = curry2(async (
   cond: (v: any, k: string | number) => Promise<boolean> | boolean,
-  data: T // dunno how to merge it with sync version...
-): Promise<T> => {
+  data: any
+): Promise<any> => {
   if(isArray(data)) {
     let indicies_offset = 0
     const indicies2rm: number[] = []
     const len = length(data as any[])
     for(let i = 0; i<len; i++)
-      if(!await cond(data[i], i))
+      if(!await cond((data as any[])[i], i))
         indicies2rm.push(i)
     for(const i of indicies2rm)
       data.splice(i - indicies_offset++, 1)
   } else for(const k in data)
     if(!await cond(data[k], k)) delete data[k]
   return data
-})
+}) as any as T_qfilterAsync
+// TODO: add .then(), .finally() and .catch() to return QPromise.
+export class QPromise<T> extends Promise<T> {
+  private ff!: AnyFunc
+  private rj!: AnyFunc
+  private _cancel_data: any
+  public cancel(resolve = false) {
+    if(resolve) this.ff?.(); else this.rj?.()
+    this.oncancel(this._cancel_data)
+  }
+  constructor(fn: AnyFunc<any, [AnyFunc, AnyFunc, AnyFunc?]>, private oncancel = noop) {
+    let _cancel_data: any = not_assigned
+    super((ff, rj) => {
+      _cancel_data = fn(ff, rj)
+      setTimeout(() => {this.ff = ff; this.rj = rj})
+    })
+    const set_cb = () => this._cancel_data=_cancel_data
+    // @ts-ignore-next
+    if(_cancel_data!==not_assigned) set_cb()
+    else setTimeout(set_cb)
+  }
+}

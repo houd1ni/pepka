@@ -1,12 +1,15 @@
-import { AnyObject } from "./types"
-import { head, path } from "./safe"
+import { AnyObject } from '../types/base'
+import { path } from './safe'
 
 type StrTmpl = ((data: AnyObject) => string)
 const ecran = '\\'
 
 // TODO: make it splicy, not accumulatie by symbols.
-/** Supports ecrans: '\\{"json": {yes} \\}'
-  @returns getTmpl('one{meme}two')({meme: 42}) -> one42two */
+/** Compiles a string template with {placeholder} syntax into a function that fills placeholders from a data object.
+ * Supports ecran escaping with backslash before { or }.
+ * @param tmpl - the template string, e.g. 'one{meme}two'
+ * @returns a function that takes a data object and returns the filled string
+ */
 export const getTmpl = (tmpl: string): StrTmpl => {
   const parts: string[] = []
   const keymap: string[] = []

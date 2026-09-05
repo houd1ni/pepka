@@ -1,5 +1,6 @@
-import { qpick } from "./quick"
-import { genBy, identity, range } from "./safe"
+import { identity } from "../src/common"
+import { qmap, qpick } from "../src/quick"
+import { genBy, range } from "../src/safe"
 
 
 if(false) {
@@ -23,7 +24,7 @@ if(false) {
 // w/o Set: with range(0, 5) -> 600ms;  range(0, 50) -> 647ms.
 for(let j=0; j<1e4; j+=1e3) {
   console.time('qpick @'+j)
-  const props = range(0, 5)
+  const props = qmap(String, range(0, 5))
   for(let i=0; i<1e5; i++) {
     const o = {1: 'yep', 4: 'yep', 'kakashka': 'noooo', 'anotherkakashka': 'nonono!'}
     // for(const x of range(0, 50)) o['_'+x] = x

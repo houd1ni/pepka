@@ -1,7 +1,8 @@
-import { AnyArgs } from "./internal_types"
-import { AnyFunc } from "./types"
+import { AnyArgs, AnyFunc } from '../types/base'
 
 export type Placeholder = symbol
+/** Placeholder token for curried function partial application. Use `__` to skip an argument.
+ */
 export const __: Placeholder = Symbol('Placeholder')
 
 const countArgs = (s: AnyArgs) => {
@@ -44,6 +45,9 @@ const _curry = (fn: Function, args: AnyArgs, new_args: AnyArgs) => {
     return curried
   }
 }
+/** Curries a function of arbitrary arity. Placeholders (__) allow partial application of any argument.
+ * @param fn - the function to curry
+ */
 export const curry = (fn: AnyFunc) => (
   (...args: AnyArgs) => fn.length>countArgs(args)
     ? _curry(fn, [], args)
@@ -69,6 +73,9 @@ export type Curried2<p0, p1, ReturnT> = {
 
 type Func2 = (a: any, b: any) => any
 const zero = 0
+/** Curries a binary (2-arg) function with placeholder support.
+ * @param fn - the binary function to curry
+ */
 export function curry2<Func extends Func2>(fn: Func) {
   type p0 = Parameters<Func>[0]
   type p1 = Parameters<Func>[1]
@@ -88,6 +95,9 @@ export function curry2<Func extends Func2>(fn: Func) {
 }
 
 type Func3 = (a: any, b: any, c: any) => any
+/** Curries a ternary (3-arg) function. Delegates to curry.
+ * @param fn - the ternary function to curry
+ */
 export function curry3<Func extends Func3>(fn: Func) {
   // type p0 = Parameters<Func>[0]
   // type p1 = Parameters<Func>[1]
