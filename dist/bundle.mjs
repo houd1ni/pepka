@@ -82,9 +82,9 @@ var isArray = (s) => Array.isArray(s);
 function isFunc(s) {
   return to(s) === "function";
 }
-var isStr = (s) => to(s) === "string";
-var isObj = (s) => !isNull(s) && to(s) === "object";
-var isNil = (s) => isNull(s) || isUndef(s);
+var isStr = (s) => to(s) == "string";
+var isObj = (s) => !isNull(s) && to(s) == "object";
+var isNil = (s) => s === nul || s === undef;
 
 // src/common.ts
 var { isNaN } = Number;

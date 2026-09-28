@@ -45,7 +45,7 @@
     "all": "pnpm dev && pnpm prod",
     "watch": "nodemon --watch src --ext ts,js --exec \"pnpm run dev\""
   },
-  "version": "1.14.1",
+  "version": "1.15.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.2",

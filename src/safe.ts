@@ -250,7 +250,7 @@ export const sizeof = (s: any[] | string | AnyObject) => {
     let len = 0
     for(let _k in s as AnyObject) len++
     return len
-  } else return length(s as any[])
+  } else return length(s as any[] | string)
 }
 /** Generates an array of integers from `from` to `to` (exclusive).
  * @param from Start value (inclusive).
