@@ -1,5 +1,5 @@
-import type { T_forEachParallel, T_qfilterAsync, T_waitTap } from '../types/async'
-import { AnyFunc, Composed } from '../types/base'
+import type { T_composeAsync, T_forEachParallel, T_qfilterAsync, T_waitTap } from '../types/async'
+import { AnyFunc } from '../types/base'
 import { curry2 } from './curry'
 import { length, not_assigned } from './internal'
 import { head, noop } from './safe'
@@ -18,7 +18,7 @@ export const forEachSerial = (() => {
   )
 })()
 /** Promise.all wrapper for functional pipelining. */
-export const waitAll = <T>(promises: Promise<T>[]) => Promise.all<T>(promises)
+export const waitAll = <T>(promises: (T | Promise<T>)[]) => Promise.all<T>(promises)
 /** Like waitAll but resolves early when all promises settle, filling the array with results in-place.
  * @param xs Array of promises.
  */
@@ -42,9 +42,9 @@ export const forEachParallel = curry2(
 export const composeAsync = (() => {
   const pipe = async (fns: AnyFunc[], input: any[], i: number): Promise<any> =>
     ~i ? await pipe(fns, [await fns[i](...input)], --i) : head(input)
-  return <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]): Composed<TIn, Promise<TOut>> =>
+  return (...fns: AnyFunc[]) =>
     (...input: any[]) => pipe(fns, input, fns.length-1)
-})()
+})() as T_composeAsync
 /**
  * @param cond async (v, k) -> boolean.
  * @param data T extends any[] | AnyObject.

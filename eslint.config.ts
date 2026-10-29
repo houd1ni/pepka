@@ -1,8 +1,9 @@
-import tseslint from 'typescript-eslint';
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
+  { ignores: ['dist/**', 'tmp/**', '**/*.d.ts'] },
   {
-    files: ['src/**/*.ts'],
+    files: ['**/*.ts'],
     extends: [tseslint.configs.base],
     languageOptions: {
       parserOptions: {
@@ -29,6 +30,8 @@ export default tseslint.config(
             'groupEnd',
             'log',
             'table',
+            'time',
+            'timeEnd',
             'profile',
             'profileEnd',
             'profileDelete',
@@ -39,7 +42,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/**/*.ts'],
+    files: ['**/*.ts'],
     languageOptions: {
       globals: {
         setTimeout: 'readonly',
@@ -50,4 +53,4 @@ export default tseslint.config(
       },
     },
   },
-);
+)

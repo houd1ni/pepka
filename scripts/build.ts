@@ -7,7 +7,7 @@ const outfile = is_dev ? 'dist/bundle.dev.js' : mode === 'cjs' ? 'dist/bundle.cj
 await esbuild.build({
   entryPoints: ['src/index.ts'],
   bundle: true,
-  format: is_dev || mode === 'esm' ? 'esm' : 'cjs',
+  format: is_dev || mode !== 'cjs' ? 'esm' : 'cjs',
   target: 'esnext',
   sourcemap: is_dev,
   outfile

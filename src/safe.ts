@@ -1,21 +1,21 @@
-import { AnyArray, AnyFunc, AnyObject, Composed, Cond, IndexesOfArray, Reducer } from '../types/base'
+import { AnyArray, AnyFunc, AnyObject, Cond, IndexesOfArray, Reducer, T_compose } from '../types/base'
 import type {
-  T_all, T_allPass, T_any, T_anyPass, T_append, T_assoc, T_assocPath,
-  T_bind, T_both, T_callWith, T_concat, T_cond, T_diff, T_filter, T_find,
-  T_findIndex, T_flatTo, T_forEach, T_genBy, T_indexOf, T_intersection,
-  T_join, T_map, T_mapKeys, T_mapObj, T_memoize, T_mergeDeep, T_mergeDeepAdd,
-  T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr,
-  T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq,
-  T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test,
-  T_uniqWith, T_zip, T_zipObj, T_zipWith
+    T_all, T_allPass, T_any, T_anyPass, T_append, T_assoc, T_assocPath,
+    T_bind, T_both, T_callWith, T_concat, T_cond, T_diff, T_filter, T_find,
+    T_findIndex, T_flatTo, T_forEach, T_genBy, T_indexOf, T_intersection,
+    T_join, T_map, T_mapKeys, T_mapObj, T_memoize, T_mergeDeep, T_mergeDeepAdd,
+    T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr,
+    T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq,
+    T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test,
+    T_uniqWith, T_zip, T_zipObj, T_zipWith
 } from '../types/safe'
 import { Split } from '../types/string'
 import { always, eq, equals, identity, includes, length, symbol, type } from './common'
 import { __, curry, curry2, curry3 } from './curry'
 import { inf, is_typed_arr, startsWithWith, undef } from './internal'
 import {
-  qappend, qfilter, qfreeze, qfreezeShallow, qmapKeys, qmapObj,
-  qmergeDeep, qmergeDeepAdd, qmergeDeepX, qreduce
+    qappend, qfilter, qfreeze, qfreezeShallow, qmapKeys, qmapObj,
+    qmergeDeep, qmergeDeepAdd, qmergeDeepX, qreduce
 } from './quick'
 import { isArray, isFunc, isNil, isNum, isObj } from './utils'
 const {assign} = Object
@@ -54,8 +54,8 @@ export const when = curry3(
  * @param fns Functions to compose, right-to-left.
  * @returns A composed function. */
 export const compose = (
-  <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]): Composed<TIn, TOut> =>
-    (...args: TIn) => {
+  (...fns: AnyFunc[]) =>
+    (...args: any[]) => {
       let first = true
       let s: any
       for(let i = length(fns)-1; i>-1; i--) {
@@ -65,9 +65,9 @@ export const compose = (
         } else
           s = s===__ ? fns[i]() : fns[i](s)
       }
-      return s as any as TOut
+      return s
     }
-)
+) as T_compose
 /** @param fn AnyFunc @param context any */
 export const bind = curry2<AnyFunc>((fn: AnyFunc, context: any) => fn.bind(context)) as any as T_bind
 /** Returns the element at index i of an array or the char at index i of a string.
@@ -398,11 +398,13 @@ export const propEq = curry3(
 export const propsEq = curry3(
   (key: string, o1: any, o2: AnyObject) => equals(o1[key], o2[key])
 ) as any as T_propsEq
-const _pathOr = (_default: any, path: (string | number)[], o: AnyObject) => length(path)
+const _pathOr = (_default: any, path: (string | number)[], o: AnyObject): any => length(path)
   ? isNil(o)
     ? _default
     : compose(
-        (k) => k in o ? _pathOr(_default, slice(1, inf, path) as typeof path, o[k] as typeof o) : _default,
+        (k: string | number) => k in o
+          ? _pathOr(_default, slice(1, inf, path) as typeof path, o[k] as typeof o)
+          : _default,
         head
       )(path)
   : o

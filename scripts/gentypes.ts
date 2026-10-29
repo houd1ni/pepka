@@ -34,6 +34,7 @@ try {
 function fix(file: string) {
   const src = readFileSync(file, 'utf8')
   const out = src
+    .replace(/(['"])\.\.\/types\1/g, '$1./types/index.js$1')
     .replace(/(['"])\.\.\/types\//g, '$1./types/')
     .replace(/((?:from\s+|import\()['"])(\.\.?\/[^'"]+?)(['"])/g, (m, pre, path, q) =>
       /\.[cm]?js$/.test(path) || /\.d\.ts$/.test(path) ? m : `${pre}${path}.js${q}`)

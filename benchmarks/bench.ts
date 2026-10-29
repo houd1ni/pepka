@@ -1,6 +1,6 @@
-import { identity } from "../src/common"
-import { qmap, qpick } from "../src/quick"
-import { genBy, range } from "../src/safe"
+import { identity } from '../src/common'
+import { qmap, qpick } from '../src/quick'
+import { genBy, range } from '../src/safe'
 
 
 if(false) {

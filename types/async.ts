@@ -1,8 +1,8 @@
 // Type-level definitions for async & timer functions.
 
-import type { AnyFunc, AnyObject, Composed } from './base'
+import type { AnyFunc, AnyObject, T_compose, T_composeAsync, Unwrap } from './base'
 
-export type T_composeAsync = <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, Promise<TOut>>
+export type { T_compose, T_composeAsync, Unwrap }
 
 export type T_debounce = <T extends AnyFunc>(time: number, fn: T) =>
   (...args: Parameters<T>) => Promise<ReturnType<T>>

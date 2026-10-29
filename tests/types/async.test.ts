@@ -9,6 +9,10 @@ import type { AnyObject } from '../../src'
 // ── composeAsync ──
 const _composed = composeAsync(async (x: number) => x + 1, async (x: number) => x * 2)
 const _r1: Promise<number> = _composed(5)
+// a step receives the awaited answer of the one below it, and the chain answers the leftmost step's, awaited
+const _r2: Promise<number[]> = composeAsync(waitAll, async (xs: string[]) => xs.map(x => x.length))(['ab'])
+// @ts-expect-error a step's input must be the awaited output of the previous one
+const _r3: Promise<string[]> = composeAsync(async (xs: number[]) => xs.map(String), async (s: string) => [s])
 
 // ── waitAll ──
 const _waitAll: Promise<number[]> = waitAll([Promise.resolve(1), Promise.resolve(2)])

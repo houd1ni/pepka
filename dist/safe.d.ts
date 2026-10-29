@@ -1,4 +1,4 @@
-import { AnyFunc, AnyObject, Composed, IndexesOfArray } from './types/base.js';
+import { AnyFunc, AnyObject, IndexesOfArray, T_compose } from './types/base.js';
 import type { T_all, T_allPass, T_any, T_anyPass, T_append, T_assoc, T_assocPath, T_bind, T_both, T_callWith, T_concat, T_cond, T_diff, T_filter, T_find, T_findIndex, T_flatTo, T_forEach, T_genBy, T_indexOf, T_intersection, T_join, T_map, T_mapKeys, T_mapObj, T_memoize, T_mergeDeep, T_mergeDeepAdd, T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr, T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq, T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test, T_uniqWith, T_zip, T_zipObj, T_zipWith } from './types/safe.js';
 import { Split } from './types/string.js';
 /** Returns a function that takes N arguments and returns the argN-th one (0-indexed).
@@ -10,17 +10,17 @@ export declare const take: (argN: number) => (...args: any[]) => any;
  * @param pipeYes Function to call when cond is true.
  * @param pipeNo Function to call when cond is false.
  * @param s Value to test and pass to the chosen branch. */
-export declare const ifElse: (...args: import("../types.js").AnyArgs) => any;
+export declare const ifElse: (...args: import("./types/index.js").AnyArgs) => any;
 /** Like ifElse but always passes through identity for the false branch.
  * @param cond Predicate function.
  * @param pipe Function to call when cond is true.
  * @param s Value to test and potentially transform. */
-export declare const when: (...args: import("../types.js").AnyArgs) => any;
+export declare const when: (...args: import("./types/index.js").AnyArgs) => any;
 /** Right-to-left function composition. Last function receives all args, each subsequent
  * function receives the return value of the previous. Use __ placeholder to call a function with no args.
  * @param fns Functions to compose, right-to-left.
  * @returns A composed function. */
-export declare const compose: <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, TOut>;
+export declare const compose: T_compose;
 /** @param fn AnyFunc @param context any */
 export declare const bind: T_bind;
 /** Returns the element at index i of an array or the char at index i of a string.
@@ -207,7 +207,7 @@ export declare const noop: (...args: any[]) => any;
  * @param {any[]} args - arguments for the function.
  * @param {string} fnName - property name of the function.
  * @param {AnyObject} o - the object with the function. */
-export declare const callFrom: (...args: import("../types.js").AnyArgs) => any;
+export declare const callFrom: (...args: import("./types/index.js").AnyArgs) => any;
 type T_complement<F extends AnyFunc> = {
     (...args: Parameters<F>): ReturnType<F> extends AnyFunc ? T_complement<ReturnType<F>> : boolean;
 };
@@ -480,7 +480,7 @@ export declare const some: T_any;
  * @param a First value.
  * @param b Second value.
  */
-export declare const weakEq: import("../types.js").T_eq;
+export declare const weakEq: import("./types/index.js").T_eq;
 /** Alias of uniqWith. Removes duplicates using a comparator (curried).
  * @param cond Comparator: (x, y) => boolean.
  * @param xs Source array.

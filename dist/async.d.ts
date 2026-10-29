@@ -1,5 +1,5 @@
-import type { T_forEachParallel, T_qfilterAsync, T_waitTap } from './types/async.js';
-import { AnyFunc, Composed } from './types/base.js';
+import type { T_composeAsync, T_forEachParallel, T_qfilterAsync, T_waitTap } from './types/async.js';
+import { AnyFunc } from './types/base.js';
 /** One promise waits for another. */
 export declare const forEachSerial: {
     (a: import("./curry.js").Placeholder, b: any[]): (a: AnyFunc) => Promise<void>;
@@ -8,7 +8,7 @@ export declare const forEachSerial: {
     (a: AnyFunc, b: any[]): Promise<void>;
 };
 /** Promise.all wrapper for functional pipelining. */
-export declare const waitAll: <T>(promises: Promise<T>[]) => Promise<Awaited<T>[]>;
+export declare const waitAll: <T>(promises: (T | Promise<T>)[]) => Promise<Awaited<T>[]>;
 /** Like waitAll but resolves early when all promises settle, filling the array with results in-place.
  * @param xs Array of promises.
  */
@@ -22,7 +22,7 @@ export declare const waitTap: T_waitTap;
 /** Waits for all promises mapped by the fn. */
 export declare const forEachParallel: T_forEachParallel;
 /** The same as compose, but waits for promises in chains and returns a Promise.  */
-export declare const composeAsync: <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, Promise<TOut>>;
+export declare const composeAsync: T_composeAsync;
 /**
  * @param cond async (v, k) -> boolean.
  * @param data T extends any[] | AnyObject.

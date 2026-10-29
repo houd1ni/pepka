@@ -34,7 +34,7 @@
     "url": "git+https://github.com/houd1ni/pepka.git"
   },
   "scripts": {
-    "lint": "eslint src --ext ts",
+    "lint": "eslint . --ext ts",
     "type-check": "tsgo --noEmit --noUnusedLocals --noUnusedParameters && tsgo --noEmit --strict --module esnext --moduleResolution bundler --types node --ignoreConfig tests/types/*.test.ts tests/pepka.spec.ts",
     "test": "tsx node_modules/uvu/bin.js tests spec",
     "gentypes": "tsx scripts/gentypes.ts",
@@ -45,7 +45,7 @@
     "all": "pnpm dev && pnpm prod",
     "watch": "nodemon --watch src --ext ts,js --exec \"pnpm run dev\""
   },
-  "version": "1.15.0",
+  "version": "1.16.0",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.2",
@@ -60,6 +60,6 @@
     "typescript-eslint": "^8.68.0",
     "uvu": "^0.5.6"
   },
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1",
   "sideEffects": false
 }

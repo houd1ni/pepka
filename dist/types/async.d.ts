@@ -1,5 +1,5 @@
-import type { AnyFunc, AnyObject, Composed } from './base.js';
-export type T_composeAsync = <TIn extends any[] = any[], TOut = any>(...fns: AnyFunc[]) => Composed<TIn, Promise<TOut>>;
+import type { AnyFunc, AnyObject, T_compose, T_composeAsync, Unwrap } from './base.js';
+export type { T_compose, T_composeAsync, Unwrap };
 export type T_debounce = <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => Promise<ReturnType<T>>;
 export type T_throttle = <T extends AnyFunc>(time: number, fn: T) => (...args: Parameters<T>) => ReturnType<T>;
 export type T_qfilterAsync = {

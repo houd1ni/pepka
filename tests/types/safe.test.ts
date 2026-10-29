@@ -119,6 +119,12 @@ const _whenR2: any = when((x: number) => x > 0, (x: number) => x * 2, 5)
 // ── compose ──
 const _composed: (x: number) => number = compose((x: number) => x + 1, (x: number) => x * 2)
 const _composedR: number = _composed(5)
+// the chain answers what its leftmost step answers, whatever the `any`s inside
+const _composedInfer: (s: string) => number = compose((xs: string[]) => xs.length, (s: string) => [s])
+const _composedInferR: number = _composedInfer('a')
+// @ts-expect-error a step's input must be the previous step's output
+const _composedBroken = compose((n: number) => n.toString(), (s: string) => s + 'x')
+const _composedBrokenR: string = _composedBroken('a')
 
 // ── bind (fn, context) ──
 const _bound: any = bind(function(this: any, x: number) { return x } as any, { a: 1 })
