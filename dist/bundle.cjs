@@ -491,7 +491,7 @@ var quniqBy = quniqWith;
 
 // src/safe.ts
 var { assign } = Object;
-var take = (argN) => (...args) => args[argN];
+var take = ((argN, ...args) => args.length ? args[argN] : (...rest) => rest[argN]);
 var ifElse = curry(
   (cond2, pipeYes, pipeNo, s) => cond2(s) ? pipeYes(s) : pipeNo(s)
 );
@@ -515,9 +515,9 @@ var nth = curry2((i, data) => data[i]);
 var slice = curry3(
   (from, to2, o) => o.slice(from, isNum(to2) ? to2 : inf)
 );
-var flip = (fn) => curry2(
+var flip = ((fn) => curry2(
   (b, a) => fn(a, b)
-);
+));
 var head = nth(0);
 var tail = slice(1, inf);
 var last = (s) => s[length(s) - 1];
@@ -535,8 +535,8 @@ var indexOf = curry2((x, xs) => findIndex(equals(x), xs));
 var divide = curry2((a, b) => b / a);
 var not = (x) => !x;
 var keys = (o) => Object.keys(o);
-var values = (o) => Object.values(o);
-var toPairs = (o) => Object.entries(o);
+var values = ((o) => Object.values(o));
+var toPairs = ((o) => Object.entries(o));
 var test = curry2((re, s) => re.test(s));
 var tap = curry2((fn, x) => {
   fn(x);

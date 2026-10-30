@@ -7,7 +7,7 @@ import type {
     T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr,
     T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq,
     T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test,
-    T_uniqWith, T_zip, T_zipObj, T_zipWith
+    T_uniqWith, T_zip, T_zipObj, T_zipWith, T_flip, T_take, T_toPairs, T_values
 } from '../types/safe'
 import { Split } from '../types/string'
 import { always, eq, equals, identity, includes, length, symbol, type } from './common'
@@ -24,7 +24,8 @@ const {assign} = Object
 /** Returns a function that takes N arguments and returns the argN-th one (0-indexed).
  * @param argN Index of the argument to return.
  * @returns A function that returns its argN-th argument. */
-export const take = (argN: number) => (...args: any[]) => args[argN]
+export const take = ((argN: number, ...args: any[]) =>
+  args.length ? args[argN] : (...rest: any[]) => rest[argN]) as T_take
 /** Conditional branching. If cond(s) is true, calls pipeYes(s), otherwise pipeNo(s).
  * @param cond Predicate function.
  * @param pipeYes Function to call when cond is true.
@@ -89,9 +90,9 @@ export const slice = curry3(
 /** Reverses the argument order of a binary function. Not curried.
  * @param fn Binary function to flip.
  * @returns A curried function that calls fn(a, b) when given (b, a). */
-export const flip = <T extends AnyFunc>(fn: T) => curry2(
+export const flip = (<T extends AnyFunc>(fn: T) => curry2(
   (b: Parameters<T>[1], a: Parameters<T>[0]) => fn(a, b)
-)
+)) as T_flip
 type FirstChar<T extends string> = T extends `${infer First}${string}`
   ? Split<T>['length'] extends 1 ? T : FirstChar<First>
   : T
@@ -181,10 +182,10 @@ type T_keys = {
 export const keys: T_keys = (o: any) => Object.keys(o)
 /** Returns the values of an object or array.
  * @param o Object or array to get values from. */
-export const values = (o: AnyObject | any[]) => Object.values(o)
+export const values = (<T extends AnyObject | any[]>(o: T) => Object.values(o)) as T_values
 /** Returns the entries of an object or array as [key, value] pairs.
  * @param o Object or array to get entries from. */
-export const toPairs = (o: AnyObject | any[]) => Object.entries(o)
+export const toPairs = (<T extends AnyObject | any[]>(o: T) => Object.entries(o)) as T_toPairs
 /** Tests if a string matches a regex.
  * @param re RegExp to test with.
  * @param s String to test. */

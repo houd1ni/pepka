@@ -16,6 +16,11 @@ export type ComposedOf<Fns extends readonly AnyFunc[]> = Fns extends readonly [i
 /** Step by step: each one answers what the step above it takes, either way round — an overloaded step (`head`,
  *  `tail`) names one parameter at a time, so `any`-shaped matches count. A link nothing fits is `never`. */
 export type Links<Fns extends readonly AnyFunc[]> = Fns extends readonly [infer A extends AnyFunc, infer B extends AnyFunc, ...infer Rest extends readonly AnyFunc[]] ? [ReturnType<B>] extends [Parameters<A>[0]] ? [A, ...Links<[B, ...Rest]>] : [Parameters<A>[0]] extends [ReturnType<B>] ? [A, ...Links<[B, ...Rest]>] : never : Fns;
+export type Apply<F, A> = F extends (a: A, ...rest: any[]) => infer R ? R : never;
+export type ApplyArgs<F, A extends any[]> = F extends (...args: A) => infer R ? R : never;
+export type Eval<Fns extends readonly AnyFunc[], A extends any[]> = Fns extends readonly [...infer Init extends AnyFunc[], infer L extends AnyFunc] ? Init extends readonly [] ? ApplyArgs<L, A> : Eval<Init, [Apply<L, A[0]>]> : never;
+export type Broken<Fns extends readonly AnyFunc[]> = [Links<Fns>] extends [never] ? true : false;
+export type ComposedChain<Fns extends readonly AnyFunc[]> = <A extends Parameters<LastOf<Fns>>>(...xs: A) => Eval<Fns, A>;
 /** A chain answers what its leftmost step answers, and takes what its rightmost step takes.
  *  Every count from one to seventeen names its own type for each link, so a step that is generic (`waitAll`) is
  *  inferred at its place in the chain instead of widening to `unknown`. */
@@ -39,6 +44,7 @@ export type T_compose = {
     <A extends AnyArgs, B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, R>(f1: (b: B16) => R, f2: (b: B15) => B16, f3: (b: B14) => B15, f4: (b: B13) => B14, f5: (b: B12) => B13, f6: (b: B11) => B12, f7: (b: B10) => B11, f8: (b: B9) => B10, f9: (b: B8) => B9, f10: (b: B7) => B8, f11: (b: B6) => B7, f12: (b: B5) => B6, f13: (b: B4) => B5, f14: (b: B3) => B4, f15: (b: B2) => B3, f16: (b: B1) => B2, f17: (...xs: A) => B1): (...xs: A) => R;
     /** eighteen steps and up: the same links, judged one pair at a time, so a long chain is not `any` */
     <Fns extends LongChain>(...fns: Fns & Links<Fns>): ComposedOf<Fns>;
+    <Fns extends readonly AnyFunc[]>(...fns: Fns & (Broken<Fns> extends true ? [never] : unknown)): ComposedChain<Fns>;
 };
 /** The same, but every step may answer a promise and so does the chain. */
 export type T_composeAsync = {

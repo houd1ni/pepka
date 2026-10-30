@@ -93,6 +93,7 @@ import {
   tap,
   test,
   toPairs,
+  typeIs,
   uniq,
   uniqBy,
   uniqWith,
@@ -125,6 +126,11 @@ const _composedInferR: number = _composedInfer('a')
 // @ts-expect-error a step's input must be the previous step's output
 const _composedBroken = compose((n: number) => n.toString(), (s: string) => s + 'x')
 const _composedBrokenR: string = _composedBroken('a')
+const _composedGeneric = compose(prop('href'), nth(1))
+const _composedGenericT: (p: readonly [string, URL]) => string = _composedGeneric
+const _composedGenericR: string = _composedGeneric(['a', new URL('https://x/')] as const)
+// @ts-expect-error
+const _composedBrokenMid = compose((x: number) => x, (n: number) => n + 1, (s: string) => s)
 
 // ── bind (fn, context) ──
 const _bound: any = bind(function(this: any, x: number) { return x } as any, { a: 1 })
@@ -494,3 +500,13 @@ const _flipBind = flip(bind)
 const _flipBindR: AnyFunc = _flipBind({ a: 1 } as AnyObject, ((x: number) => x) as AnyFunc)
 const _flipCallWith = flip(callWith)
 const _flipCallWithR: any = _flipCallWith(((x: number) => x * 2) as AnyFunc, [5])
+
+const _takeApplied: string = take(1, 'a', 'b')
+const _takeCurried: any = take(1)(10, 20, 30)
+const _nthReadonly: number = nth(1, [1, 2] as readonly number[])
+const _nthCurriedReadonly: number = nth(1)([1, 2] as readonly number[])
+const _narrow_me: string | number = 'x' as string | number
+if(typeIs('String')(_narrow_me)) {
+  const _narrowed: string = _narrow_me
+}
+const _not_narrowed: boolean = typeIs('Whatever' as string)(_narrow_me)

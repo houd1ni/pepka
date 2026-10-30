@@ -65,15 +65,23 @@ export type T_join = {
   (delim: string, arr: ArrayLike<any> & {join: AnyFunc<string, [delim: string]>}): string
 }
 
+export type FlipResult<A, B, R, Rest extends any[] = []> =
+  & ((b: B, a: A, ...rest: Rest) => R)
+  & ((b: B) => (a: A, ...rest: Rest) => R)
+export type T_flip = {
+  <A, B, R, Rest extends any[] = []>(fn: (a: A, b: B, ...rest: Rest) => R): FlipResult<A, B, R, Rest>
+  <A, B, R>(fn: (a: A) => (b: B) => R): FlipResult<A, B, R>
+}
+
 export type T_slice = {
   (from: number): {
-    <T>(to: number, xs: T[]): T[]
     (to: number, xs: string): string
-    (to: number): <T>(xs: T[]) => T[]
-    (to: number): (xs: string) => string
+    <T>(to: number, xs: T[]): T[]
+    (to: number): <T extends any[] | string>(xs: T) => T
   }
-  (from: number, to: number): <T>(xs: T[]) => T[]
-  (from: number, to: number): (xs: string) => string
+  (from: number, to: number): <T extends any[] | string>(xs: T) => T
+  (from: number, to: number, xs: string): string
+  <T>(from: number, to: number, xs: T[]): T[]
   <T>(from: number, to: number, xs: T[]): T[]
   (from: number, to: number, xs: string): string
 }
@@ -98,13 +106,22 @@ export type T_keys = {
   <T extends AnyObject>(o: T): (keyof T)[]
 }
 
+export type T_values = <T extends AnyObject | readonly any[]>(o: T) =>
+  T extends readonly (infer E)[] ? E[] : T[keyof T][]
+
+export type T_toPairs = <T extends AnyObject | readonly any[]>(o: T) =>
+  T extends readonly (infer E)[] ? [string, E][] : {[K in keyof T]: [K & string, T[K]]}[keyof T][]
+
+export type T_take = {
+  (argN: number): (...args: any[]) => any
+  <A extends any[], I extends keyof A & number>(argN: I, ...args: A): A[I]
+  <A extends any[]>(argN: number, ...args: A): A[number]
+}
+
 export type T_nth = {
-  (i: number): {
-    <T>(data: T[]): T
-    (data: string): string
-  }
-  <T>(i: number, data: T[]): T
+  <T>(i: number, data: readonly T[]): T
   (i: number, data: string): string
+  (i: number): <T extends readonly any[] | string>(data: T) => T extends readonly (infer E)[] ? E : string
 }
 
 export type T_sort = {

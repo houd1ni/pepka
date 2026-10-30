@@ -1,10 +1,10 @@
 import { AnyFunc, AnyObject, IndexesOfArray, T_compose } from './types/base.js';
-import type { T_all, T_allPass, T_any, T_anyPass, T_append, T_assoc, T_assocPath, T_bind, T_both, T_callWith, T_concat, T_cond, T_diff, T_filter, T_find, T_findIndex, T_flatTo, T_forEach, T_genBy, T_indexOf, T_intersection, T_join, T_map, T_mapKeys, T_mapObj, T_memoize, T_mergeDeep, T_mergeDeepAdd, T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr, T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq, T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test, T_uniqWith, T_zip, T_zipObj, T_zipWith } from './types/safe.js';
+import type { T_all, T_allPass, T_any, T_anyPass, T_append, T_assoc, T_assocPath, T_bind, T_both, T_callWith, T_concat, T_cond, T_diff, T_filter, T_find, T_findIndex, T_flatTo, T_forEach, T_genBy, T_indexOf, T_intersection, T_join, T_map, T_mapKeys, T_mapObj, T_memoize, T_mergeDeep, T_mergeDeepAdd, T_mergeDeepX, T_mergeShallow, T_nth, T_omit, T_overProp, T_pathEq, T_pathOr, T_pathsEq, T_pick, T_pickBy, T_prepend, T_prop, T_propEq, T_propsEq, T_range, T_reduce, T_replace, T_slice, T_sort, T_split, T_tap, T_test, T_uniqWith, T_zip, T_zipObj, T_zipWith, T_flip, T_take, T_toPairs, T_values } from './types/safe.js';
 import { Split } from './types/string.js';
 /** Returns a function that takes N arguments and returns the argN-th one (0-indexed).
  * @param argN Index of the argument to return.
  * @returns A function that returns its argN-th argument. */
-export declare const take: (argN: number) => (...args: any[]) => any;
+export declare const take: T_take;
 /** Conditional branching. If cond(s) is true, calls pipeYes(s), otherwise pipeNo(s).
  * @param cond Predicate function.
  * @param pipeYes Function to call when cond is true.
@@ -35,12 +35,7 @@ export declare const slice: T_slice;
 /** Reverses the argument order of a binary function. Not curried.
  * @param fn Binary function to flip.
  * @returns A curried function that calls fn(a, b) when given (b, a). */
-export declare const flip: <T extends AnyFunc>(fn: T) => {
-    (a: import("./curry.js").Placeholder, b: Parameters<T>[0]): (a: Parameters<T>[1]) => any;
-    (a: Parameters<T>[1], b: import("./curry.js").Placeholder): (b: Parameters<T>[0]) => any;
-    (a: Parameters<T>[1]): (b: Parameters<T>[0]) => any;
-    (a: Parameters<T>[1], b: Parameters<T>[0]): any;
-};
+export declare const flip: T_flip;
 type FirstChar<T extends string> = T extends `${infer First}${string}` ? Split<T>['length'] extends 1 ? T : FirstChar<First> : T;
 type HeadOverload = {
     <T extends string>(s: T): FirstChar<T>;
@@ -159,10 +154,10 @@ type T_keys = {
 export declare const keys: T_keys;
 /** Returns the values of an object or array.
  * @param o Object or array to get values from. */
-export declare const values: (o: AnyObject | any[]) => any[];
+export declare const values: T_values;
 /** Returns the entries of an object or array as [key, value] pairs.
  * @param o Object or array to get entries from. */
-export declare const toPairs: (o: AnyObject | any[]) => [string, any][];
+export declare const toPairs: T_toPairs;
 /** Tests if a string matches a regex.
  * @param re RegExp to test with.
  * @param s String to test. */
